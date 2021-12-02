@@ -1,3 +1,5 @@
+library(dplyr)
+library(tidyr)
 vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
   #handle NAs
   mutate_if(is.character, ~replace(., .x == "-", NA)) %>%
@@ -47,4 +49,23 @@ vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
                 !is.na(tcaminata_3era_etapa) &
                 !is.na(serv_4ta_etapa) & 
                 !is.na(t_4ta_etapa)) ~ 1,
-           T ~ 0))
+           T ~ 0)) %>%
+  #create OD
+  unite(paraderosubida, paraderobajada,
+        col = "OD",
+        sep = "*",
+        remove = F)
+#valid status
+valid_stat <- group_by(vjs_pma, 
+                       OD, 
+                       valid) %>%
+  summarise(Demanda = sum(Demanda)) %>%
+  pivot_wider(names_from = valid, values_from = Demanda) %>%
+  mutate_if(is.numeric, ~replace_na(., 0)) %>%
+  mutate(f.valid = ((`1` + `0`)/`1`)) %>%
+  ungroup() %>%
+  select(OD, f.valid) %>%
+  filter(f.valid != Inf)
+#create valid data
+vjs_pma <- left_join(vjs_pma, valid_stat) %>%
+  mutate(Demanda = Demanda*f.valid)
