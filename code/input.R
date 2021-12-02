@@ -1,0 +1,35 @@
+BBDD_vjs <- function(DDBB_v, per) {
+  library(DBI)
+  library(dtplyr)
+  library(dplyr)
+  library(data.table)
+  #connection
+  con <- DBI::dbConnect(odbc::odbc(),
+                        Driver   = "SQL Server",
+                        Server   = "10.222.128.21,9433",
+                        Database = "uchile",
+                        UID      = rstudioapi::askForPassword("Database user"),
+                        PWD      = rstudioapi::askForPassword("Database password"),
+                        encoding = "latin1")
+  #trips
+  sql.trips <- paste0("SELECT TOP 1000 SUM(CAST(factorexpansion AS FLOAT)) AS Demanda, periodomediodeviaje, 
+paraderosubida, paraderobajada, netapa,
+serv_1era_etapa, t_1era_etapa,	tespera_1era_etapa, ttrasbordo_1era_etapa, tcaminata_1era_etapa,
+serv_2da_etapa,	t_2da_etapa, tespera_2da_etapa, ttrasbordo_2da_etapa, tcaminata_2da_etapa, 
+serv_3era_etapa, t_3era_etapa, tespera_3era_etapa, ttrasbordo_3era_etapa, tcaminata_3era_etapa, 
+serv_4ta_etapa, t_4ta_etapa
+FROM [uchile].[dbo].", DDBB_v,
+"WHERE periodomediodeviaje = ", per, " AND paraderosubida <> '-' AND paraderobajada <> '-'
+GROUP BY periodomediodeviaje, 
+paraderosubida, paraderobajada, netapa,
+serv_1era_etapa, t_1era_etapa,	tespera_1era_etapa, ttrasbordo_1era_etapa, tcaminata_1era_etapa,
+serv_2da_etapa,	t_2da_etapa, tespera_2da_etapa, ttrasbordo_2da_etapa, tcaminata_2da_etapa, 
+serv_3era_etapa, t_3era_etapa, tespera_3era_etapa, ttrasbordo_3era_etapa, tcaminata_3era_etapa, 
+serv_4ta_etapa, t_4ta_etapa;")
+  trips <- dbGetQuery(conn = con,
+                      statement = sql.trips)
+  dbDisconnect(con)
+  return(trips)
+}
+  
+  
