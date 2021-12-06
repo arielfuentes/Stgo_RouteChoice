@@ -1,8 +1,8 @@
+#adatrap query ----
 BBDD_vjs <- function(DDBB_v, per) {
   library(DBI)
-  library(dtplyr)
   library(dplyr)
-  library(data.table)
+  library(tidyr)
   #connection
   con <- DBI::dbConnect(odbc::odbc(),
                         Driver   = "SQL Server",
@@ -27,9 +27,20 @@ serv_2da_etapa,	t_2da_etapa, tespera_2da_etapa, ttrasbordo_2da_etapa, tcaminata_
 serv_3era_etapa, t_3era_etapa, tespera_3era_etapa, ttrasbordo_3era_etapa, tcaminata_3era_etapa, 
 serv_4ta_etapa, t_4ta_etapa;")
   trips <- dbGetQuery(conn = con,
-                      statement = sql.trips)
+                      statement = sql.trips) %>%
+    as_tibble()
   dbDisconnect(con)
   return(trips)
 }
-  
-  
+#lines dicc ----
+dicc_lines <- function(shp){
+  library(sf)
+  library(dplyr)
+  library(readr)
+  user_lines <- st_read(paste0("data/", shp)) %>%
+    st_drop_geometry() %>%
+    select(ROUTE_NAME, COD_USUARI, COD_SINRUT, COD_USUSEN) %>%
+    filter(COD_SINRUT != "NA") %>%
+    distinct() %>%
+    bind_rows(read_delim("data/faltantes.csv", ";"))
+}

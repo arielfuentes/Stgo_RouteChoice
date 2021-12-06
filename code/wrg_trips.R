@@ -68,4 +68,16 @@ valid_stat <- group_by(vjs_pma,
   filter(f.valid != Inf)
 #create valid data
 vjs_pma <- left_join(vjs_pma, valid_stat) %>%
-  mutate(Demanda = Demanda*f.valid)
+  mutate(Demanda = Demanda*f.valid,
+         interpar = case_when(paraderosubida == paraderobajada ~ 0,
+                              T ~ 1)) %>%
+  filter(valid ==1,
+         interpar ==1) %>%
+  select(-c("Demanda", "valid", "f.valid", "interpar", "OD")) %>%
+  mutate_if(is.numeric, ~replace_na(., 0)) #%>%
+#add lines dictionary
+  # left_join(dicc_lines("Shapes 06Jul2019.shp"))
+
+  #identify routes
+  # mutate(rts = case_when(netapa == 1 ~ serv_1era_etapa,
+  #                        netapa == 2 ~ serv_1era_etapa))
