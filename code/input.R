@@ -39,6 +39,7 @@ dicc_lines <- function(shp){
   library(readr)
   user_lines <- st_read(paste0("data/", shp)) %>%
     st_drop_geometry() %>%
+    as_tibble() %>%
     select(ROUTE_NAME, COD_USUARI, COD_SINRUT, COD_USUSEN) %>%
     filter(COD_SINRUT != "NA") %>%
     distinct() %>%
