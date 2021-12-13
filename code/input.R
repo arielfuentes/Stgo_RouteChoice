@@ -45,3 +45,41 @@ dicc_lines <- function(shp){
     distinct() %>%
     bind_rows(read_delim("data/faltantes.csv", ";"))
 }
+
+stops <- function(file, sheet){
+  library(readxl)
+  stops_bus <- read_excel(paste0("data/", file),
+                          sheet = sheet, 
+                          col_types = c(rep("skip", 6), 
+                                        "text", "text", 
+                                        rep("skip", 4), 
+                                        "numeric", "numeric", 
+                                        rep("skip", 3))) %>%
+    filter(`Código paradero TS` != "POR DEFINIR") %>%
+    distinct()
+  return(stops_bus)
+}
+
+x <- stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
+           "01Abr2019 al 22Jun2019")
+
+stops_bus <- bind_rows(stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
+                "23Jun2019 al 06Jul2019"), 
+          stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
+                "01Abr2019 al 22Jun2019"),
+          stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
+                "01Mar2019 al 31Mar2019")) %>%
+  group_by(`Código paradero TS`, `Código  paradero Usuario`) %>%
+  summarise(x = mean(x), y = mean(y)) %>%
+  ungroup() %>%
+  select(CODINFRA = `Código paradero TS`, 
+         SIMT = `Código  paradero Usuario`, 
+         x,
+         y)
+stops_mt <- read_delim("data/dicc_mt.csv", delim = ";") %>%
+  select(CODINFRA, X, Y) %>%
+  mutate(SIMT = CODINFRA) %>%
+  select(CODINFRA, SIMT, x = X, y = Y)
+
+stops_df <- bind_rows(stops_bus, stops_mt)
+rm(stops_bus, stops_mt)
