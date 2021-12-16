@@ -117,4 +117,17 @@ vjs_pma <- left_join(vjs_pma,
             "id_1era",
             "id_2da",
             "id_3era",
-            "id_4ta"))
+            "id_4ta")) %>%
+  na.omit()
+
+vjs_pma <- left_join(vjs_pma, rename(stops_df, 
+                          paraderosubida = CODINFRA,
+                          paraderosubida_SIMT = SIMT,
+                          x_sub = x,
+                          y_sub = y)) %>%
+  left_join(rename(stops_df, 
+                   paraderobajada = CODINFRA,
+                   paraderobajada_SIMT = SIMT,
+                   x_baj = x,
+                   y_baj = y)) %>%
+  select(-c("paraderosubida", "paraderobajada"))

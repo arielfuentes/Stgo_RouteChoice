@@ -60,10 +60,8 @@ stops <- function(file, sheet){
   return(stops_bus)
 }
 
-x <- stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
-           "01Abr2019 al 22Jun2019")
-
 library(dplyr)
+library(readr)
 stops_bus <- bind_rows(stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
                 "23Jun2019 al 06Jul2019"), 
           stops("2019-07-06_consolidado_anexo4_(Circunvalación)_anual.xlsx", 
@@ -77,7 +75,7 @@ stops_bus <- bind_rows(stops("2019-07-06_consolidado_anexo4_(Circunvalación)_an
          SIMT = `Código  paradero Usuario`, 
          x,
          y)
-library(readr)
+
 stops_mt <- read_delim("data/dicc_mt.csv", delim = ";") %>%
   select(CODINFRA, X, Y) %>%
   mutate(SIMT = CODINFRA) %>%
