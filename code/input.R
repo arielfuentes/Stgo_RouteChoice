@@ -14,18 +14,18 @@ BBDD_vjs <- function(DDBB_v, per) {
   #trips
   sql.trips <- paste0("SELECT TOP 1000 SUM(CAST(factorexpansion AS FLOAT)) AS Demanda, periodomediodeviaje, 
 paraderosubida, paraderobajada, netapa,
-serv_1era_etapa, t_1era_etapa,	tespera_1era_etapa, ttrasbordo_1era_etapa, tcaminata_1era_etapa,
-serv_2da_etapa,	t_2da_etapa, tespera_2da_etapa, ttrasbordo_2da_etapa, tcaminata_2da_etapa, 
-serv_3era_etapa, t_3era_etapa, tespera_3era_etapa, ttrasbordo_3era_etapa, tcaminata_3era_etapa, 
-serv_4ta_etapa, t_4ta_etapa
+serv_1era_etapa, AVG(CAST(REPLACE(t_1era_etapa, '-', '') AS FLOAT)) AS t_1era_etapa,	AVG(CAST(REPLACE(tespera_1era_etapa, '-', '') AS FLOAT)) AS tespera_1era_etapa, AVG(CAST(REPLACE(ttrasbordo_1era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_1era_etapa, AVG(CAST(REPLACE(tcaminata_1era_etapa, '-', '') AS FLOAT)) AS tcaminata_1era_etapa,
+serv_2da_etapa,	AVG(CAST(REPLACE(t_2da_etapa, '-', '') AS FLOAT)) AS t_2da_etapa, AVG(CAST(REPLACE(tespera_2da_etapa, '-', '') AS FLOAT)) AS tespera_2da_etapa, AVG(CAST(REPLACE(ttrasbordo_2da_etapa, '-', '') AS FLOAT)) AS ttrasbordo_2da_etapa, AVG(CAST(REPLACE(tcaminata_2da_etapa, '-', '') AS FLOAT)) AS tcaminata_2da_etapa, 
+serv_3era_etapa, AVG(CAST(REPLACE(t_3era_etapa, '-', '') AS FLOAT)) AS t_3era_etapa, AVG(CAST(REPLACE(tespera_3era_etapa, '-', '') AS FLOAT)) AS tespera_3era_etapa, AVG(CAST(REPLACE(ttrasbordo_3era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_3era_etapa, AVG(CAST(REPLACE(tcaminata_3era_etapa, '-', '') AS FLOAT)) AS tcaminata_3era_etapa, 
+serv_4ta_etapa, AVG(CAST(REPLACE(t_4ta_etapa, '-', '') AS FLOAT)) AS t_4ta_etapa
 FROM [uchile].[dbo].", DDBB_v,
 "WHERE periodomediodeviaje = ", per, " AND paraderosubida <> '-' AND paraderobajada <> '-'
 GROUP BY periodomediodeviaje, 
 paraderosubida, paraderobajada, netapa,
-serv_1era_etapa, t_1era_etapa,	tespera_1era_etapa, ttrasbordo_1era_etapa, tcaminata_1era_etapa,
-serv_2da_etapa,	t_2da_etapa, tespera_2da_etapa, ttrasbordo_2da_etapa, tcaminata_2da_etapa, 
-serv_3era_etapa, t_3era_etapa, tespera_3era_etapa, ttrasbordo_3era_etapa, tcaminata_3era_etapa, 
-serv_4ta_etapa, t_4ta_etapa;")
+serv_1era_etapa, 
+serv_2da_etapa,	
+serv_3era_etapa, 
+serv_4ta_etapa;")
   trips <- dbGetQuery(conn = con,
                       statement = sql.trips) %>%
     as_tibble()
@@ -45,7 +45,7 @@ dicc_lines <- function(shp){
     distinct() %>%
     bind_rows(read_delim("data/faltantes.csv", ";"))
 }
-
+#read TPub stops ---- 
 stops <- function(file, sheet){
   library(readxl)
   stops_bus <- read_excel(paste0("data/", file),
@@ -83,3 +83,7 @@ stops_mt <- read_delim("data/dicc_mt.csv", delim = ";") %>%
 
 stops_df <- bind_rows(stops_bus, stops_mt)
 rm(stops_bus, stops_mt)
+
+#read zones ----
+library(sf)
+zones <- st_read("data/Zonificacion_EOD2012.shp")
