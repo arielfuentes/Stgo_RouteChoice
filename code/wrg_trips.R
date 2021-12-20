@@ -130,4 +130,13 @@ vjs_pma <- left_join(vjs_pma, rename(stops_df,
                    paraderobajada_SIMT = SIMT,
                    x_baj = x,
                    y_baj = y)) %>%
-  select(-c("paraderosubida", "paraderobajada"))
+  select(-c("paraderosubida", "paraderobajada")) %>%
+  #group trip parameters
+  mutate(tviaje = t_1era_etapa + t_2da_etapa + t_3era_etapa + t_4ta_etapa,
+         tesp = tespera_1era_etapa + tespera_2da_etapa + tespera_3era_etapa,
+         tb2 = ttrasbordo_1era_etapa + ttrasbordo_2da_etapa + ttrasbordo_3era_etapa,
+         tcam = tcaminata_1era_etapa + tcaminata_2da_etapa + tcaminata_3era_etapa) %>%
+  select(-c("t_1era_etapa", "t_2da_etapa", "t_3era_etapa", "t_4ta_etapa",
+            "tespera_1era_etapa", "tespera_2da_etapa", "tespera_3era_etapa",
+            "ttrasbordo_1era_etapa", "ttrasbordo_2da_etapa", "ttrasbordo_3era_etapa", 
+            "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa"))
