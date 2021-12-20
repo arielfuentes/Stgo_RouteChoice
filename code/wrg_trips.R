@@ -101,7 +101,7 @@ vjs_pma <- left_join(vjs_pma,
                    serv_4ta_etapa = COD_SINRUT,
                    serv_4ta_usu = COD_USUSEN,
                    id_4ta = id_serv)) %>%
-  #identify routes ----
+  ##dentify routes ----
   mutate(rts = case_when(netapa == 1 ~ as.character(id_1era),
                          netapa == 2 ~ paste(id_1era, "|", id_2da),
                          netapa == 3 ~ paste(id_1era, "|", id_2da, "|", id_3era),
@@ -131,7 +131,7 @@ vjs_pma <- left_join(vjs_pma, rename(stops_df,
                    x_baj = x,
                    y_baj = y)) %>%
   select(-c("paraderosubida", "paraderobajada")) %>%
-  #group trip parameters
+  ##group trip parameters ----
   mutate(tviaje = t_1era_etapa + t_2da_etapa + t_3era_etapa + t_4ta_etapa,
          tesp = tespera_1era_etapa + tespera_2da_etapa + tespera_3era_etapa,
          tb2 = ttrasbordo_1era_etapa + ttrasbordo_2da_etapa + ttrasbordo_3era_etapa,
