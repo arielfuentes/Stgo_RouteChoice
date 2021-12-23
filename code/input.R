@@ -86,4 +86,5 @@ rm(stops_bus, stops_mt)
 
 #read zones ----
 library(sf)
-zones <- st_read("data/Zonificacion_EOD2012.shp")
+zones <- st_read("data/Zonificacion_EOD2012.shp") %>%
+  st_make_valid()
