@@ -73,7 +73,7 @@ vjs_pma <- left_join(vjs_pma, valid_stat) %>%
                               T ~ 1)) %>%
   filter(valid ==1,
          interpar ==1) %>%
-  select(-c("Demanda", "valid", "f.valid", "interpar", "OD")) %>%
+  select(-c("valid", "f.valid", "interpar", "OD")) %>%
   mutate_if(is.numeric, ~replace_na(., 0))
 #add lines dictionary
 lines <- dicc_lines("Shapes 06Jul2019.shp") %>%
@@ -101,7 +101,7 @@ vjs_pma <- left_join(vjs_pma,
                    serv_4ta_etapa = COD_SINRUT,
                    serv_4ta_usu = COD_USUSEN,
                    id_4ta = id_serv)) %>%
-  ##dentify routes ----
+  ##Identify routes ----
   mutate(rts = case_when(netapa == 1 ~ as.character(id_1era),
                          netapa == 2 ~ paste(id_1era, "|", id_2da),
                          netapa == 3 ~ paste(id_1era, "|", id_2da, "|", id_3era),
@@ -119,12 +119,20 @@ vjs_pma <- left_join(vjs_pma,
             "id_3era",
             "id_4ta")) %>%
   na.omit()
-
-vjs_pma <- left_join(vjs_pma, rename(stops_df, 
-                          paraderosubida = CODINFRA,
-                          paraderosubida_SIMT = SIMT,
-                          x_sub = x,
-                          y_sub = y)) %>%
+##fix stops names ----
+vjs_pma <- mutate(vjs_pma,
+                  paraderosubida = if_else(paraderosubida == "IRARRAZAVAL  L3", 
+                                           "IRARRAZAVAL L3",
+                                           paraderosubida),
+                  paraderobajada = if_else(paraderobajada == "IRARRAZAVAL ", 
+                                           "IRARRAZAVAL",
+                                           paraderobajada)) %>%
+  ##add SIMT codes ----
+  left_join(rename(stops_df, 
+                   paraderosubida = CODINFRA,
+                   paraderosubida_SIMT = SIMT,
+                   x_sub = x,
+                   y_sub = y)) %>%
   left_join(rename(stops_df, 
                    paraderobajada = CODINFRA,
                    paraderobajada_SIMT = SIMT,
@@ -139,4 +147,5 @@ vjs_pma <- left_join(vjs_pma, rename(stops_df,
   select(-c("t_1era_etapa", "t_2da_etapa", "t_3era_etapa", "t_4ta_etapa",
             "tespera_1era_etapa", "tespera_2da_etapa", "tespera_3era_etapa",
             "ttrasbordo_1era_etapa", "ttrasbordo_2da_etapa", "ttrasbordo_3era_etapa", 
-            "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa"))
+            "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) %>%
+  na.omit()
