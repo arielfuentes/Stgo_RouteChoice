@@ -74,7 +74,8 @@ stops_bus <- bind_rows(stops("2019-07-06_consolidado_anexo4_(Circunvalación)_an
   select(CODINFRA = `Código paradero TS`, 
          SIMT = `Código  paradero Usuario`, 
          x,
-         y)
+         y) %>%
+  filter(SIMT != 15)
 
 stops_mt <- read_delim("data/dicc_mt.csv", delim = ";") %>%
   select(CODINFRA, X, Y) %>%
