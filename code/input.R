@@ -12,7 +12,7 @@ BBDD_vjs <- function(DDBB_v, per) {
                         PWD      = rstudioapi::askForPassword("Database password"),
                         encoding = "latin1")
   #trips
-  sql.trips <- paste0("SELECT TOP 1000 SUM(CAST(factorexpansion AS FLOAT)) AS Demanda, periodomediodeviaje, 
+  sql.trips <- paste0("SELECT TOP 1000 SUM(CAST(factorexpansion AS FLOAT))/5 AS Demanda, periodomediodeviaje, 
 paraderosubida, paraderobajada, netapa,
 serv_1era_etapa, AVG(CAST(REPLACE(t_1era_etapa, '-', '') AS FLOAT)) AS t_1era_etapa,	AVG(CAST(REPLACE(tespera_1era_etapa, '-', '') AS FLOAT)) AS tespera_1era_etapa, AVG(CAST(REPLACE(ttrasbordo_1era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_1era_etapa, AVG(CAST(REPLACE(tcaminata_1era_etapa, '-', '') AS FLOAT)) AS tcaminata_1era_etapa,
 serv_2da_etapa,	AVG(CAST(REPLACE(t_2da_etapa, '-', '') AS FLOAT)) AS t_2da_etapa, AVG(CAST(REPLACE(tespera_2da_etapa, '-', '') AS FLOAT)) AS tespera_2da_etapa, AVG(CAST(REPLACE(ttrasbordo_2da_etapa, '-', '') AS FLOAT)) AS ttrasbordo_2da_etapa, AVG(CAST(REPLACE(tcaminata_2da_etapa, '-', '') AS FLOAT)) AS tcaminata_2da_etapa, 
