@@ -30,7 +30,8 @@ vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
                 !is.na(ttrasbordo_2da_etapa) & 
                 !is.na(tcaminata_2da_etapa) &
                 !is.na(serv_3era_etapa) & 
-                !is.na(t_3era_etapa)) |
+                !is.na(t_3era_etapa) & 
+                !is.na(paraderosubida_2da)) |
              (netapa >= 4 & 
                 !is.na(serv_1era_etapa) & 
                 !is.na(t_1era_etapa) &
@@ -48,7 +49,9 @@ vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
                 !is.na(ttrasbordo_3era_etapa) & 
                 !is.na(tcaminata_3era_etapa) &
                 !is.na(serv_4ta_etapa) & 
-                !is.na(t_4ta_etapa)) ~ 1,
+                !is.na(t_4ta_etapa) & 
+                !is.na(paraderosubida_2da) & 
+                !is.na(paraderosubida_3era)) ~ 1,
            T ~ 0)) %>%
   #create OD
   unite(paraderosubida, paraderobajada,
@@ -117,8 +120,8 @@ vjs_pma <- left_join(vjs_pma,
             "id_1era",
             "id_2da",
             "id_3era",
-            "id_4ta")) %>%
-  na.omit()
+            "id_4ta")) #%>%
+  # na.omit()
 ##fix stops names ----
 vjs_pma <- mutate(vjs_pma,
                   paraderosubida = if_else(paraderosubida == "IRARRAZAVAL  L3", 
@@ -134,18 +137,43 @@ vjs_pma <- mutate(vjs_pma,
                    x_sub = x,
                    y_sub = y)) %>%
   left_join(rename(stops_df, 
+                   paraderosubida_2da = CODINFRA,
+                   paraderosubida_2da_SIMT = SIMT,
+                   x_sub2 = x,
+                   y_sub2 = y)) %>%
+  left_join(rename(stops_df, 
+                   paraderosubida_3era = CODINFRA,
+                   paraderosubida_3era_SIMT = SIMT,
+                   x_sub3 = x,
+                   y_sub3 = y)) %>%
+  left_join(rename(stops_df, 
                    paraderobajada = CODINFRA,
                    paraderobajada_SIMT = SIMT,
                    x_baj = x,
                    y_baj = y)) %>%
-  select(-c("paraderosubida", "paraderobajada")) %>%
+  # filter((netapa == 2 & !is.na(paraderosubida)
+  #         & !is.na(paraderosubida_2da_SIMT)
+  #         & !is.na(paraderobajada_2da_SIMT)) |
+  #          (netapa %in% c(3, 4) & !is.na(paraderosubida_2da_SIMT)
+  #           & !is.na(paraderosubida_2da_SIMT) 
+  #           & !is.na(paraderosubida_3era_SIMT)
+  #           | paraderobajada_SIMT != "PF1126")) %>%
+  select(-c("paraderosubida", "paraderosubida_2da", "paraderosubida_3era", "paraderobajada")) %>%
   ##group trip parameters ----
   mutate(tviaje = t_1era_etapa + t_2da_etapa + t_3era_etapa + t_4ta_etapa,
          tesp = tespera_1era_etapa + tespera_2da_etapa + tespera_3era_etapa,
          tb2 = ttrasbordo_1era_etapa + ttrasbordo_2da_etapa + ttrasbordo_3era_etapa,
-         tcam = tcaminata_1era_etapa + tcaminata_2da_etapa + tcaminata_3era_etapa) %>%
+         tcam = tcaminata_1era_etapa + tcaminata_2da_etapa + tcaminata_3era_etapa,
+         geom = case_when(netapa == 1 ~ sprintf("LINESTRING(%s %s, %s %s)", 
+                                                x_sub, y_sub, x_baj, y_baj),
+                          netapa == 2 ~ sprintf("LINESTRING(%s %s, %s %s, %s %s)", 
+                                                x_sub, y_sub, x_sub2, y_sub2, x_baj, y_baj),
+                          netapa %in% c(3, 4) ~ sprintf("LINESTRING(%s %s, %s %s, %s %s, %s %s)", 
+                                                x_sub, y_sub, x_sub2, y_sub2, x_sub3, y_sub3, x_baj, y_baj))) %>%
+  filter(!is.na(geom)) %>%
+  st_as_sf(wkt = "geom", crs = 32719) %>%
   select(-c("t_1era_etapa", "t_2da_etapa", "t_3era_etapa", "t_4ta_etapa",
             "tespera_1era_etapa", "tespera_2da_etapa", "tespera_3era_etapa",
             "ttrasbordo_1era_etapa", "ttrasbordo_2da_etapa", "ttrasbordo_3era_etapa", 
-            "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) %>%
-  na.omit()
+            "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) #%>%
+  # na.omit()
