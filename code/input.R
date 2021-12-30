@@ -12,20 +12,29 @@ BBDD_vjs <- function(DDBB_v, per) {
                         PWD      = rstudioapi::askForPassword("Database password"),
                         encoding = "latin1")
   #trips
-  sql.trips <- paste0("SELECT TOP 1000 SUM(CAST(factorexpansion AS FLOAT))/5 AS Demanda, periodomediodeviaje, 
-paraderosubida, paraderobajada, netapa,
-serv_1era_etapa, AVG(CAST(REPLACE(t_1era_etapa, '-', '') AS FLOAT)) AS t_1era_etapa,	AVG(CAST(REPLACE(tespera_1era_etapa, '-', '') AS FLOAT)) AS tespera_1era_etapa, AVG(CAST(REPLACE(ttrasbordo_1era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_1era_etapa, AVG(CAST(REPLACE(tcaminata_1era_etapa, '-', '') AS FLOAT)) AS tcaminata_1era_etapa,
-serv_2da_etapa,	AVG(CAST(REPLACE(t_2da_etapa, '-', '') AS FLOAT)) AS t_2da_etapa, AVG(CAST(REPLACE(tespera_2da_etapa, '-', '') AS FLOAT)) AS tespera_2da_etapa, AVG(CAST(REPLACE(ttrasbordo_2da_etapa, '-', '') AS FLOAT)) AS ttrasbordo_2da_etapa, AVG(CAST(REPLACE(tcaminata_2da_etapa, '-', '') AS FLOAT)) AS tcaminata_2da_etapa, 
-serv_3era_etapa, AVG(CAST(REPLACE(t_3era_etapa, '-', '') AS FLOAT)) AS t_3era_etapa, AVG(CAST(REPLACE(tespera_3era_etapa, '-', '') AS FLOAT)) AS tespera_3era_etapa, AVG(CAST(REPLACE(ttrasbordo_3era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_3era_etapa, AVG(CAST(REPLACE(tcaminata_3era_etapa, '-', '') AS FLOAT)) AS tcaminata_3era_etapa, 
-serv_4ta_etapa, AVG(CAST(REPLACE(t_4ta_etapa, '-', '') AS FLOAT)) AS t_4ta_etapa
-FROM [uchile].[dbo].", DDBB_v,
-"WHERE periodomediodeviaje = ", per, " AND paraderosubida <> '-' AND paraderobajada <> '-'
-GROUP BY periodomediodeviaje, 
-paraderosubida, paraderobajada, netapa,
-serv_1era_etapa, 
-serv_2da_etapa,	
-serv_3era_etapa, 
-serv_4ta_etapa;")
+  sql.trips <- paste0("SELECT SUM(CAST(factorexpansion AS FLOAT))/5 AS Demanda, 
+  periodomediodeviaje,
+  netapa,
+  paraderosubida,
+  paraderosubida_2da,
+  paraderosubida_3era,
+  paraderobajada,
+  serv_1era_etapa, AVG(CAST(REPLACE(t_1era_etapa, '-', '') AS FLOAT)) AS t_1era_etapa,	AVG(CAST(REPLACE(tespera_1era_etapa, '-', '') AS FLOAT)) AS tespera_1era_etapa, AVG(CAST(REPLACE(ttrasbordo_1era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_1era_etapa, AVG(CAST(REPLACE(tcaminata_1era_etapa, '-', '') AS FLOAT)) AS tcaminata_1era_etapa,
+  serv_2da_etapa,	AVG(CAST(REPLACE(t_2da_etapa, '-', '') AS FLOAT)) AS t_2da_etapa, AVG(CAST(REPLACE(tespera_2da_etapa, '-', '') AS FLOAT)) AS tespera_2da_etapa, AVG(CAST(REPLACE(ttrasbordo_2da_etapa, '-', '') AS FLOAT)) AS ttrasbordo_2da_etapa, AVG(CAST(REPLACE(tcaminata_2da_etapa, '-', '') AS FLOAT)) AS tcaminata_2da_etapa, 
+  serv_3era_etapa, AVG(CAST(REPLACE(t_3era_etapa, '-', '') AS FLOAT)) AS t_3era_etapa, AVG(CAST(REPLACE(tespera_3era_etapa, '-', '') AS FLOAT)) AS tespera_3era_etapa, AVG(CAST(REPLACE(ttrasbordo_3era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_3era_etapa, AVG(CAST(REPLACE(tcaminata_3era_etapa, '-', '') AS FLOAT)) AS tcaminata_3era_etapa, 
+  serv_4ta_etapa, AVG(CAST(REPLACE(t_4ta_etapa, '-', '') AS FLOAT)) AS t_4ta_etapa
+  FROM [uchile].[dbo].", DDBB_v,
+  "WHERE periodomediodeviaje = ", per, " AND paraderosubida <> '-' AND paraderobajada <> '-'
+  GROUP BY periodomediodeviaje, 
+  netapa,
+  paraderosubida,
+  paraderosubida_2da,
+  paraderosubida_3era,
+  paraderobajada, 
+  serv_1era_etapa, 
+  serv_2da_etapa,	
+  serv_3era_etapa, 
+  serv_4ta_etapa;")
   trips <- dbGetQuery(conn = con,
                       statement = sql.trips) %>%
     as_tibble()
