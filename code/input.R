@@ -18,6 +18,7 @@ BBDD_vjs <- function(DDBB_v, per) {
   paraderosubida,
   paraderosubida_2da,
   paraderosubida_3era,
+  paraderosubida_4ta,
   paraderobajada,
   serv_1era_etapa, AVG(CAST(REPLACE(t_1era_etapa, '-', '') AS FLOAT)) AS t_1era_etapa,	AVG(CAST(REPLACE(tespera_1era_etapa, '-', '') AS FLOAT)) AS tespera_1era_etapa, AVG(CAST(REPLACE(ttrasbordo_1era_etapa, '-', '') AS FLOAT)) AS ttrasbordo_1era_etapa, AVG(CAST(REPLACE(tcaminata_1era_etapa, '-', '') AS FLOAT)) AS tcaminata_1era_etapa,
   serv_2da_etapa,	AVG(CAST(REPLACE(t_2da_etapa, '-', '') AS FLOAT)) AS t_2da_etapa, AVG(CAST(REPLACE(tespera_2da_etapa, '-', '') AS FLOAT)) AS tespera_2da_etapa, AVG(CAST(REPLACE(ttrasbordo_2da_etapa, '-', '') AS FLOAT)) AS ttrasbordo_2da_etapa, AVG(CAST(REPLACE(tcaminata_2da_etapa, '-', '') AS FLOAT)) AS tcaminata_2da_etapa, 
@@ -30,6 +31,7 @@ BBDD_vjs <- function(DDBB_v, per) {
   paraderosubida,
   paraderosubida_2da,
   paraderosubida_3era,
+  paraderosubida_4ta,
   paraderobajada, 
   serv_1era_etapa, 
   serv_2da_etapa,	
@@ -84,8 +86,12 @@ stops_bus <- bind_rows(stops("2019-07-06_consolidado_anexo4_(Circunvalación)_an
          SIMT = `Código  paradero Usuario`, 
          x,
          y) %>%
-  filter(SIMT != 15)
-
+  filter(!SIMT %in% c("15", "PF1126", "PD1614")) %>%
+  bind_rows(tibble(CODINFRA = c("L-34-40-103-OP", "L-32-41-20-NS"), 
+                   SIMT = c("PF1126", "PD1614"), 
+                   x = c(351877.7, 358184), 
+                   y = c(6279407.7, 6292345.8)))
+  
 stops_mt <- read_delim("data/dicc_mt.csv", delim = ";") %>%
   select(CODINFRA, X, Y) %>%
   mutate(SIMT = CODINFRA) %>%
