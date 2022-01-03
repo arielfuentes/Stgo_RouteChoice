@@ -17,7 +17,8 @@ vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
               !is.na(ttrasbordo_1era_etapa) & 
               !is.na(tcaminata_1era_etapa) &
               !is.na(serv_2da_etapa) &
-              !is.na(t_2da_etapa)) |
+              !is.na(t_2da_etapa) & 
+              !is.na(paraderosubida_2da)) |
              (netapa == 3 & 
                 !is.na(serv_1era_etapa) & 
                 !is.na(t_1era_etapa) &
@@ -31,7 +32,8 @@ vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
                 !is.na(tcaminata_2da_etapa) &
                 !is.na(serv_3era_etapa) & 
                 !is.na(t_3era_etapa) & 
-                !is.na(paraderosubida_2da)) |
+                !is.na(paraderosubida_2da) & 
+                !is.na(paraderosubida_3era)) |
              (netapa >= 4 & 
                 !is.na(serv_1era_etapa) & 
                 !is.na(t_1era_etapa) &
@@ -51,7 +53,8 @@ vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
                 !is.na(serv_4ta_etapa) & 
                 !is.na(t_4ta_etapa) & 
                 !is.na(paraderosubida_2da) & 
-                !is.na(paraderosubida_3era)) ~ 1,
+                !is.na(paraderosubida_3era) & 
+                !is.na(paraderosubida_4ta)) ~ 1,
            T ~ 0)) %>%
   #create OD
   unite(paraderosubida, paraderobajada,
@@ -127,6 +130,15 @@ vjs_pma <- mutate(vjs_pma,
                   paraderosubida = if_else(paraderosubida == "IRARRAZAVAL  L3", 
                                            "IRARRAZAVAL L3",
                                            paraderosubida),
+                  paraderosubida_2da = if_else(paraderosubida_2da == "IRARRAZAVAL  L3", 
+                                           "IRARRAZAVAL L3",
+                                           paraderosubida_2da),
+                  paraderosubida_3era = if_else(paraderosubida_3era == "IRARRAZAVAL  L3", 
+                                           "IRARRAZAVAL L3",
+                                           paraderosubida_3era),
+                  paraderosubida_4ta = if_else(paraderosubida_4ta == "IRARRAZAVAL  L3", 
+                                                "IRARRAZAVAL L3",
+                                                paraderosubida_4ta),
                   paraderobajada = if_else(paraderobajada == "IRARRAZAVAL ", 
                                            "IRARRAZAVAL",
                                            paraderobajada)) %>%
@@ -146,6 +158,11 @@ vjs_pma <- mutate(vjs_pma,
                    paraderosubida_3era_SIMT = SIMT,
                    x_sub3 = x,
                    y_sub3 = y)) %>%
+  left_join(rename(stops_df, 
+                   paraderosubida_4ta = CODINFRA,
+                   paraderosubida_4ta_SIMT = SIMT,
+                   x_sub4 = x,
+                   y_sub4 = y)) %>%
   left_join(rename(stops_df, 
                    paraderobajada = CODINFRA,
                    paraderobajada_SIMT = SIMT,
@@ -168,8 +185,10 @@ vjs_pma <- mutate(vjs_pma,
                                                 x_sub, y_sub, x_baj, y_baj),
                           netapa == 2 ~ sprintf("LINESTRING(%s %s, %s %s, %s %s)", 
                                                 x_sub, y_sub, x_sub2, y_sub2, x_baj, y_baj),
-                          netapa %in% c(3, 4) ~ sprintf("LINESTRING(%s %s, %s %s, %s %s, %s %s)", 
-                                                x_sub, y_sub, x_sub2, y_sub2, x_sub3, y_sub3, x_baj, y_baj))) %>%
+                          netapa == 3 ~ sprintf("LINESTRING(%s %s, %s %s, %s %s, %s %s)", 
+                                                        x_sub, y_sub, x_sub2, y_sub2, x_sub3, y_sub3, x_baj, y_baj),
+                          netapa == 4 ~ sprintf("LINESTRING(%s %s, %s %s, %s %s, %s %s, %s %s)", 
+                                                x_sub, y_sub, x_sub2, y_sub2, x_sub3, y_sub3, x_sub4, y_sub4, x_baj, y_baj))) %>%
   filter(!is.na(geom)) %>%
   st_as_sf(wkt = "geom", crs = 32719) %>%
   select(-c("t_1era_etapa", "t_2da_etapa", "t_3era_etapa", "t_4ta_etapa",
