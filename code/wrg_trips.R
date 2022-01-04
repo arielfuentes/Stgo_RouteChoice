@@ -196,3 +196,8 @@ vjs_pma <- mutate(vjs_pma,
             "ttrasbordo_1era_etapa", "ttrasbordo_2da_etapa", "ttrasbordo_3era_etapa", 
             "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) #%>%
   # na.omit()
+
+zoi_trips <- st_join(vjs_pma, zoi, join = st_intersects) #%>%
+  # filter(!is.na(id))
+
+readr::write_csv(vjs_pma, "output/vjs_pma_sp.csv")
