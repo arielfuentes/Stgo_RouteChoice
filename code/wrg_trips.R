@@ -200,4 +200,9 @@ vjs_pma <- mutate(vjs_pma,
 zoi_trips <- st_join(vjs_pma, zoi, join = st_intersects) #%>%
   # filter(!is.na(id))
 
+tm_shape(zoi) +
+  tm_polygons(col = "gray") +
+  tm_shape(zoi_trips) +
+  tm_lines(lwd = "Demanda")
+
 readr::write_csv(vjs_pma, "output/vjs_pma_sp.csv")
