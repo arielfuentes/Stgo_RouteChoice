@@ -489,9 +489,9 @@ zoi <- zones %>%
                      '321',
                      '320',
                      '668',
-                     '309'))# %>%
-  # st_combine() %>%
-  # st_as_sf()
+                     '309')) %>%
+  st_combine() %>%
+  st_as_sf()
 #create map
 tm_shape(zones) +
   tm_grid(col = "white", lwd = 2, labels.size = .8) +
