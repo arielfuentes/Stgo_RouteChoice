@@ -197,12 +197,28 @@ vjs_pma <- mutate(vjs_pma,
             "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) #%>%
   # na.omit()
 
-zoi_trips <- st_join(vjs_pma, zoi, join = st_intersects) #%>%
+vjs_pma <- vjs_pma %>% filter(Demanda > 0)
+zoi_trips <- st_join(head(vjs_pma), zoi, join = st_intersects) #%>%
   # filter(!is.na(id))
+zoi_trips_a <- st_filter(vjs_pma[1:200000,], 1, zoi, join = st_within)
+zoi_trips_b <- st_filter(vjs_pma[200001:400000,], zoi, join = st_within)
+zoi_trips_c <- st_filter(vjs_pma[400001:600000,], zoi, join = st_within)
+zoi_trips_d <- st_filter(vjs_pma[600001:832883,], zoi, join = st_within)
+zoi_trips <- bind_rows(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
+rm(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
 
-tm_shape(zoi) +
-  tm_polygons(col = "gray") +
-  tm_shape(zoi_trips) +
-  tm_lines(lwd = "Demanda")
+tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "red", border.col = "black", border.alpha = 1) +
+  tm_shape(arrange(zoi_trips, desc(Demanda))[1:120,]) +
+  tm_lines(lwd = "Demanda", scale = 6) +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Principales Flujos", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom")) 
 
-readr::write_csv(vjs_pma, "output/vjs_pma_sp.csv")
+
+#test threshold for demanda (d >= .5)
