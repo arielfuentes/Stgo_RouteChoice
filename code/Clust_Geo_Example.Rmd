@@ -1,0 +1,146 @@
+---
+title: <center> Ejemplo ClustGeo </center>
+author: "Ariel Fuentes"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: TRUE
+    number_sections: FALSE
+    toc_float: FALSE 
+      # collapsed: false
+      # smooth_scroll: false
+    css: "../code/style.css"
+# bibliography: ../code/biblio.bib
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ClustGeo)
+library(dplyr)
+library(tibble)
+library(tmap)
+library(sf)
+```
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri(file.path("../data/logo_geo_0.png")
+                                      ),
+               alt = 'logo',
+               style = 'position:absolute; top:0; right:0; padding:1px;',
+               width = "110px",
+               heigth = "110px")
+```
+
+# 1. Datos
+
+303 Municipalidades francesas localizadas en la costa Atlántica, incluye 4 variables (numéricas) socioeconómicas. Estos datos son provistos por el INSEE.
+
+Cuyas variables son:
+
+- employ.rate.city: La proporción de trabajadores sobre la población en edad laboral
+- graduate.rate: Nivel de educación
+- housing.appart: Proporción de departamentos
+- agri.land: Área agricola
+
+````{r, warning = F}
+data(estuary)
+socio_mun <- estuary$dat %>% 
+  mutate(INSEE_COM = row.names(.),
+         ID = row_number()) %>%
+  as_tibble() 
+
+sp_mun <- estuary$map %>% 
+  st_as_sf() %>%
+  left_join(socio_mun)
+
+row.names(sp_mun) <- sp_mun$INSEE_COM
+
+tm_shape(sp_mun) +
+  tm_polygons(col = "employ.rate.city") + 
+  tm_layout(legend.outside = T)
+tm_shape(sp_mun) +
+  tm_polygons(col = "graduate.rate") +
+  tm_layout(legend.outside = T)
+tm_shape(sp_mun) +
+  tm_polygons(col = "housing.appart") + 
+  tm_layout(legend.outside = T)
+tm_shape(sp_mun) +
+  tm_polygons(col = "agri.land") +
+  tm_layout(legend.outside = T)
+````
+
+# 2. Matrices de Disimilaridades
+
+Se calcula matriz de Distancia $D_0$ o de variables socioeconómicas:
+
+`````{r, warning = F}
+D0 <- select(sp_mun, c(employ.rate.city, graduate.rate, housing.appart, agri.land)) %>% 
+  st_drop_geometry %>% 
+  dist()
+````
+
+Se calcula matriz de Distancia $D_1$ o de distancia geográfica:
+
+````{r, warning = F}
+D1 <- as.dist(st_distance(st_centroid(sp_mun), st_centroid(sp_mun)))
+````
+
+# 3. Elección de número de clusters
+
+Para escoger el apropiado número de clusters, nos basamos en el dendograma de Ward para las variables socioeconómicas usando $D_0$
+
+````{r}
+tree <- hclustgeo(D0)
+plot(tree, hang = -1, label = F, xlab = "", ylab = "", main = "")
+rect.hclust(tree, k = 5, border = c(4, 5, 3, 2, 1))
+````
+
+La inspección visual sugiere retener K = 5 clusters y generamos mapa relacionado.
+
+````{r, warning = F}
+P5 <- cutree(tree, 5)
+sp_mun <- mutate(sp_mun, P5 = P5)
+tm_shape(sp_mun) +
+  tm_polygons(col = "P5") +
+  tm_layout(legend.outside = T)
+````
+
+Composición de Clusters:
+
+````{r, warning = F}
+lapply(1:5, function(x) sp_mun %>%
+    mutate(P5 = P5) %>%
+    filter(P5 == x) %>%
+      pull(NOM_COMM))
+````
+
+- El Cluster 1 corresponde a 
+- El Cluster 2 (norte de Royan, norte de Bordeaux cerca del estuario de Gironde) corresponde a municipalidades suburbanas con niveles promedios de empleo y graduados, baja proporción de departamentos y alto nivel de cultivos. 
+- El Cluster 3 corresponde a 
+- El Cluster 4 (bosque de Landes) corresponde a alto nivel de graduados y empleo, baja cantidad de departamentos y altas áreas agrícolas.
+- El Cluster 5 (Bordeaux y Arcachon) corresponde a Municipalidades urbana con alta proporción de graduados y bajo empleo, escasos terrenos agrícolas y alta proporción de departamentos.
+
+# 4. Cálculo de parámetro de mezcla 
+
+Se calcula parámetro de mezcla $alpha$, si $alpha = 0$ no se toman en cuenta las disimilaridades geográficas, y si  $alpha = 1$ no se toman en cuenta las disimilaridades socioeconómicas.
+
+````{r, warning = F}
+cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = 5, graph = T)
+````
+
+El gráfico sugiere escoger $alpha = 0.3$, por lo que lo aplicamos para a la clusterización con restricción espacial.
+
+# 5. Clusterización con restricciones espaciales suaves
+
+````{r, warning = F}
+tree <- hclustgeo(D0, D1, alpha =.4)
+P5bis <- cutree(tree, 5)
+sp_mun <- mutate(sp_mun, P5bis = P5bis)
+tm_shape(sp_mun) +
+  tm_polygons(col = "P5bis") +
+  tm_layout(legend.outside = T)
+````
+
+Se aprecia un aumento en la cohesión de esta partición
+
