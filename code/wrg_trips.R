@@ -175,7 +175,11 @@ vjs_pma <- mutate(vjs_pma,
   #           & !is.na(paraderosubida_2da_SIMT) 
   #           & !is.na(paraderosubida_3era_SIMT)
   #           | paraderobajada_SIMT != "PF1126")) %>%
-  select(-c("paraderosubida", "paraderosubida_2da", "paraderosubida_3era", "paraderobajada")) %>%
+  select(-c("paraderosubida", 
+            "paraderosubida_2da", 
+            "paraderosubida_3era", 
+            "paraderosubida_4ta", 
+            "paraderobajada")) %>%
   ##group trip parameters ----
   mutate(tviaje = t_1era_etapa + t_2da_etapa + t_3era_etapa + t_4ta_etapa,
          tesp = tespera_1era_etapa + tespera_2da_etapa + tespera_3era_etapa,
@@ -197,10 +201,10 @@ vjs_pma <- mutate(vjs_pma,
             "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) #%>%
   # na.omit()
 
-vjs_pma <- vjs_pma %>% filter(Demanda > 0)
-zoi_trips <- st_join(head(vjs_pma), zoi, join = st_intersects) #%>%
+# vjs_pma <- vjs_pma %>% filter(Demanda > 0)
+# zoi_trips <- st_join(head(vjs_pma), zoi, join = st_intersects) #%>%
   # filter(!is.na(id))
-zoi_trips_a <- st_filter(vjs_pma[1:200000,], 1, zoi, join = st_within)
+zoi_trips_a <- st_filter(vjs_pma[1:200000,], zoi, join = st_within)
 zoi_trips_b <- st_filter(vjs_pma[200001:400000,], zoi, join = st_within)
 zoi_trips_c <- st_filter(vjs_pma[400001:600000,], zoi, join = st_within)
 zoi_trips_d <- st_filter(vjs_pma[600001:832883,], zoi, join = st_within)
@@ -220,5 +224,34 @@ tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
   tm_compass(position = c("left", "top"), type = "4star", size = 2) +
   tm_scale_bar(position = c("right", "bottom")) 
 
+#test threshold for demand
+mutate(st_drop_geometry(zoi_trips), 
+       flt = if_else(Demanda > .2, Demanda, 0)) %>%
+  summarise(D_new = (sum(flt)/sum(Demanda)-1)*100)
 
-#test threshold for demanda (d >= .5)
+nrow(filter(st_drop_geometry(zoi_trips), Demanda >.2))
+
+zoi_trips <- st_drop_geometry(zoi_trips) %>%
+  filter(Demanda > .2)
+
+stops_trips_1era <- zoi_trips %>% 
+  group_by(paraderosubida_SIMT) %>% 
+  summarise(Demanda = sum(Demanda), 
+            tviaje = mean(tviaje), 
+            tesp = mean(tesp), 
+            tb2 = mean(tb2), 
+            tcam = mean(tcam), 
+            x = mean(x_sub), 
+            y = mean(y_sub)) %>%
+  na.omit()
+
+stops_trips_2da <- zoi_trips %>% 
+  group_by(paraderosubida_2da_SIMT) %>% 
+  summarise(Demanda = sum(Demanda), 
+            tviaje = mean(tviaje), 
+            tesp = mean(tesp), 
+            tb2 = mean(tb2), 
+            tcam = mean(tcam), 
+            x = mean(x_sub), 
+            y = mean(y_sub)) %>%
+  na.omit()
