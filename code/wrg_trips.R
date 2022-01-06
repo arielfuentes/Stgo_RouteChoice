@@ -1,5 +1,6 @@
 library(dplyr)
 library(tidyr)
+source("code/zoi.R", encoding = "utf-8")
 vjs_pma <- BBDD_vjs(DDBB_v = "[viajes201904]", per = "'04 - PUNTA MANANA'") %>%
   #handle NAs
   mutate_if(is.character, ~replace(., .x == "-", NA)) %>%
@@ -81,6 +82,7 @@ vjs_pma <- left_join(vjs_pma, valid_stat) %>%
          interpar ==1) %>%
   select(-c("valid", "f.valid", "interpar", "OD")) %>%
   mutate_if(is.numeric, ~replace_na(., 0))
+rm(valid_stat)
 #add lines dictionary
 lines <- dicc_lines("Shapes 06Jul2019.shp") %>%
   select(COD_SINRUT, COD_USUSEN) %>%
@@ -89,6 +91,7 @@ lines <- dicc_lines("Shapes 06Jul2019.shp") %>%
 lines_user_id <- distinct(lines, COD_USUSEN) %>%
   mutate(id_serv = row_number())
 lines <- left_join(lines, lines_user_id)
+rm(lines_user_id)
 #add user service's names ----
 vjs_pma <- left_join(vjs_pma, 
                      rename(lines, 
@@ -195,10 +198,11 @@ vjs_pma <- mutate(vjs_pma,
                                                 x_sub, y_sub, x_sub2, y_sub2, x_sub3, y_sub3, x_sub4, y_sub4, x_baj, y_baj))) %>%
   filter(!is.na(geom)) %>%
   st_as_sf(wkt = "geom", crs = 32719) %>%
-  select(-c("t_1era_etapa", "t_2da_etapa", "t_3era_etapa", "t_4ta_etapa",
-            "tespera_1era_etapa", "tespera_2da_etapa", "tespera_3era_etapa",
-            "ttrasbordo_1era_etapa", "ttrasbordo_2da_etapa", "ttrasbordo_3era_etapa", 
-            "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) #%>%
+  filter(Demanda > .2)
+  # select(-c("t_1era_etapa", "t_2da_etapa", "t_3era_etapa", "t_4ta_etapa",
+  #           "tespera_1era_etapa", "tespera_2da_etapa", "tespera_3era_etapa",
+  #           "ttrasbordo_1era_etapa", "ttrasbordo_2da_etapa", "ttrasbordo_3era_etapa", 
+  #           "tcaminata_1era_etapa", "tcaminata_2da_etapa", "tcaminata_3era_etapa")) #%>%
   # na.omit()
 
 # vjs_pma <- vjs_pma %>% filter(Demanda > 0)
@@ -207,7 +211,7 @@ vjs_pma <- mutate(vjs_pma,
 zoi_trips_a <- st_filter(vjs_pma[1:200000,], zoi, join = st_within)
 zoi_trips_b <- st_filter(vjs_pma[200001:400000,], zoi, join = st_within)
 zoi_trips_c <- st_filter(vjs_pma[400001:600000,], zoi, join = st_within)
-zoi_trips_d <- st_filter(vjs_pma[600001:832883,], zoi, join = st_within)
+zoi_trips_d <- st_filter(vjs_pma[600001:nrow(vjs_pma),], zoi, join = st_within)
 zoi_trips <- bind_rows(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
 rm(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
 
@@ -225,33 +229,92 @@ tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
   tm_scale_bar(position = c("right", "bottom")) 
 
 #test threshold for demand
-mutate(st_drop_geometry(zoi_trips), 
-       flt = if_else(Demanda > .2, Demanda, 0)) %>%
-  summarise(D_new = (sum(flt)/sum(Demanda)-1)*100)
+# mutate(st_drop_geometry(zoi_trips), 
+#        flt = if_else(Demanda > .2, Demanda, 0)) %>%
+#   summarise(D_new = (sum(flt)/sum(Demanda)-1)*100)
+# 
+# nrow(filter(st_drop_geometry(zoi_trips), Demanda >.2))
 
-nrow(filter(st_drop_geometry(zoi_trips), Demanda >.2))
+# zoi_trips <- st_drop_geometry(zoi_trips) %>%
+#   filter(Demanda > .2)
 
-zoi_trips <- st_drop_geometry(zoi_trips) %>%
-  filter(Demanda > .2)
+vjs_pma <- st_drop_geometry(vjs_pma)
 
-stops_trips_1era <- zoi_trips %>% 
-  group_by(paraderosubida_SIMT) %>% 
+stops_trips_1era <- vjs_pma %>% 
+  group_by(paraderosubida = paraderosubida_SIMT) %>% 
   summarise(Demanda = sum(Demanda), 
-            tviaje = mean(tviaje), 
-            tesp = mean(tesp), 
+            tviaje = mean(t_1era_etapa), 
+            tesp = 0, 
             tb2 = mean(tb2), 
             tcam = mean(tcam), 
             x = mean(x_sub), 
             y = mean(y_sub)) %>%
   na.omit()
 
-stops_trips_2da <- zoi_trips %>% 
-  group_by(paraderosubida_2da_SIMT) %>% 
+stops_trips_2da <- vjs_pma %>% 
+  filter(netapa > 1) %>%
+  group_by(paraderosubida = paraderosubida_2da_SIMT) %>% 
   summarise(Demanda = sum(Demanda), 
-            tviaje = mean(tviaje), 
-            tesp = mean(tesp), 
+            tviaje = mean(t_2da_etapa), 
+            tesp = mean(tespera_1era_etapa), 
             tb2 = mean(tb2), 
             tcam = mean(tcam), 
             x = mean(x_sub), 
             y = mean(y_sub)) %>%
   na.omit()
+
+stops_trips_3era <- vjs_pma %>% 
+  filter(netapa > 2) %>% 
+  group_by(paraderosubida = paraderosubida_3era_SIMT) %>% 
+  summarise(Demanda = sum(Demanda), 
+            tviaje = mean(t_3era_etapa), 
+            tesp = mean(tespera_2da_etapa), 
+            tb2 = mean(tb2), 
+            tcam = mean(tcam), 
+            x = mean(x_sub), 
+            y = mean(y_sub)) %>%
+  na.omit()
+
+stops_trips_4ta <- vjs_pma %>% 
+  filter(netapa > 3) %>% 
+  group_by(paraderosubida = paraderosubida_4ta_SIMT) %>% 
+  summarise(Demanda = sum(Demanda), 
+            tviaje = mean(t_4ta_etapa), 
+            tesp = mean(tespera_3era_etapa), 
+            tb2 = mean(tb2), 
+            tcam = mean(tcam), 
+            x = mean(x_sub), 
+            y = mean(y_sub)) %>%
+  na.omit()
+
+stops_trips <- bind_rows(stops_trips_1era, 
+                         stops_trips_2da, 
+                         stops_trips_3era, 
+                         stops_trips_4ta) %>%
+  group_by(paraderosubida) %>%
+  summarise(Demanda = sum(Demanda), 
+            tviaje = mean(tviaje), 
+            tesp = mean(tesp), 
+            tb2 = mean(tb2), 
+            tcam = mean(tcam), 
+            x = mean(x), 
+            y = mean(y)) %>%
+  st_as_sf(coords = c("x", "y"), crs = 32719)
+  
+rm(stops_trips_1era, 
+   stops_trips_2da, 
+   stops_trips_3era, 
+   stops_trips_4ta)
+
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
+  tm_shape(stops_trips) +
+  tm_dots(col = "red") +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Paradas", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom")) 
