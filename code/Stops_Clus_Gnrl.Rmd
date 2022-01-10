@@ -1,0 +1,203 @@
+---
+title: <center> Paradas ClustGeo </center>
+author: "Ariel Fuentes"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: TRUE
+    number_sections: FALSE
+    toc_float: FALSE 
+      # collapsed: false
+      # smooth_scroll: false
+    css: "../code/style.css"
+# bibliography: ../code/biblio.bib
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ClustGeo)
+library(dplyr)
+library(tibble)
+library(tmap)
+library(sf)
+```
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri(file.path("../data/logo_geo_0.png")
+                                      ),
+               alt = 'logo',
+               style = 'position:absolute; top:0; right:0; padding:1px;',
+               width = "110px",
+               heigth = "110px")
+```
+
+# 1. Datos
+
+Se consideran 10553 paradas, que son las que están activas con demanda para el periodo PMA.
+
+Las variables a considerar son:
+
+- Validaciones promedio de Subida
+- Tiempo de Viaje promedio originado en la parada
+- Tiempo de Espera promedio originado en la parada
+- Tiempo de Transbordo promedio originado en la parada
+- Tiempo de Caminata promedio originado en la parada
+
+````{r, warning = F, echo = F}
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
+  tm_shape(stops_trips) +
+  tm_dots(col = "Demanda", style = "quantile") +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Validaciones de Subida", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom"))
+
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
+  tm_shape(stops_trips) +
+  tm_dots(col = "tviaje", style = "quantile") +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Tiempo de Viaje", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom"))
+
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
+  tm_shape(stops_trips) +
+  tm_dots(col = "tesp", style = "quantile") +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Tiempo de Espera", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom"))
+
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
+  tm_shape(stops_trips) +
+  tm_dots(col = "tb2", style = "quantile") +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Tiempo de Transbordo", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom"))
+
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
+  tm_shape(stops_trips) +
+  tm_dots(col = "tcam", style = "quantile") +
+  tm_layout(bg.color = "#DAF7A6", 
+            main.title = "Tiempo de Caminata", 
+            main.title.position = "center", 
+            title.size = 1, 
+            legend.show = F) +
+  tm_compass(position = c("left", "top"), type = "4star", size = 2) +
+  tm_scale_bar(position = c("right", "bottom"))
+
+````
+
+# 2. Matrices de Disimilaridades
+
+Se calcula matriz de Distancia $D_0$ o de variables comerciales:
+
+`````{r, warning = F}
+D0 <- stops_trips %>%
+  st_drop_geometry() %>%
+  select(-paraderosubida) %>% 
+  dist()
+````
+
+Se calcula matriz de Distancia $D_1$ o de distancia geográfica:
+
+````{r, warning = F}
+D1 <- as.dist(st_distance(stops_trips, stops_trips))
+````
+
+# 3. Elección de número de clusters
+
+Para escoger el apropiado número de clusters, nos basamos en el dendograma de Ward para las variables comerciales usando $D_0$
+
+````{r}
+tree <- hclustgeo(D0)
+plot(tree, hang = -1, label = F, xlab = "", ylab = "", main = "")
+rect.hclust(tree, k = 5, border = c(4, 5, 3, 2, 1))
+````
+
+Visualmente no es posible dada la cantidad de datos, se debe implementar algoritmo automático de detección de grupos óptimos, como por ejemplo el *Gap Statistic Method*, para el caso del ejercicio, se aplicarán 1500 grupos.
+
+````{r, warning = F}
+P1.5 <- cutree(tree, 1500)
+
+hclus_stops <- mutate(stops_trips, P1.5 = P1.5)
+
+tm_shape(hclus_stops) +
+  tm_dots(col = "P1.5", style = "quantile") +
+  tm_layout(legend.outside = T)
+````
+
+
+# 4. Cálculo de parámetro de mezcla 
+
+Se calcula parámetro de mezcla $alpha$, si $alpha = 0$ no se toman en cuenta las disimilaridades geográficas, y si  $alpha = 1$ no se toman en cuenta las disimilaridades comerciales.
+
+
+Esta función requiere ser optimizada, dado que por el volumen de datos actual no es posible, toma mucho tiempo en procesar.
+
+A modo de ejemplo, se usará $alpha = 0.1$ para aplicar clusterización con restricción espacial.
+
+# 5. Clusterización con restricciones espaciales
+
+````{r, warning = F}
+w_tree <- lapply(seq(0, 1, .1), function(x) hclustgeo(D0, D1, alpha = x))
+w_P1.5 <- lapply(w_tree, function(x) cutree(x, k = 1500))
+hclust_lst <- lapply(w_P1.5, function(x) mutate(stops_trips, P1.5 = x))
+lapply(1:length(hclust_lst), function(x) tm_shape(hclust_lst[[x]]) +
+         tm_dots("P1.5", style = "quantile") +
+         tm_layout(title = x))
+````
+
+# 6. Centroides de clusters
+
+````{r, warning = F}
+hcent <- hclust_lst[[2]] %>%
+  mutate(x = st_coordinates(.)[, 1],
+         y = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  group_by(P1.5) %>% 
+  summarise(x = mean(x), 
+            y = mean(y)) %>% 
+  st_as_sf(coords = c("x", "y"), crs = 32719)
+
+tm_shape(hcent) +
+  tm_dots(col = "black", size = .2, shape = 10)
+````
+
+# 7. Nueva zonificación
+
+````{r, warning = F}
+st_vor <- st_collection_extract(st_voronoi(do.call(c, st_geometry(hcent)))) %>%
+    `st_crs<-`(32719) %>%
+    st_intersection(nngeo::st_remove_holes(st_union(zones)))
+tm_shape(zones) +
+  tm_polygons(col = "red") +
+  tm_shape(st_vor) +
+  tm_polygons(alpha = .5) +
+  tm_shape(hcent) +
+  tm_dots(alpha = .1)
+````
