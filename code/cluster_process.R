@@ -1,6 +1,7 @@
 library(tmap)
 library(ClustGeo)
 library(dplyr)
+library(cluster)
 tm_shape(zones) +
   tm_grid(col = "white", lwd = 2, labels.size = .8) +
   tm_polygons(col = "lightblue", border.col = "black", border.alpha = 1) +
@@ -14,6 +15,8 @@ tm_shape(zones) +
   tm_compass(position = c("left", "top"), type = "4star", size = 2) +
   tm_scale_bar(position = c("right", "bottom"))
 
+stops_trips <- st_read("output/stops_trips.gpkg")
+stops_trips <- stops_trips[1:1000,]
 D0 <- stops_trips %>%
   st_drop_geometry() %>%
   select(-paraderosubida) %>% 
@@ -24,7 +27,22 @@ D1 <- as.dist(st_distance(stops_trips, stops_trips))
 tree <- hclustgeo(D0)
 plot(tree, hang = -1, label = F, xlab = "", ylab = "", main = "")
 
-P1.5 <- cutree(tree, 1500)
+# fviz_nbclust(stops_trips %>%
+#                st_drop_geometry() %>%
+#                select(-paraderosubida), FUN = hcut, method = "silhouette")
+# https://uc-r.github.io/hc_clustering
+gap_stat <- clusGap(stops_trips %>%
+                      st_drop_geometry() %>%
+                      select(-paraderosubida), 
+                    FUN = hcut, nstart = 25, K.max = 50, B = 50)
+
+gap_stat$Tab %>% 
+  as_tibble(rownames = "clus") %>% 
+  arrange(desc(gap))
+
+fviz_gap_stat(gap_stat)
+
+P1.5 <- cutree(tree, 800)
 
 hclus_stops <- mutate(stops_trips, P1.5 = P1.5)
 
@@ -32,12 +50,31 @@ tm_shape(hclus_stops) +
   tm_dots(col = "P1.5", breaks = seq(0, 1500, 300)) +
   tm_layout(legend.outside = T)
 
-# cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = 3000, graph = F)
+cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .2), K = 800, graph = T)
 
 hclustgeo(D0, D1, alpha =.2)
 
 
-w_tree <- lapply(seq(0, 1, .1), function(x) hclustgeo(D0, D1, alpha = x))
+# w_tree <- lapply(seq(0, 1, .1), function(x) hclustgeo(D0, D1, alpha = x))
+
+set.seed(23)
+library(furrr)
+# seed_lst <- sample(1:10000, 50, replace=FALSE)
+future::plan(strategy = multisession, workers = 4)
+options <- furrr_options(seed = 123)
+
+range.alpha <- seq(0, 1, .1)
+w_tree <- range.alpha %>%
+  future_map(~hclustgeo(D0, D1, alpha = .x))
+part <- stats::cutree(tree,k=800)
+
+n <- as.integer(attr(D1, "Size"))
+wt <- rep(1/n, n)
+W <- matrix(0,length(range.alpha),2)
+rownames(W)  <- paste("alpha=", range.alpha, sep="")
+colnames(W) <- c("W0","W1")
+W[i,1] <- withindiss(D0,part,wt)
+W[i,2] <- withindiss(D1,part,wt)
 w_P1.5 <- lapply(w_tree, function(x) cutree(x, k = 1500))
 hclust_lst <- lapply(w_P1.5, function(x) mutate(stops_trips, P1.5 = x))
 lapply(1:length(hclust_lst), function(x) tm_shape(hclust_lst[[x]]) +
@@ -77,3 +114,44 @@ tm_shape(hcent) +
 ############################################################
 library(rmarkdown)
 rmarkdown::render(input = "code/Stops_Clus_Gnrl.Rmd", output_dir = "output/", output_format = "html_document")
+#################################################################
+stops_trips103 <- st_filter(stops_trips, 
+                            filter(zoi, Zona == 103), 
+                            .predicate = st_within)
+
+tm_shape(filter(zoi, Zona == 103)) +
+  tm_polygons(col = "gray") +
+  tm_shape(stops_trips103) +
+  tm_dots(col = "red")
+
+D0 <- stops_trips103 %>%
+  st_drop_geometry() %>%
+  select(-paraderosubida) %>% 
+  dist()
+
+D1 <- as.dist(st_distance(stops_trips103, stops_trips103))
+
+tree <- hclustgeo(D0)
+plot(tree, hang = -1, label = F, xlab = "", ylab = "", main = "")
+
+gap_stat <- clusGap(stops_trips103 %>%
+                      st_drop_geometry() %>%
+                      select(-paraderosubida), 
+                    FUN = hcut, nstart = 25, K.max =  nrow(stops_trips103) - 1, B = 50)
+
+nclus <- gap_stat$Tab %>% 
+  as_tibble(rownames = "clus") %>% 
+  filter(clus > 1) %>%
+  filter(SE.sim == min(SE.sim)) %>%
+  pull(clus)
+
+fviz_gap_stat(gap_stat)
+
+P <- cutree(tree, nclus)
+hclus_stops <- mutate(stops_trips103, P = P)
+
+tm_shape(hclus_stops) +
+  tm_dots(col = "P", palette = c("blue", "red")) +
+  tm_layout(legend.outside = T)
+
+cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = nclus, graph = T)
