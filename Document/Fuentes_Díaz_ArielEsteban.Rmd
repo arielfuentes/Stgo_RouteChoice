@@ -90,11 +90,19 @@ block_toc(style = "Image Caption")
 
 \newpage
 
-# CAPÍTULOS
+# CAPÍTULO 1: MARCO TEÓRICO
 
 \newpage
 
-# CONCLUSIONES
+# CAPÍTULO 2: METODOLOGÍA
+
+\newpage
+
+# CAPÍTULO 3: APLICACIÓN DEL MODELO Y ANÁLISIS DE RESULTADOS
+
+\newpage
+
+# CONCLUSIONES Y RECOMENDACIONES
 
 \newpage
 
