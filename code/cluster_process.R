@@ -1,4 +1,5 @@
 library(tmap)
+library(factoextra)
 library(ClustGeo)
 library(dplyr)
 library(cluster)
@@ -99,12 +100,12 @@ tm_shape(hcent) +
 
   st_vor <- st_collection_extract(st_voronoi(do.call(c, st_geometry(hcent)))) %>%
     `st_crs<-`(32719) %>%
-    st_intersection(nngeo::st_remove_holes(st_union(zones)))
+    st_intersection(nngeo::st_remove_holes(st_union(zoi)))
   
   
     
   
-    tm_shape(zones) +
+    tm_shape(zoi) +
       tm_polygons(col = "red") +
     tm_shape(st_vor) +
     tm_polygons(alpha = .5) +
@@ -155,3 +156,42 @@ tm_shape(hclus_stops) +
   tm_layout(legend.outside = T)
 
 cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = nclus, graph = T)
+
+alpha_ch <- cr$Q %>% 
+  as_tibble(rownames = "alpha") %>% 
+  mutate(Promedio = (Q0+Q1)/2) %>% 
+  filter(Promedio == max(Promedio)) %>% 
+  tidyr::separate(alpha, "=", into = c("alpha_nm", "alpha_num")) %>% 
+  pull(alpha_num)
+
+tree <- hclustgeo(D0, D1, alpha = as.numeric(alpha_ch)[1])
+P <- P <- cutree(tree, nclus)
+
+hclus_stops <- mutate(stops_trips103, P = P)
+
+tm_shape(hclus_stops) +
+  tm_dots(col = "P", palette = c("blue", "red")) +
+  tm_layout(legend.outside = T)
+
+hcent <- hclus_stops %>%
+  mutate(x = st_coordinates(.)[, 1],
+         y = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry() %>%
+  group_by(P) %>% 
+  summarise(x = mean(x), 
+            y = mean(y)) %>% 
+  st_as_sf(coords = c("x", "y"), crs = 32719)
+
+tm_shape(hcent) +
+  tm_dots(col = "black", size = .2, shape = 10)
+
+st_vor <- st_intersection(st_cast(st_voronoi(st_union(st_geometry(hcent)), 
+           envelope = st_geometry(filter(zoi, Zona == 103)))), 
+           st_geometry(filter(zoi, Zona == 103)))
+
+tm_shape(filter(zoi, Zona == 103)) +
+  tm_polygons(col = "red") +
+  tm_shape(st_vor) +
+  tm_polygons(alpha = .8, col = "lightblue") +
+  tm_shape(hcent) +
+  tm_dots()
