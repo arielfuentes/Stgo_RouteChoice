@@ -1,0 +1,114 @@
+---
+title: "Propuesta Metodológica para la desagregación de demanda de Transporte Público del Sistema RED, aplicado al eje Norte-Sur de Santiago de Chile"
+author: "Ariel Fuentes"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  officedown::rdocx_document:
+    plots:
+      style: Normal
+      align: center
+      caption:
+       style: Image Caption
+       pre: 'Figura '
+       sep: ': '
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      caption:
+       style: Table Caption
+       pre: 'Tabla '
+       sep: ': '
+      conditional:
+       first_row: true
+       first_column: false
+       last_row: false
+       last_column: false
+       no_hband: false
+       no_vband: true
+    reference_docx: template.docx
+bibliography: library.bib
+csl: iso690-numeric-cs.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tibble)
+library(flextable)
+library(magick)
+library(ganttrify)
+library(officer)
+```
+
+# UNIVERSIDAD DE SANTIAGO DE CHILE
+
+# FACULTAD DE INGENIERÍA
+
+# Departamento de Ingeniería Geográfica
+
+Propuesta Metodológica para la desagregación de demanda de Transporte Público del Sistema RED, aplicado al eje Norte-Sur de Santiago de Chile.
+
+Nombre Alumno: Ariel Fuentes Díaz
+
+Profesor Guía: Marcos Medina Tapia
+
+Santiago-Chile
+
+Segundo Semestre 2021
+
+\newpage
+
+# RESUMEN Y PALABRAS CLAVES
+
+\newpage
+
+# DEDICATORIA
+
+\newpage
+
+# AGRADECIMIENTOS
+
+\newpage
+
+# TABLA DE CONTENIDO
+
+```{r}
+block_toc()
+```
+
+\newpage
+
+# ÍNDICE DE TABLAS Y FIGURAS
+
+```{r}
+block_toc(style = "Image Caption")
+```
+
+\newpage
+
+# INTRODUCCIÓN
+
+\newpage
+
+# CAPÍTULOS
+
+\newpage
+
+# CONCLUSIONES
+
+\newpage
+
+# GLOSARIO
+
+\newpage
+
+# BIBLIOGRAFÍA
+
+\newpage
+
+# ANEXOS
+
+\newpage
+
+# APÉNDICE
+
