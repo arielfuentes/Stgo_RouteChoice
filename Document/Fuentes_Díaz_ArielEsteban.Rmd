@@ -34,7 +34,6 @@ csl: iso690-numeric-cs.csl
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tibble)
-library(flextable)
 library(magick)
 library(ganttrify)
 library(officer)
@@ -86,23 +85,45 @@ block_toc(style = "Image Caption")
 
 \newpage
 
-# INTRODUCCIÓN
+# CAPÍTULO 1: INTRODUCCIÓN
+
+## 1.1 Planteamiento del Problema
+
+## 1.2 Hipótesis
+
+## 1.3 Objetivos
 
 \newpage
 
-# CAPÍTULO 1: MARCO TEÓRICO
+# CAPÍTULO 2: MARCO TEÓRICO
+
+## 2.1 Modelación de Transporte
+
+## 2.2 Asignación de Transporte Público
 
 \newpage
 
-# CAPÍTULO 2: METODOLOGÍA
+# CAPÍTULO 3: METODOLOGÍA
+
+## 3.1 Metodología General
+
+## 3.2 Etapas Metodológicas
 
 \newpage
 
-# CAPÍTULO 3: APLICACIÓN DEL MODELO Y ANÁLISIS DE RESULTADOS
+# CAPÍTULO 4: APLICACIÓN DEL MODELO Y ANÁLISIS DE RESULTADOS
+
+## 4.1 Asignación de Demanda en Zonificación Base
+
+## 4.2 Análisis Estadístico de las Entradas del Modelo
+
+## 4.3 Aplicación de Escenarios
+
+## 4.4 Análisis de Resultados
 
 \newpage
 
-# CONCLUSIONES Y RECOMENDACIONES
+# CAPÍTULO 5: CONCLUSIONES Y RECOMENDACIONES
 
 \newpage
 
