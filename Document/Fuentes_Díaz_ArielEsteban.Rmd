@@ -37,6 +37,8 @@ library(tibble)
 library(magick)
 library(ganttrify)
 library(officer)
+library(kableExtra)
+library(officedown)
 ```
 
 # UNIVERSIDAD DE SANTIAGO DE CHILE
@@ -88,6 +90,23 @@ block_toc(style = "Image Caption")
 # CAPÍTULO 1: INTRODUCCIÓN
 
 ## 1.1 Planteamiento del Problema
+
+Desde 2007, el Sistema de Transporte Público de la ciudad de Santiago integra física y tarifariamente a la totalidad de los buses de transporte público urbano de la ciudad, operados por empresas privadas, al Metro de Santiago, y al sistema MetroTren Nos, a través de un único medio de acceso electrónico: la Tarjeta bip!.
+[^1] Los Operadores de Uso de Vías son aquellas sociedades anónimas que prestan los servicios de Transporte Público mediante buses, bajo un sistema de concesión de uso de vías o modalidades análogas de regulación, actualmente existen 6 operadores en el sistema RED Movilidad[^2]
+:
+
+[^1]: <https://www.dtpm.cl/index.php/homepage/sistema-integrado-de-transporte>
+
+[^2]: <https://www.dtpm.cl/index.php/sistema-transporte-publico-santiago/buses>
+
+````{r include = F}
+UN <- tibble(Operador = c("Buses Vule S.A.", "Subus Chile S.A.", "Voy Santiago SPA", "Metbus S.A.", "Redbus Urbano S.A.", "Servicio de Transporte de Personas S.A."),
+       Servicios = c("Unidad de Negocio 3", "Unidad de Negocio 2", "Unidad de Negocio 4", "Unidad de Negocio 5", "Unidad de Negocio 6", "Unidad de Negocio 7"))
+````
+
+```{r tab.cap='Empresas Operadoras', tab.id='op.', first_column = TRUE}
+UN
+````
 
 ## 1.2 Hipótesis
 
