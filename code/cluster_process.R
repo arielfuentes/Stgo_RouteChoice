@@ -116,40 +116,43 @@ tm_shape(hcent) +
 library(rmarkdown)
 rmarkdown::render(input = "code/Stops_Clus_Gnrl.Rmd", output_dir = "output/", output_format = "html_document")
 #################################################################
-stops_trips103 <- st_filter(stops_trips, 
-                            filter(zoi, Zona == 103), 
+stops_trips669 <- st_filter(stops_trips, 
+                            filter(zoi, Zona == 669), 
                             .predicate = st_within)
 
-tm_shape(filter(zoi, Zona == 103)) +
+tm_shape(filter(zoi, Zona == 669)) +
   tm_polygons(col = "gray") +
-  tm_shape(stops_trips103) +
+  tm_shape(stops_trips669) +
   tm_dots(col = "red")
 
-D0 <- stops_trips103 %>%
+D0 <- stops_trips669 %>%
   st_drop_geometry() %>%
   select(-paraderosubida) %>% 
   dist()
 
-D1 <- as.dist(st_distance(stops_trips103, stops_trips103))
+D1 <- as.dist(st_distance(stops_trips669, stops_trips669))
 
 tree <- hclustgeo(D0)
 plot(tree, hang = -1, label = F, xlab = "", ylab = "", main = "")
 
-gap_stat <- clusGap(stops_trips103 %>%
+gap_stat <- clusGap(stops_trips669 %>%
                       st_drop_geometry() %>%
-                      select(-paraderosubida), 
-                    FUN = hcut, nstart = 25, K.max =  nrow(stops_trips103) - 1, B = 50)
+                      select(-paraderosubida), method = "Tibs2001SEmax",
+                    FUN = hcut, nstart = 25, K.max =  nrow(stops_trips669) - 1, B = 50)
 
 nclus <- gap_stat$Tab %>% 
-  as_tibble(rownames = "clus") %>% 
-  filter(clus > 1) %>%
-  filter(SE.sim == min(SE.sim)) %>%
-  pull(clus)
+  as_tibble(rownames = "clus") %>%
+  mutate(GlobalMax = max(gap),
+         GapSE = gap - SE.sim, 
+         Clus_ch = if_else(GapSE > GlobalMax, 1, if_else(gap == GlobalMax, 1, 0))) %>%
+  filter(Clus_ch == 1) %>%
+  pull(clus) %>%
+  as.numeric()
 
 fviz_gap_stat(gap_stat)
 
 P <- cutree(tree, nclus)
-hclus_stops <- mutate(stops_trips103, P = P)
+hclus_stops <- mutate(stops_trips669, P = P)
 
 tm_shape(hclus_stops) +
   tm_dots(col = "P", palette = c("blue", "red")) +
@@ -157,41 +160,57 @@ tm_shape(hclus_stops) +
 
 cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = nclus, graph = T)
 
-alpha_ch <- cr$Q %>% 
+alpha_ch <- cr$Qnorm %>% 
   as_tibble(rownames = "alpha") %>% 
-  mutate(Promedio = (Q0+Q1)/2) %>% 
+  mutate(Promedio = (Q0norm+Q1norm)/2) %>% 
   filter(Promedio == max(Promedio)) %>% 
   tidyr::separate(alpha, "=", into = c("alpha_nm", "alpha_num")) %>% 
   pull(alpha_num)
 
 tree <- hclustgeo(D0, D1, alpha = as.numeric(alpha_ch)[1])
-P <- P <- cutree(tree, nclus)
+P <- cutree(tree, nclus)
 
-hclus_stops <- mutate(stops_trips103, P = P)
+hclus_stops <- mutate(stops_trips669, P = P)
 
 tm_shape(hclus_stops) +
   tm_dots(col = "P", palette = c("blue", "red")) +
   tm_layout(legend.outside = T)
 
+hull <- st_convex_hull(st_union(group_by(hclus_stops, P), by_feature = T))
+lapply(split(hclus_stops, P), function(x) plot(st_convex_hull(st_union(x))))
 hcent <- hclus_stops %>%
-  mutate(x = st_coordinates(.)[, 1],
-         y = st_coordinates(.)[, 2]) %>%
-  st_drop_geometry() %>%
-  group_by(P) %>% 
-  summarise(x = mean(x), 
-            y = mean(y)) %>% 
-  st_as_sf(coords = c("x", "y"), crs = 32719)
+  group_by(P) %>%
+  summarise(.groups = "keep") %>%
+  st_convex_hull() %>%
+  st_centroid()
+# hcent <- hclus_stops %>%
+#   mutate(x = st_coordinates(.)[, 1],
+#          y = st_coordinates(.)[, 2]) %>%
+#   st_drop_geometry() %>%
+#   group_by(P) %>% 
+#   summarise(x = mean(x), 
+#             y = mean(y)) %>% 
+#   st_as_sf(coords = c("x", "y"), crs = 32719)
 
 tm_shape(hcent) +
   tm_dots(col = "black", size = .2, shape = 10)
 
 st_vor <- st_intersection(st_cast(st_voronoi(st_union(st_geometry(hcent)), 
-           envelope = st_geometry(filter(zoi, Zona == 103)))), 
-           st_geometry(filter(zoi, Zona == 103)))
+           envelope = st_geometry(filter(zoi, Zona == 669)))), 
+           st_geometry(filter(zoi, Zona == 669)))
 
-tm_shape(filter(zoi, Zona == 103)) +
+tm_shape(filter(zoi, Zona == 669)) +
   tm_polygons(col = "red") +
   tm_shape(st_vor) +
   tm_polygons(alpha = .8, col = "lightblue") +
   tm_shape(hcent) +
-  tm_dots()
+  tm_dots() +
+  tm_shape(stops_trips669) +
+  tm_dots(col = "white")
+#######################################################
+anti_zoi <- zones[!lengths(st_within(zones, zoi)), ]
+
+tm_shape(anti_zoi) +
+  tm_polygons(col = "lightblue") +
+  tm_shape(zoi) +
+  tm_polygons(col = "orange")
