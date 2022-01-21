@@ -122,7 +122,7 @@ stops_trips669 <- st_filter(stops_trips,
 
 tm_shape(filter(zoi, Zona == 669)) +
   tm_polygons(col = "gray") +
-  tm_shape(stops_trips669) +
+  tm_shape(stops_trips) +
   tm_dots(col = "red")
 
 D0 <- stops_trips669 %>%
@@ -210,7 +210,54 @@ tm_shape(filter(zoi, Zona == 669)) +
 #######################################################
 anti_zoi <- zones[!lengths(st_within(zones, zoi)), ]
 
-tm_shape(anti_zoi) +
+map <- tm_shape(anti_zoi) +
   tm_polygons(col = "lightblue") +
   tm_shape(zoi) +
-  tm_polygons(col = "orange")
+  tm_polygons(col = "orange") +
+  tm_shape(stops_trips) +
+  tm_dots(col = "black")
+
+tmap_leaflet(map)
+###########################################################
+#points per zone in the zoi ----
+pts_zn <- lapply(zoi$Zona, function(x) st_filter(stops_trips, 
+                                  filter(zoi, Zona == x), 
+                                  .predicate = st_within) %>%
+         mutate(Zona = x))
+#n of points per zone in zoi -----
+npts_zn <- bind_rows(lapply(1:length(pts_zn), function(x) tibble(n = nrow(pts_zn[[x]]),
+                                            Zona = unique(pts_zn[[x]]$Zona)))
+)
+
+zn_clus <- filter(npts_zn, n > 2) %>%
+  pull(Zona) %>%
+  as.numeric()
+#zones eligible for clustering ----
+zoi_clus <- filter(zoi, Zona %in% zn_clus)
+zoi_noclus <- filter(zoi, !Zona %in% zn_clus)
+anti_zoi <- zones[!lengths(st_within(zones, zoi)), ]
+#zones outside the clustering process -----
+zones_noclus <- bind_rows(zoi_noclus, anti_zoi)
+
+tm_shape(zones_noclus) +
+  tm_polygons()
+
+#Disimilarity matrices ----
+pts_zn <- bind_rows(pts_zn) %>%
+  filter(Zona %in% zn_clus)
+
+D0 <- lapply(group_split(select(st_drop_geometry(pts_zn), -c("paraderosubida")), Zona),
+             function(x) dist(select(x, -Zona)))
+names(D0) <- zn_clus
+
+D1 <- lapply(group_split(pts_zn, Zona), function(x) as.dist(st_distance(x, x)))
+names(D1) <- zn_clus
+
+#number of clusters -----
+gap_stat <- lapply(1:length(group_split(pts_zn, Zona)), 
+                   function(x) clusGap(select(st_drop_geometry(group_split(pts_zn, Zona)[[x]]), 
+                                              -c("paraderosubida", "Zona")), 
+                                       FUN = hcut, 
+                                       nstart = 25, 
+                                       K.max =  nrow(group_split(pts_zn, Zona)[[x]]) - 1, 
+                                       B = 50))
