@@ -117,14 +117,19 @@ block_toc(style = "Image Caption")
 
 # INTRODUCCIÓN
 
-En el presente informe se realiza un análisis crítico del anteproyecto denominado: “Propuesta Metodológica para la desagregación de demanda de Transporte Público del Sistema RED, aplicado al eje Norte-Sur de Santiago de Chile”.
-En el primer ítem se realizará un resumen explicativo del anteproyecto del trabajo de título, conteniendo justificación del tema, objetivo que desee alcanzar y métodos utilizados para llevar a cabo el problema a investigar, para mejorar la comprensión, también incluirá palabras claves relacionadas con la temática.
-Como el trabajo de título es sometido a una comisión que entiende sobre la temática del transporte y su dimensión espacial, esta, en la aprobación del anteproyecto realiza observaciones y contribuciones para mejorar la calidad del trabajo, es por ello, que en un segundo ítem se analizará las observaciones entregadas y su incorporación al trabajo de título.
-A partir de lo anterior, más una revisión completa del anteproyecto, se hará un análisis crítico del mismo, describiendo sus fortalezas y debilidades, de modo de poder generar todas las mejoras posibles para entregar una buena contribución al área de transporte de pasajeros.
-Por último, se presentarán las conclusiones de este desarrollo, las que permitirán plantear un plan de trabajo para fortalecer las debilidades detectadas.
+En el presente trabajo de título se desarrollará una Propuesta Metodológica para la desagregación de demanda de Transporte Público. En particular, esta propuesta será aplicada para el eje Norte-Sur del sistema RED Movilidad. El objetivo de desarrollar esta propuesta es satisfacer la necesidad de *estimar la demanda desagregada de transporte público a bajo costo, que posea precisión táctica-operacional*. Como se verá en el capítulo 2, el mecanismo del modelo clásico de transporte, está sostenido en una zonificación, por tanto, para obtener la demanda de las rutas de transporte público en un periodo del día, es necesaria una matriz Origen - Destino a nivel zonal, que se conecta a través de sus centroides hacia los distintos nodos de la red de transporte, existiendo así un problema de agregación.  Por tanto, nuestra propuesta consiste en crear un nuevo esquema de zonificación, que no tan solo aumente la cantidad de zonas en el área de estudio, sino que considere una regularización del fenómeno espacial, disminuyendo la incertidumbre de la agregación. 
 
-Los contenidos del presente informe se estructurarán de la siguiente forma:
+Lo antes mencionado, podrá ser logrado gracias a la disponibilidad de datos de Movilidad de manera desagregada, que disponemos en la era del *Big Data*, en este caso en particular, son las validaciones de viajes con tarjetas inteligentes; denominadas tarjeta *bip!*, más variables territoriales. Como consecuencia de ello, el análisis de estos datos en su dimensión espacial, permitirá la creación de modelo estadístico que entregue un mayor número de zonas regularizadas espacialemente para el área de estudio, que a bajo costo podrá elevar la precisión táctica-operacional de la demanda de transporte público.  
 
+La estructura del trabajo se clasifica en:
+
+- Justificación del Problema
+- Marco Teórico de la Modelación de Demanda de Transporte Público
+- Metodología
+- Aplicación del Modelo
+- Validación
+- Análisis de Resultados
+- Conclusiones y Recomendaciones
 
 <!---BLOCK_PORTRAIT_STOP--->
 
@@ -153,7 +158,7 @@ UN
 ````
 Fuente: Elaboración Propia basado en @DTPM2.
 
-Las modelaciones gubernamentales son encargadas al Programa de Vialidad y Transporte Urbano de la Subsecretaría del Ministerio del Transporte y Telecomunicaciones (SECTRA), cuyo énfasis es estratégico, utilizando escenarios de Desarrollo Urban ; quienes trabajan con información a nivel agregado mediante el uso de las Encuestas Origen Destino. Como señala @Willumsen2016, *"tanto el mundo académico como el profesional buscan activamente mejorar las bases de modelación de transporte. Entre las aproximaciones utilizadas se ha avanzado hacia modelos desagregados, donde incluso los modelos basados en actividades han llegado a eliminar el uso de zonas".*
+Las modelaciones gubernamentales son encargadas al Programa de Vialidad y Transporte Urbano de la Subsecretaría del Ministerio del Transporte y Telecomunicaciones (SECTRA), cuyo énfasis es estratégico, utilizando escenarios de Desarrollo Urbano; quienes trabajan con información a nivel agregado mediante el uso de las Encuestas Origen Destino. Como señala @Willumsen2016, *"tanto el mundo académico como el profesional buscan activamente mejorar las bases de modelación de transporte. Entre las aproximaciones utilizadas se ha avanzado hacia modelos desagregados, donde incluso los modelos basados en actividades han llegado a eliminar el uso de zonas".*
 
 Para evaluar en la dimensión de servicio de transporte, utilizando una matriz de viajes basadas en zonas de grandes dimensiones, la conectividad desde el centroide puede provocar que elija rutas infactibles, donde los parámetros de transbordos son difíciles de calibrar, distorsionando los resultados, incluso a nivel de modo. Esto puede ser resuelto mediante una zonificación más detallada, la cual permite identificar con mayor facilidad los desbalances en la calibración, porque al existir más centroides, el usuario puede elegir una gama más acotada de recorridos para realizar su viaje.  En @Altan2018 se encontró que al triplicar las zonas para el modelo de asignación de Estambul, el error se redujo un 23% y la correlación aumentó en 10 puntos.
 
@@ -183,7 +188,7 @@ La forma en que generalmente se responde a tales incertidumbres es midiendo la d
 
 \newline
 
-Es posible desagregar la demanda zonal utilizando metodología que implique bajo nivel de costo y precisión en la estimación de demanda a servicios, considerando la localización de paradas como indicador espacial de la concentración de demanda, la cual mejorará resultados de la asignación de asignación de rutas, con precisión táctico-operacional.
+Es posible desagregar la demanda zonal utilizando metodología que implique bajo nivel de costo y precisión en la estimación de demanda a servicios, considerando la localización de paradas como indicador espacial de la concentración de demanda, la cual mejorará resultados de la asignación de rutas, con precisión táctico-operacional.
 
 \newline
 
