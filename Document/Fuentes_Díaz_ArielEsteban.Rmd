@@ -41,11 +41,11 @@ library(kableExtra)
 library(officedown)
 ```
 
-# UNIVERSIDAD DE SANTIAGO DE CHILE
+**UNIVERSIDAD DE SANTIAGO DE CHILE**
 
-# FACULTAD DE INGENIERÍA
+**FACULTAD DE INGENIERÍA**
 
-# Departamento de Ingeniería Geográfica
+**Departamento de Ingeniería Geográfica**
 
 Propuesta Metodológica para la desagregación de demanda de Transporte Público del Sistema RED, aplicado al eje Norte-Sur de Santiago de Chile.
 
@@ -59,7 +59,27 @@ Segundo Semestre 2021
 
 \newpage
 
-# RESUMEN Y PALABRAS CLAVES
+<!---BLOCK_PORTRAIT_START--->
+
+# RESUMEN
+
+Para este trabajo de título se propone una metodología de redefinición de TAZ (del inglés, transportation analysis zone), es decir, de las Zonas de Análisis de Transporte. Esta metodología es desarrollada mediante el post-procesamiento de los datos masivos de tarjetas inteligentes (bip!), constituyéndose la ubicación geográfica, indicadores de calidad de viaje como tiempo de espera, tiempo de viaje, acceso, junto a otras variables espaciales como la densidad poblacional.
+Se propone en esta metodología, que a través de ponderadores espaciales se puede clusterizar y redefinir zonas, las que serán de menor área y más homogéneas, que permitirán por una parte recuperar viajes intrazonales y por otro lado, facilitar y mejorar la calibración para un modelo de asignación de demanda de transporte público, donde se ha detectado que una de las principales barreras para mejorar dichos modelos, radica en su zonificación, la método a usar es una clusterización jerárquica y espacial por zona de una zonificación base (EOD 2012) y posterior poligonización de los respectivos clusters. 
+Esta metodología hará que ese proceso sea más eficiente y abordable al ser bajo en costo de procesamiento y monetario. 
+Para validar y demostrar los resultados de la metodología, se evaluarán modelos de asignación simplificados, utilizando primero con la zonificación de la EOD 2012 y posteriormente con la zonificación propuesta.
+
+Palabras Claves: Zonas de Análisis de Transporte, Asignación de Transporte, Clusterización. 
+
+\newpage
+
+# ABSTRACT
+
+For this title work, a methodology for redefining TAZ (from English, transportation analysis zone) is proposed, that is, of the Transportation Analysis Zones. This methodology is developed through the post-processing of massive data from smart cards (bip!), constituting the geographical location, trip quality indicators such as waiting time, travel time, access, along with other spatial variables such as density population.
+It is proposed in this methodology that, through spatial weights, zones can be clustered and redefined, which will be smaller in area and more homogeneous, which will allow, on the one hand, to recover intrazonal trips and, on the other hand, to facilitate and improve the calibration for a model. of public transport demand allocation, where it has been detected that one of the main barriers to improving these models lies in their zoning, the method to use is a hierarchical and spatial clustering by zone of a base zoning (EOD 2012) and subsequent polygonization of the respective clusters.
+This methodology will make this process more efficient and affordable as it is low in processing and monetary cost.
+To validate and demonstrate the results of the methodology, simplified allocation models will be evaluated, first using the 2012 EOD zoning and later using the proposed zoning.
+
+Keywords: Transport Analysis Zones, Transit Assignment, Clustering.
 
 \newpage
 
@@ -73,53 +93,849 @@ Segundo Semestre 2021
 
 # TABLA DE CONTENIDO
 
-```{r}
+```{r, echo = F}
 block_toc()
 ```
 
 \newpage
 
-# ÍNDICE DE TABLAS Y FIGURAS
+# ÍNDICE DE TABLAS
 
-```{r}
+```{r, echo = F}
+block_toc(style = "Table Caption")
+```
+
+\newpage
+
+# ÍNDICE DE FIGURAS
+
+```{r, echo = F}
 block_toc(style = "Image Caption")
 ```
 
 \newpage
 
-# CAPÍTULO 1: INTRODUCCIÓN
+# INTRODUCCIÓN
 
-## 1.1 Planteamiento del Problema
+En el presente informe se realiza un análisis crítico del anteproyecto denominado: “Propuesta Metodológica para la desagregación de demanda de Transporte Público del Sistema RED, aplicado al eje Norte-Sur de Santiago de Chile”.
+En el primer ítem se realizará un resumen explicativo del anteproyecto del trabajo de título, conteniendo justificación del tema, objetivo que desee alcanzar y métodos utilizados para llevar a cabo el problema a investigar, para mejorar la comprensión, también incluirá palabras claves relacionadas con la temática.
+Como el trabajo de título es sometido a una comisión que entiende sobre la temática del transporte y su dimensión espacial, esta, en la aprobación del anteproyecto realiza observaciones y contribuciones para mejorar la calidad del trabajo, es por ello, que en un segundo ítem se analizará las observaciones entregadas y su incorporación al trabajo de título.
+A partir de lo anterior, más una revisión completa del anteproyecto, se hará un análisis crítico del mismo, describiendo sus fortalezas y debilidades, de modo de poder generar todas las mejoras posibles para entregar una buena contribución al área de transporte de pasajeros.
+Por último, se presentarán las conclusiones de este desarrollo, las que permitirán plantear un plan de trabajo para fortalecer las debilidades detectadas.
 
-Desde 2007, el Sistema de Transporte Público de la ciudad de Santiago integra física y tarifariamente a la totalidad de los buses de transporte público urbano de la ciudad, operados por empresas privadas, al Metro de Santiago, y al sistema MetroTren Nos, a través de un único medio de acceso electrónico: la Tarjeta bip!.
-[^1] Los Operadores de Uso de Vías son aquellas sociedades anónimas que prestan los servicios de Transporte Público mediante buses, bajo un sistema de concesión de uso de vías o modalidades análogas de regulación, actualmente existen 6 operadores en el sistema RED Movilidad[^2]
-:
+Los contenidos del presente informe se estructurarán de la siguiente forma:
 
-[^1]: <https://www.dtpm.cl/index.php/homepage/sistema-integrado-de-transporte>
 
-[^2]: <https://www.dtpm.cl/index.php/sistema-transporte-publico-santiago/buses>
+<!---BLOCK_PORTRAIT_STOP--->
+
+\newpage
+
+# CAPÍTULO 1: JUSTIFICACIÓN DE LA INVESTIGACIÓN
+
+\newline
+
+## 1.1 Antecedentes Generales
+
+\newline
+
+Desde 2007, el Sistema de Transporte Público de la ciudad de Santiago integra física y tarifariamente a la totalidad de los buses de transporte público urbano de la ciudad, operados por empresas privadas, al Metro de Santiago, y al sistema MetroTren Nos, a través de un único medio de acceso electrónico: la Tarjeta bip! @DTPM1.
+
+Los Operadores de Uso de Vías son aquellas sociedades anónimas que prestan los servicios de Transporte Público mediante buses, bajo un sistema de concesión de uso de vías o modalidades análogas de regulación, actualmente existen 6 operadores en el sistema RED Movilidad @DTPM2.
+
 
 ````{r include = F}
 UN <- tibble(Operador = c("Buses Vule S.A.", "Subus Chile S.A.", "Voy Santiago SPA", "Metbus S.A.", "Redbus Urbano S.A.", "Servicio de Transporte de Personas S.A."),
        Servicios = c("Unidad de Negocio 3", "Unidad de Negocio 2", "Unidad de Negocio 4", "Unidad de Negocio 5", "Unidad de Negocio 6", "Unidad de Negocio 7"))
 ````
 
-```{r tab.cap='Empresas Operadoras', tab.id='op.', first_column = TRUE}
+```{r tab.cap='Empresas Operadoras', tab.id='op', first_column = TRUE, echo = F}
 UN
 ````
+Fuente: Elaboración Propia basado en @DTPM2.
 
-## 1.2 Hipótesis
+Las modelaciones gubernamentales son encargadas al Programa de Vialidad y Transporte Urbano de la Subsecretaría del Ministerio del Transporte y Telecomunicaciones (SECTRA), cuyo énfasis es estratégico, utilizando escenarios de Desarrollo Urban ; quienes trabajan con información a nivel agregado mediante el uso de las Encuestas Origen Destino. Como señala @Willumsen2016, *"tanto el mundo académico como el profesional buscan activamente mejorar las bases de modelación de transporte. Entre las aproximaciones utilizadas se ha avanzado hacia modelos desagregados, donde incluso los modelos basados en actividades han llegado a eliminar el uso de zonas".*
 
-## 1.3 Objetivos
+Para evaluar en la dimensión de servicio de transporte, utilizando una matriz de viajes basadas en zonas de grandes dimensiones, la conectividad desde el centroide puede provocar que elija rutas infactibles, donde los parámetros de transbordos son difíciles de calibrar, distorsionando los resultados, incluso a nivel de modo. Esto puede ser resuelto mediante una zonificación más detallada, la cual permite identificar con mayor facilidad los desbalances en la calibración, porque al existir más centroides, el usuario puede elegir una gama más acotada de recorridos para realizar su viaje.  En @Altan2018 se encontró que al triplicar las zonas para el modelo de asignación de Estambul, el error se redujo un 23% y la correlación aumentó en 10 puntos.
+
+Como el enfoque de las modelaciones gubernamentales es estratégico, estas utilizan la demanda a nivel agregado, por lo que, las empresas operadoras de transporte público requieren, un método de estimación de demanda desagregada que se pueda obtener a bajo costo; el cual posea una precisión táctica-operacional para su respectiva zona de operación. Que sea a bajo costo implica que no será necesario realizar un nuevo estudio de movilidad (Encuesta Origen - Destino) y que su respectiva zonificación sea rápida de generar a través de una modelación estadística. Una encuesta de movilidad es costosa, para la ciudad de Santiago la última EOD (2012) costó 600 millones (CLP) @EODCepal, y esta es realizada cada 10 años. 
+
+## 1.2 Estado Actual del Problema
+
+Tanto la red de transporte como la demanda, no es estable a través del tiempo. Por ello, las empresas operadoras necesitan: 
+
+a) evaluar los impactos por modificaciones al Plan Operacional, 
+
+b) predecir la demanda del siguiente año, para generar sus respectivos presupuestos, y 
+
+c) renegociar contratos por afectación por otros modos.
+
+````{r, echo = F}
+fp_bold <- fp_text_lite(bold = TRUE)
+fp_refnote <- fp_text_lite(vertical.align = "superscript")
+bl <- block_list(fpar(ftext("Herramienta para análisis de datos masivos de transporte público", fp_bold)))
+````
+
+La forma en que generalmente se responde a tales incertidumbres es midiendo la demanda por inclusión o eliminación de paradas, datos que son provistos por ADATRAP `r run_footnote(x = bl, prop = fp_refnote)`;  sin considerar el efecto de red por las diversas modificaciones en el sistema. Se obtienen las transacciones promedio por tipo día y se calendariza para el siguiente año. Metodología poco clara, que puede ser un mix de las anteriores. Es necesaria una modelación apropiada que pueda ser desarrollada en corto plazo para responder a esta problemática. Las metodologías antes mencionadas, poseen un alto grado de incertidumbre, para ser consideradas suficientes para evaluar cambios al programa operacional, predecir la demanda del siguiente periodo y renegociación de contratos. Una metodología comúnmente aceptada, para medir la elasticidad del sistema de transporte, es el modelo clásico de transporte. Por dicha razón es que el Directorio Metropolitano de Santiago (DTPM) @DTPMModelo, ha licitado a través de SECTRA, modelos de asignación (4 etapa del modelo clásico de transporte) que sean capaces de estimar a un nivel táctico-operacional, a diferencia de las modelaciones que comúnmente realiza SECTRA. Estos están dispuestos en la página web del DTPM, temporalmente son distantes entre sí; que, al no tener buen nivel de actualización, les resta utilidad para aplicabilidad a las problemáticas que las empresas operadoras necesitan resolver. Adicionalmente, el costo de elaboración de estos es alto, tanto en tiempo como en dinero . El año 2016, DTPM licitó estudio de Mejoramiento y Actualización del Modelo de Asignación de viajes del Sistema Transantiago, adjudicándose por un monto que ascendió a 89.000.000 millones de pesos @Chilecompra, y que cuyos resultados se materializaron el año 2018.
+
+\newline
+
+## 1.3 Hipótesis
+
+\newline
+
+Es posible desagregar la demanda zonal utilizando metodología que implique bajo nivel de costo y precisión en la estimación de demanda a servicios, considerando la localización de paradas como indicador espacial de la concentración de demanda, la cual mejorará resultados de la asignación de asignación de rutas, con precisión táctico-operacional.
+
+\newline
+
+## 1.4 Objetivos
+
+\newline
+
+### Objetivo General
+
+Construir un modelo espacial que desagregue la demanda de una zonificación base del año 2012, en microzonas para las zonas de análisis de transporte, que componen el eje Norte-Sur del Transporte Público de Santiago.
+
+\newline
+
+### Objetivos Específicos
+
+i) Analizar la composición de los viajes del eje Norte-Sur del sistema RED a nivel zonal, utilizando los datos de las tarjetas inteligentes del año 2019 en el periodo Punta Mañana.
+
+ii) Analizar el grado de ajuste de la demanda a rutas, en función de la zonificación actual mediante un modelo de estimación de demanda.
+
+iii) Construir modelo espacial y asignación de demanda para cada zona en el área de análisis.
+
+iv) Analizar la estructura espacial de zonas (obtenidas en iii)), composición de los viajes intrazonales e interzonales y accesibilidad.
+
+v) Evaluar la precisión táctica-operacional para modelo propuesto en la nueva configuración de zonas de análisis de transporte.
 
 \newpage
 
 # CAPÍTULO 2: MARCO TEÓRICO
 
-## 2.1 Modelación de Transporte
+## 2.1 La Demanda de Transporte
 
-## 2.2 Asignación de Transporte Público
+La demanda de servicios del transporte es altamente cualitativa y diferenciada @Ortúzar2008. Existe una amplia gama de demandas específicas de transporte que se diferencian por hora del día, día de la semana, motivo del viaje, tipo de mercancía, importancia de la velocidad y frecuencia, etcétera.Un servicio de transporte sin los atributos que permitan satisfacer esta demanda diferenciada puede ser totalmente inútil. Estas características hacen más difícil analizar y predecir la demanda por servicios de transporte: las ton/km y los pasajeros/km son unidades de rendimiento extremadamente gruesas que esconden una inmensa gama de requerimientos y servicios. La demanda de transporte es una demanda derivada, es decir, no es un fin en sí misma. Con la posible excepción del turismo, la gente viaja para satisfacer ciertas necesidades en sus destinos (trabajo, salud, entretenimiento). Esto es aún más cierto en el caso de las mercancías. Para comprender la demanda de transporte es importante analizar cómo están distribuidas en el espacio las facilidades para satisfacer estas necesidades humanas e industriales, tanto en contextos urbanos como regionales. Es evidente que un buen sistema de transporte amplía las oportunidades para satisfacer dichas necesidades, así como un sistema muy congestionado o mal conectado limita las opciones de movilidad y, por tanto, el desarrollo económico y social.La demanda de transporte tiene lugar en relación al espacio. Aunque parece trivial, es la distribución de las actividades en el espacio lo que provoca la demanda de transporte. Existen algunos problemas de transporte que se pueden tratar, a un nivel muy agregado, sin considerar explícitamente el espacio. Sin embargo, en la gran mayoría de los casos, el tratamiento explícito del espacio es inevitable y muy deseable. El enfoque más usual para tratar el espacio consiste en dividir el área de estudio en zonas y codificarlas, junto a las redes de transporte, de una forma adecuada para su procesamiento y tratamiento con la ayuda de paquetes computacionales especializados (software). En algunos casos, el área de estudio puede ser descrito simplificadamente, suponiendo que las zonas de interés forman un corredor que puede ser representado mediante un sistema lineal. En ambos casos existen diferentes métodos para tratar la distancia y/o distribuir orígenes y destinos (y sus atributos) en el espacio, los cuales son elementos esenciales del análisis de transporte.La articulación espacial de la demanda frecuentemente provoca problemas de falta de coordinación del sistema, la cual puede influir, de forma relevante, en el equilibrio entre oferta y demanda de transporte. Por ejemplo, un servicio de taxis puede tener una fuerte demanda no satisfecha en una parte de la ciudad, mientras en otras existen muchos taxis buscando clientes. Por otro lado, la concentración de población y actividad económica en corredores bien definidos puede justificar un sistema de transporte masivo de alta capacidad que quizás no sería defendible en áreas geográficas con menor densidad de actividades.Finalmente, la oferta y demanda de transporte tienen elementos dinámicosmuy potentes. Una parte importante de la demanda de viajes de transporte se concentra especialmente, durante unas pocas horas del día, en áreas urbanas coincidentemente con los momentos de mayor congestión de tráfico (horas punta). Esta característica de variabilidad de la demanda en el tiempo hace que su análisis y cálculo de previsiones sean más difíciles y a la vez también más interesantes de estudiar. Puede ser que un sistema de transporte funcione adecuadamente para la demanda promedio de viajes pero que se colapse durante la hora punta. Existen varias técnicas para tratar de repartir la carga de la hora punta de una red: flexibilizar los horarios de trabajo, partir la jornada laboral, tarificación por congestión, etc. Sin embargo, la variación de demanda entre las horas punta y valle sigue siendo un problema central y fascinante de la modelización y planificación del transporte.
 
+## 2.2 Oferta de Transporte
+
+La primera característica de la oferta de transporte es @Ortúzar2008 que es un servicio y no una mercancía; por lo tanto, no se puede almacenar para ser utilizada cuando exista una demanda mayor. Un servicio de transporte tiene que ser consumido cuándo y dónde se produce, si no, pierde su beneficio. Por esta razón es muy importante estimar la demanda con la mayor precisión posible para así ahorrar recursos ajustando la oferta de servicios de transporte a ella.Muchas características de los sistemas de transporte provienen de su naturaleza como servicio. En términos muy generales, un sistema de transporte requiere un número de activos fijos (la infraestructura) y un número de unidades móviles (los vehículos). Es la combinación de ambos, junto con una serie de normas para su operación, lo que posibilita el movimiento de personas y mercancías.Frecuentemente se da el caso de que la infraestructura y/o los vehículos de transporte no son propiedad ni son operados por la misma empresa o grupo de empresas. Esto sucede en la mayoría de los modos de transporte, con la excepción notable de muchos sistemas ferroviarios. La separación entre el gestor de infraestructura y el gestor del servicio final de transporte genera una serie de interacciones suficientemente complejas entre entidades o Administraciones Públicas (estatales, regionales y/o locales), empresas de construcción, empresarios, operadores de transporte, viajeros, transportistas y público en general. Este último juega diversos papeles en la oferta de servicios de transporte, ya que con sus demandas puede influir en la puesta en marcha o no, de nuevos servicios que satisfagan sus necesidades dotando así, por ejemplo, de accesibilidad a un territorio y fomentando a la vez el desarrollo y la actividad económica.La provisión de infraestructura de transporte es particularmente importante desde el punto de vista de la oferta. La infraestructura de transporte es un “sistema unitario”, en el sentido de que no se puede concebir media pista de aterrizaje o la tercera parte de una estación de ferrocarril. Ciertamente, en algunos casos, puede haber razones suficientes para proveer gradualmente infraestructura a medida que crece la demanda. Por ejemplo, se puede empezar con una carretera sin pavimento, mejorarla más adelante con una o dos vías mediante un tratamiento superficial; luego una carretera sencilla o autovía bien construida, para finalizar con una carretera a nivel de autopista. De esta forma, la provisión de la infraestructura puede ajustarse y adecuarse a la demanda, evitándose así tempranas inversiones en instalaciones costosas innecesarias. Esto no es tan sencillo en otras áreas como, por ejemplo, aeropuertos, líneas ferroviarias, de metro, etcétera.A este respecto es necesario indicar que las últimas tendencias en la planificación del transporte van dirigidas hacia la gestión de la demanda en entornos de movilidad sostenible. El espacio es limitado pero el crecimiento de la demanda no lo es tanto. Por ello, puede ser interesante, en lugar de crecer en infraestructuras, proceder a una mejor optimización de los recursos existentes gestionando adecuadamente la demanda en modos y formas diferentes a los utilizados en las últimas décadas.Por otro lado, las inversiones en infraestructura del transporte no solamente son enormes sino que también su puesta en servicio lleva un tiempo considerable. Normalmente se trata de proyectos grandes y desde que comienza su planificación hasta que se implementan pueden pasar entre 5 y 15 años. Este aspecto es incluso más crítico en áreas urbanas en las que cualquier construcción y/o reparación de infraestructura de transporte, puede provocar serias perturbaciones, cuyas repercusiones en los usuarios y no usuarios son evidentes.
+
+Además, las inversiones en transporte tienen un componente político muy importante. Por ejemplo, en los países en desarrollo los políticos normalmente consideran los proyectos de carreteras como algo seguro electoralmente: demuestran que hacen algo y es difícil que los medios de comunicación puedan demostrar errores. En países industrializados, en cambio, los proyectos de transporte normalmente conllevan el riesgo de polemizar con los residentes afectados o con los usuarios que sufren debido a la congestión y a los retrasos en obras sobrepasadas por la demanda. El juicio político es esencial en este tipo de disyuntivas, pero cuando no está apoyado por una planificación exhaustiva, las decisiones resultan ser una reacción rápida y, en general, poco reflexiva al problema y al momento de crisis; en el caso del transporte esto es, inevitablemente, “demasiado tarde”. En estos casos, la ref lexión y la planificación son esenciales. En los 80, el énfasis en medidas tácticas de gestión de transporte a corto plazo ref lejaba tanto una desconfianza en la modelización como un intento de evitar los problemas políticos, y una incapacidad a la hora de pensar estratégicamente acerca del futuro del sistema de transporte.La separación entre los que proveen infraestructura y los que ofrecen servicios introduce también complejidades desde el punto de vista económico. Para empezar, no siempre está claro que todos los usuarios perciban realmente los costes totales incurridos en la provisión de los servicios que ellos usan. Por ejemplo, prácticamente nunca se paga directamente por el espacio físico ocupado por las carreteras y cuando se hace, no se incluyen los costes de congestión u otras externalidades; posiblemente lo más cercano a esto son las autopistas de peaje y los modernos esquemas de tarificación vial. Los impuestos sobre vehículos y combustibles son solamente una aproximación genérica al pago por la provisión de infraestructura.Pero, ¿son importantes estas cuestiones? ¿no ocurre quizás que otros bienes y servicios como los parques públicos, las bibliotecas, la policía son a menudo proporcionados sin realizar ningún pago directo? ¿Qué problema hay en permitir la libre utilización económica de las calles? La teoría económica básica nos enseña que sí importa. En un mercado perfecto, una buena asignación de recursos para satisfacer las necesidades humanas solamente se consigue cuando los costes marginales de los bienes son iguales a su utilidad marginal. Por eso, a menudo se dice que el precio de los bienes y servicios, es decir, su coste percibido, debería fijarse según su coste marginal. Por supuesto, los mercados reales no son perfectos y la capacidad para pagar no es un buen indicador de necesidad; sin embargo, este marco general proporciona una base para contrastar otras formas de organizar el sistema de precios y su impacto en la asignación de recursos.El transporte es un elemento muy importante en el bienestar de los países y sus habitantes. Si los usuarios que utilizan la infraestructura de transporte no perciben las consecuencias de sus elecciones en términos de recursos, probablemente van a generar un equilibrio ineficiente entre oferta y demanda. Se despilfarrarán recursos, escasos al ser tarificados por debajo de su coste real, mientras que recursos más abundantes pero tarificados podrían no ser utilizados. El hecho de que globalmente algunos sectores de la economía (típicamente los dueños de vehículos privados) paguen más de lo necesario (a través de impuestos, tasas, combustibles, etc.) por el uso de infraestructura, no garantiza una asignación de recursos más racional. Los propietarios de coches probablemente ven estos costes anuales como costes fijos (a fondo perdido) y como mucho afectan en su decisión de comprar un coche, pero no de utilizarlo.En los países industrializados, sobre todo, las subvenciones entre usuarios se producen de forma “cruzada” no sólo entre modos (los impuestos del combustible pueden usarse para subvencionar el ferrocarril) sino dentro del mismo modo (los costes de mantenimiento de las carreteras son pagados mucho más ampliamente por los coches en función de lo que deterioran, que lo que pagan los vehículos pesados que, evidentemente, deterioran mucho más). Comparados con los vehículos pesados, los coches contribuyen más a los costes de mantenimiento de una carretera (de peaje o no) que el deterioro que ambos generan.Otro elemento de distorsión proviene de los efectos secundarios asociados a la producción de servicios de transporte: accidentes, contaminación y degradación del medioambiente en general. Estos efectos normalmente no son internalizados; el usuario del sistema de transporte raramente percibe el coste medioambiental o los gastos derivados de las hospitalizaciones de los heridos en accidentes relacionados con el transporte. Internalizar estos costes también podría ayudar a mejorar la toma de decisiones en planificación de transporte y, por tanto, a mejorar la asignación de la demanda hacia modos alternativos.Una de las características más importantes de la oferta de transporte es el grado de congestión al que se ha llegado últimamente, sobre todo en áreas urbanas y en algunas infraestructuras interurbanas. Es difícil definir la congestión objetivamente aunque todos sabemos cuándo la sufrimos. Hay aquí un problema de “percepción”, ya que de sobra es conocido que lo que se considera congestión excesiva en ciudades como Leeds o Lleida frecuentemente se consideraría normal en Londres o Lagos. La congestión surge cuando la intensidad de la demanda se aproxima a la capacidad de la instalación (calle, carretera, estación, etc.) y el tiempo requerido para utilizarla (viajar a través de ella) sobrepasa muy por encima la media establecida bajo condiciones de baja demanda. En el caso de la infraestructura de transporte, la inclusión de un vehículo adicional en el sistema genera un retraso suplementario a todos los demás usuarios, como puede verse, por ejemplo \@ref(fig:cong)
+
+```{r, echo=FALSE}
+img.file <- file.path("Congestión.png")
+fpar_1 <- fpar(external_img(src = img.file, height = 4, width = 5))
+````
+
+````{r, echo = F, fig.cap="Congestión y sus efectos externos", fig.id = "cong", fig.cap.style = "Image Caption"}
+fpar_1
+````
+Fuente: Sacado de @Ortúzar2008
+
+Obsérvese que la contribución de un vehículo adicional al retraso de todos los usuarios es mayor cuando la intensidad de flujo vehicular es más alta. Este efecto externo, motivado por el fenómeno de la congestión, es generalmente percibido por los demás usuarios pero no por el conductor que lo origina. Éste es el coste que se intenta internalizar mediante sistemas como la tarificación vial electrónica, con el objetivo de ayudar en la toma de decisiones individuales más razonadas.
+
+## 2.3 Estado de Equilibrio
+
+En términos generales, dado un sistema de transporte con una cierta capacidad
+de operación, la función de la planificación del transporte es asegurar la
+satisfacción de una cierta demanda *D* de movimiento de personas y mercancías
+con diferentes motivos de viaje, en distintos momentos del día, semana, mes y
+año, utilizando los distintos modos que lo conforman @Ortúzar2008. El sistema de transporte
+se puede definir como la interacción de:
+
+1. Una infraestructura (p. ej., la red de transporte).
+
+2. Un sistema de gestión (esto es, un conjunto de normas, como p. ej., conducir
+por la derecha y una serie de estrategias de control, como las señales de
+tráfico, etc.).
+
+3. Un conjunto de modos de transporte y sus operadores.
+
+Considérense un conjunto de volúmenes de tráfico V sobre una red, a una
+velocidad *S* y con una capacidad de operación *Q* de acuerdo a un sistema de
+gestión *M*. En términos muy generales, la velocidad sobre la red puede ser
+representada como:
+
+$S = f(Q,V,M)$ (2.1)
+
+La velocidad puede ser considerada como una primera aproximación de un indicador general del *nivel de servicio* ofrecido por el sistema de transporte. En términos más generales, un nivel de servicio sería especificado como una combinación de varios efectos: velocidad o tiempo de viaje, tiempos de espera y caminata y precio. El sistema de gestión M puede incluir esquemas de gestión del
+tráfico, control de áreas de tráfico y/o regulaciones aplicables a cada modo. 
+
+Como en el caso de la mayoría de los bienes y servicios, se espera que el
+nivel de demanda D dependa del nivel de servicio ofrecido por el sistema de
+transporte y también de la distribución de las actividades A en el espacio:
+
+$D = f({S,A})$ (2.2)
+
+Para un sistema de actividades fijo resulta que combinando las ecuaciones
+(2.1) y (2.3) se debería encontrar un conjunto de puntos de equilibrio entre la oferta y la demanda de transporte. Pero al variar el nivel de servicio en el espacio y en el tiempo, el sistema de actividades probablemente cambiará, determinando dos conjuntos diferentes de puntos de equilibrio: a corto y a largo plazo. El objetivo de la planificación del transporte es prever y gestionar la evolución en el tiempo de estos puntos de equilibrio de forma que se maximice
+el bienestar social. 
+
+
+Algunas relaciones causa-efecto muy simples se pueden representar gráficamente
+para ayudar a comprender la naturaleza de algunos problemas de
+transporte. Un ejemplo típico es el círculo vicioso coche/transporte público
+
+````{r, echo=FALSE}
+img.file <- file.path("circulo vicioso.png")
+fpar_2 <- fpar(external_img(src = img.file, height = 4, width = 5))
+````
+
+````{r, echo = F, fig.cap="Círculo Vicioso del transporte público", fig.id = "vicioso", fig.cap.style = "Image Caption"}
+fpar_2
+````
+Fuente: Sacado de @Ortúzar2008
+
+El crecimiento económico trae como consecuencia, entre otros aspectos, un aumento en la compra de vehículos privados.
+Inicialmente, más coches significan, en general, que más personas desean transferirse
+del transporte público al coche, lo cual implica evidentemente menos
+pasajeros. A ello, los operadores pueden responder incrementando los precios
+de los billetes y/o reduciendo la frecuencia (el nivel del servicio) o ambos. En
+consecuencia, la situación descrita hace más atractiva la posesión y uso del
+coche privado, acelerando así el círculo vicioso. A medida que este proceso se
+repite cada año, los niveles de congestión aumentan, los autobuses se retrasan,
+sus frecuencias disminuyen y sus tarifas son cada vez más altas; se constata,
+por tanto, que la acumulación de decisiones individuales razonables, provoca
+un estado final peor para todos que el inicial.
+
+Medidas estructurales (físicas) como el establecimiento de
+carriles bus y otras medidas de prioridad a buses son particularmente atractivas,
+ya que dan como resultado una asignación más eficiente del espacio vial.
+Por otro lado, las subvenciones al transporte público tienen sus detractores y
+sus defensores; pueden reducir la necesidad de subir los precios a corto plazo,
+pero tienden a generar grandes déficits y a proteger una gestión “pobre”, que
+es en parte consecuencia de su propia ineficacia. Este aspecto últimamente
+ha hecho que, en países en los que el transporte público se ejerce, por parte
+de empresas u operadores privados en base a concesiones (España, p. ej.), las
+licitaciones se realicen en función de lo que se denomina “Contratos de Gestión
+Interesada”, en los cuales se exige y vigila al empresario en el cumplimiento
+de ciertos estándares de calidad (puntualidad, frecuencias, comportamiento y
+atención al usuario, adaptabilidad de bus, edad del bus, etc.), de forma que sus
+ingresos aumenten si dichos estándares se cumplen, penalizando a aquellos
+empresarios que no los cumplen.
+
+Desgraciadamente, es imposible caracterizar todos los problemas de transporte
+de una forma sencilla, única y universal. Los problemas de transporte
+dependen del contexto, el cual no puede ignorarse a la hora de resolverlos. Los
+modelos pueden contribuir a lograr que la identificación de los problemas y la
+selección de la forma de resolverlos tenga una base más sólida @Ortúzar2008.
+
+## 2.4 Modelación Agregada y Desagregada
+
+El nivel de agregación seleccionado para la medición de los datos es una cuestión
+importante en el diseño general de un estudio de planificación de transporte @Ortúzar2008.
+Aunque un nivel mayor de detalle –con miras a un mayor grado de
+exactitud– debería mejorar la calidad de los modelos, probablemente incrementará
+los costes de recogida y análisis de datos así como de la mayoría de
+los restantes aspectos del ejercicio de la modelización.
+De interés central es la agregación de los datos exógenos, es decir, la información
+acerca de cuestiones diferentes al comportamiento de los viajeros,
+que se supone endógeno (es decir, el modelo intenta replicarlo). Por ejemplo,
+durante años se ha discutido si un ítem de datos representa el valor medio de
+un grupo de viajeros o si debería ser recogido específicamente para un individuo.
+Es inevitable un cierto grado de agregación cuando el modelo de interés
+procura representar el comportamiento de más de un individuo. Pero, cuando el modelo de interés
+intenta representar el comportamiento individual, como es el caso de los modelos desagregados o de segunda generación, es lógico pensar que la información exógena pueda ser obtenida y utilizada
+separadamente para cada viajero. Una cuestión importante es entonces si, por
+razones de coste u otras, se debería preferir utilizar datos menos detallados
+(ver @Daly1990).
+La previsión de la demanda futura es un elemento crucial en la mayoría
+de los estudios de planificación del transporte. El ser capaz de predecir el
+uso más probable de nuevas infraestructuras es un precursor esencial para
+la toma de decisiones racional acerca de las ventajas o no de proveer tales
+infraestructuras. También puede ser importante tener alguna idea acerca de
+la sensibilidad de la demanda respecto a variables importantes que estén bajo
+control del analista (p. ej., la tarifa que se cobra por su uso). En la mayoría de
+los casos las previsiones y los estudios de sensibilidad deben proporcionarse
+a nivel agregado, es decir, deben representar el comportamiento del total de
+la población de interés. Por lo tanto, con el fin de obtener estos indicadores
+el analista que utiliza modelos desagregados tiene que encontrar un método
+robusto para agregar los resultados del modelo.
+Los modelos de la primera generación se solían utilizar casi sin excepción
+en los estudios de transporte hasta finales de los 70; llegaron a hacerse
+familiares, necesitaban relativamente pocas habilidades por parte del analista
+(pero sí algún conocimiento de informática básica) y tenían la propiedad de
+ofrecer una “receta” para todo el proceso de modelización completo, desde la
+recolección de datos hasta la predicción de flujos en los enlaces de una red.
+Los resultados de estos modelos, quizás porque eran generados por complicados
+programas de ordenador, a menudo se consideraban más exactos de lo que
+se pretendía; por ejemplo, predecir giros a izquierda de vehículos a 15 años
+vista. Los modelos de la primera generación han sido criticados severamente
+(a veces con justificación) por su inflexibilidad, inexactitud y coste. Desgraciadamente,
+muchos enfoques de la segunda generación, habiendo adoptado
+un tratamiento sofisticado de las elecciones y restricciones enfrentadas por los
+viajeros individuales, han fallado al momento de realizar previsiones, a veces
+porque requerían datos que no podían ser estimados de forma razonable.
+Los modelos desagregados, que llegaron a ser muy populares en los 80,
+ofrecen sustanciales ventajas sobre los métodos tradicionales y también son
+de utilidad práctica en múltiples aplicaciones. Sin embargo, un problema práctico
+importante es que requieren un alto nivel de conocimiento y “habilidades”
+estadísticas y econométricas (especialmente en la interpretación de los resultados), y definitivamente mucho mayor que en el caso de los modelos agregados.
+Además, se ha exagerado la diferencia entre los modelos de primera
+y segunda generación. Por ejemplo, los modelos desagregados fueron inicialmente
+promocionados como radicalmente diferentes a los métodos clásicos,
+una “revolución” en este campo del conocimiento. Sin embargo, bastante más
+tarde quedó claro que era más adecuado considerarlos una “evolución” desde un
+punto de vista de modelización @Williams1982b. De hecho,
+en muchos casos, existe una equivalencia completa en la forma de pronosticar @Daly1982a.
+La diferencia esencial está en el tratamiento de la descripción del comportamiento,
+en particular durante el proceso de desarrollo del modelo; en muchos
+casos, el enfoque desagregado es claramente superior al conjunto de comportamientos
+individuales por zonas y estratos predefinidos de la población.
+Los intentos de clarificar el tema de en qué circunstancias sería preferible
+utilizar un enfoque agregado o desagregado, han llegado a la conclusión de que
+no existe un enfoque más adecuado para todas las situaciones planteadas @Daly1990. Estos intentos también han concluido que se requiere una serie de directrices para ayudar a los profesionales desesperados a elegir la herramienta de modelización más apropiada para un contexto determinado. En este libro se ha intentado dar respuesta a esta cuestión.
+
+## 2.5 Modelo Clásico de Transporte
+
+Años de experimentación y desarrollo han dado como resultado la definición de
+una estructura general de modelización denominada modelo clásico de transporte.
+Esta estructura es, en efecto, el resultado de la práctica en los 60, pero
+ha permanecido relativamente inalterada a pesar de las importantes mejoras
+experimentadas en las técnicas de modelización durante los últimos 40 años.
+La forma general del modelo puede verse en la siguiente figura. 
+
+
+````{r, echo=FALSE}
+img.file <- file.path("Modelo Clásico.png")
+fpar_3 <- fpar(external_img(src = img.file, height = 4, width = 5))
+````
+
+````{r, echo = F, fig.cap="Modelo Clásico de Transporte", fig.id = "4etapas", fig.cap.style = "Image Caption"}
+fpar_3
+````
+Fuente: Sacado de @Ortúzar2008
+
+El enfoque comienza considerando una zonificación y un sistema de redes así como la recogida
+y codificación de datos de planificación, calibración y validación. Estos
+datos deberían incluir información para el año base sobre la población de diferentes
+tipos en cada zona del estudio así como niveles de actividad económica,
+incluyendo empleo, espacio dedicado a la actividad comercial, instalaciones de
+educación y recreativas @Ortúzar2008. A continuación estos datos se utilizan como variables
+independientes de la función de demanda, para estimar modelos que reproduzcan
+el número total de viajes atraídos y generados (variable dependiente) por
+cada zona del área de estudio (generación de viajes). El paso siguiente es asignar
+estos viajes a diferentes destinos, en otras palabras, su distribución en el
+espacio, dando lugar a una matriz de viajes origen-destino (O-D). La etapa siguiente
+consiste en modelizar la elección del modo, y esto tiene como resultado
+el reparto o distribución modal, es decir, la asignación de los viajes de la matriz
+O-D según los diferentes modos de transporte. Finalmente, la última etapa del modelo clásico consiste en la asignación de los viajes en cada modo a su red correspondiente: típicamente de transporte público o de transporte privado.
+
+El modelo clásico se presenta como una secuencia de cuatro etapas o submodelos:
+generación de viajes, distribución, reparto modal y asignación. Actualmente
+se reconoce que las decisiones de viaje no se toman realmente siguiendo
+este tipo de secuencia; una visión contemporánea es que el posicionamiento de
+cada submodelo depende de la forma de la función de utilidad asumida para
+explicar todas estas elecciones de viaje @Williams1977. Más aún, se
+critica que el modelo de cuatro etapas concentra la atención en sólo un espectro
+limitado de las decisiones que pueden adoptar los usuarios. La tendencia actual
+requiere analizar una gama más amplia de respuestas a los problemas y proyectos
+de transporte. Por ejemplo, ante una situación de congestión creciente,
+un viajero puede responder con una serie de cambios simples en:
+
+- El *recorrido* seguido, para evitar la congestión o aprovechar nuevos enlaces;
+esto incluye la elección de aparcamiento o una combinación de servicios en el caso de transporte público.
+- El *modo* utilizado para llegar al destino.
+- La *hora* de salida para evitar los momentos más congestionados.
+- El *destino* del viaje hacia una zona menos congestionada.
+- La *frecuencia* de los viajes, haciéndolos otro día, o quizás combinándolos
+con otras actividades.
+
+Además, a más largo plazo pueden tener lugar otras respuestas más complejas,
+por ejemplo, cambio de lugar de empleo, de localización residencial, de
+áreas comerciales, etc.; todos estos aspectos son sensibles, al menos en parte,
+a cambios en la accesibilidad del sistema de transporte.
+A pesar de estos comentarios, el modelo secuencial de cuatro etapas constituye
+un punto de referencia respecto a métodos alternativos. Por ejemplo,
+algunos de los enfoques actuales intentan tratar de forma simultánea la elección
+de frecuencia de viaje (viajes por semana), destino y modo de viaje en un
+modelo único que colapsa estas tres etapas. Otros enfoques ponen el énfasis
+en el papel de las actividades familiares y en las elecciones de viaje que ellas
+originan; conceptos como circuitos, presupuestos de tiempo y dinero se utilizan
+en este contexto para modelizar las decisiones y restricciones de viaje. Estas
+estrategias de modelización son más difíciles de plantear en términos de los
+cuatro submodelos o decisiones anteriormente descritas. Hasta el momento,
+estos nuevos enfoques han jugado un papel más bien de investigación y su
+uso operativo parece aún lejano. Sin embargo, estos modelos basados en las
+actividades permiten una mejor comprensión del comportamiento respecto
+a viajes y probablemente en el futuro mejoren los enfoques de modelización
+más convencionales.
+La secuencia generación-distribución-elección modal-asignación es la más
+común pero no es la única posible. Por ejemplo, algunos estudios en el pasado
+han situado la elección modal antes que la distribución e inmediatamente
+después de (o junto con) la generación de viajes. Esto permite dar un mayor
+énfasis a las variables decisionales que dependen de la unidad que genera el
+viaje, quizás el hogar. Sin embargo, situar la elección modal antes de que se
+conozca la distribución dificulta la inclusión en el modelo de los atributos del
+viaje y del modo y le resta relevancia en términos de análisis de políticas al
+modelo de reparto modal. Quizás un mejor enfoque sería tratar simultáneamente
+la distribución y elección del modo.
+Obsérvese también que el modelo clásico considera a la generación de viajes
+como inelástica, es decir, es independiente del nivel de servicio proporcionado
+por el sistema de transporte. Probablemente, ello no es demasiado realista pero 
+solamente en los últimos años se han desarrollado técnicas que pueden tener
+en cuenta estos efectos de forma sistemática.
+Una vez calibrado y validado el modelo según las condiciones del año
+base es cuando puede ser aplicado a uno o más horizontes de planificación.
+Para hacer esto se deben plantear escenarios y planes que describan
+las características relevantes del sistema de transporte y las variables de planificación
+en situaciones futuras. La elaboración de escenarios realistas y
+consistentes no es tarea fácil, ya que es muy sencillo caer en la trampa de construir
+alternativas futuras que no sean financieramente factibles ni realistas
+en cuanto al probable desarrollo de los usos del suelo y de las actividades en
+la zona de estudio. A pesar de estas dificultades, establecer escenarios es aún
+más un arte que una técnica y requiere mucha experiencia ingenieril combinada
+con un sólido juicio político; desgraciadamente, éstos son recursos
+escasos que no suelen encontrarse al mismo tiempo en los equipos de planificación.
+Una vez definidos un conjunto de escenarios y planes realistas para su
+verificación, se activa nuevamente la misma secuencia de modelos para simular
+sus prestaciones. A continuación se realiza una comparación entre los costes
+y beneficios de los diferentes proyectos bajo diferentes escenarios, con el
+objetivo final de elegir el programa de inversión más rentable y la política de
+transporte más adecuada que satisfaga la demanda por desplazamientos en la
+zona de estudio.
+Una cuestión importante en el modelo clásico de cuatro etapas es la necesidad
+de verificar la utilización consistente de las variables que influyen
+sobre la demanda. Por ejemplo, al final de la fase de asignación de tráfico se
+obtendrán nuevos niveles de flujo y, por lo tanto, nuevos tiempos de viaje que,
+probablemente, no sean los mismos tiempos de viaje supuestos al estimar la
+distribución de viajes y elección de modo. Por ello parecería necesario volver a
+ejecutar los modelos de distribución y elección modal basándose en los nuevos
+tiempos de viaje deducidos de la asignación, recalcular las nuevas matrices
+modales y utilizarlas para la aplicación, también de nuevo, del modelo de
+asignación y así sucesivamente. Desafortunadamente, en general este proceso
+iterativo ingenioso, no conduce a un conjunto estable de modelos de distribución,
+elección modal y asignación con tiempos de viaje consistentes. 
+
+## 2.6 Redes y Zonificación
+
+Una de las primeras y más importantes decisiones a las que tiene que enfrentarse
+el profesional de la modelización de transporte es el nivel de detalle
+(resolución) que se va a adoptar en el estudio @Ortúzar2008. Este problema tiene varias dimensiones:
+esquemas de redes y servicios a considerar, tipo de variables de
+comportamiento que se incluirán, tratamiento del tiempo, etc. Este epígrafe
+concentra su atención en establecer consideraciones de diseño relativas a dos
+de estas decisiones: la definición de la zonificación y de la red.
+En estos dos casos, al igual que en otros aspectos fundamentales de la modelización
+de transporte, la opción finalmente elegida refleja un compromiso
+entre dos objetivos en conflicto: la exactitud y el coste. Se puede alcanzar una
+gran exactitud utilizando una zonificación más detallada y un sistema de redes
+más preciso. En el límite, esto implicaría reconocer cada hogar de cada uno de
+los individuos, su localización, distancia a los puntos de acceso a las redes, etc.
+Con una muestra suficientemente grande (tasa del 100% durante varios días), se
+podría lograr una representación muy precisa del sistema actual. Sin embargo
+el problema de estabilidad temporal debilita esta visión de la exactitud, ya que
+se necesitaría predecir, con el mismo nivel de detalle, los cambios a nivel de
+cada hogar individual que afectarían a la demanda de transporte. Esta tarea
+es imposible e innecesaria. Cuando se realizan prognosis es posible admitir
+menores niveles de detalle no sólo por motivos económicos, sino por el nivel
+de exactitud requerido.
+
+### 2.6.1 Diseño de la Zonificación
+
+La zonificación se utiliza para agregar hogares individuales y edificios en
+porciones tratables del territorio para los objetivos de la modelización. Las
+dos dimensiones principales de una zonificación son el número de zonas y
+su tamaño y, evidentemente, ambas están relacionadas. Cuanto mayor sea el número de zonas, obviamente más pequeñas deberán ser para cubrir la misma
+área de estudio. En el pasado ha sido una práctica común desarrollar un
+sistema de zonificación específico para cada estudio y para cada contexto de
+decisión. Esto es claramente despilfarrador si se realizan distintos estudios en
+áreas cercanas. Además, la introducción de sistemas zonales diferentes hace
+difícil la utilización de datos de estudios previos y las comparaciones de modelos
+en el tiempo.
+La primera decisión al establecer un sistema de zonificación es distinguir
+el área de estudio como tal del “resto del mundo”. Existen algunas ideas que
+pueden facilitar esta elección:
+Al elegir el área de estudio se debe considerar el contexto •• de decisión, la
+red de transporte que debe ser modelizada y la naturaleza de los viajes
+que interesan, es decir, si son obligatorios u opcionales, de corta o larga
+distancia, etcétera.
+
+- Para estudios estratégicos se debería definir el área de estudio de forma que
+la mayoría de los viajes tenga su origen y destino dentro de ella. Sin embargo,
+esto puede no ser posible en el análisis de problemas de transporte en
+pequeñas áreas urbanas donde la mayoría de los viaje de interés atraviesan
+el área e interesa considerar la posibilidad de establecer una circunvalación
+(by-pass).
+
+-  Problemas similares surgen en estudios de gestión de tráfico en áreas locales,
+donde los flujos de tráfico también tienen su origen o destino, o ambos,
+fuera del área de interés. En estos casos es interesante saber si es posible
+modelizar los cambios que experimentarían estos viajes como consecuencia
+de nuevas intervenciones en la red.
+
+- El área de estudio tendría que ser algo mayor que el área concreta de interés
+y debe comprender todos los proyectos de transporte que hayan de ser
+considerados. Debe permitir el cambio de rutas, cambios en el destino, etc.,
+ya que interesa modelizar sus efectos en el área de estudio.
+
+La región externa al área de estudio se divide normalmente en un cierto
+número de zonas externas. En algunos casos puede ser suficiente considerar
+cada zona exterior como representante de una parte del “resto del mundo” en
+una dirección particular. Las fronteras de estas diferentes partes del “resto del
+mundo” podrían representar áreas naturales conectadas mediante arcos de
+transporte por los que circulen flujos que alimentan el área de estudio. En otros
+casos, puede ser ventajoso considerar zonas externas de tamaño creciente con la distancia al área del análisis. Esta consideración puede facilitar el análisis de
+los impactos sobre diferentes tipos de viajes (corta y larga distancia).
+Dicha área también debe dividirse en zonas internas más pequeñas. Su
+número dependerá del compromiso entre una serie de criterios que se señalan
+más adelante. Por ejemplo, para el análisis y organización de redes de gestión
+de tráfico se requerirá generalmente zonas más pequeñas, representando incluso
+aparcamientos de vehículos o los principales generadores/atractores de
+viajes. Por otra parte, en el caso de estudios estratégicos, se necesitan diseños
+zonales mucho más amplios. Por ejemplo, en estudios estratégicos de Londres
+se han usado zonificaciones muy finas con unas 1.000 zonas (para 7,2 millones
+de habitantes) y varios niveles de agregación de las mismas hasta 50 zonas (a
+nivel de municipio). En la siguiente tabla se presentan ejemplos de los números de
+zonas elegidos en diversos estudios.
+
+````{r, echo=FALSE}
+img.file <- file.path("n zonas.png")
+fpar_4 <- fpar(external_img(src = img.file, height = 4, width = 5))
+````
+
+````{r, echo = F, fig.cap="Número típico de zonas en varios estudios", fig.id = "nzonas", fig.cap.style = "Image Caption"}
+fpar_4
+````
+Fuente: Sacado de @Ortúzar2008
+
+Las zonas se representan en los modelos de ordenador, como si todos sus
+atributos y propiedades estuvieran concentrados en un único punto denominado
+centroide de zona. Este punto se puede considerar flotando en el espacio y no en una localización física sobre un mapa. Los centroides se conectan a la
+red mediante los conectores de centroide que representan los costes medios
+(distancia, tiempo) para incorporarse al sistema de transportes modelizado que
+tienen los viajes con origen o destino en esa zona. Casi tan importante como
+el coste asociado a cada conector es el nodo de la red al que se conecta. Estos
+nodos deben estar próximos a los puntos naturales de acceso/salida de la zona.
+El papel de los centroides y conectores en la modelización debe contribuir a la
+definición de los límites de zonas.
+A continuación se incluye un sencillo listado de criterios de zonificación
+que han sido recopilados a partir de la experiencia adquirida en varios estudios:
+
+1. El tamaño de las zonas debe ser tal que el error de agregación causado por la hipótesis de que todas las actividades se concentran en el centroide, no
+sea muy grande. Puede ser conveniente comenzar con un sistema con zonas
+muy pequeñas, ya que éstas pueden agregarse de varias formas dependiendo
+de la naturaleza de los proyectos que vayan a ser evaluados.
+
+2. El sistema de zonificación debe ser compatible con otras divisiones administrativas,
+particularmente las zonas censales. Este criterio es probablemente
+el fundamental y el resto sólo ha de seguirse si no conduce a inconsistencias
+con el censo.
+
+3. Es necesario que las zonas sean lo más homogéneas posibles en su composición
+de usos del suelo y/o población. Las secciones censales con claras diferencias
+al respecto (p. ej., sectores residenciales con niveles de ingreso
+diferentes) no deben agregarse, ni aunque sean pequeñas.
+
+4. Es importante que los límites de zonas sean compatibles con los cordones y
+las líneas-pantalla, así como con los límites de zonificaciones preexistentes.
+Se ha demostrado en la práctica que se debe evitar el uso de vías o calles
+principales como límites de zonas, ya que incrementa considerablemente
+la dificultad de asignar viajes a zonas, cuando éstos se originan o acaban
+en la frontera entre las mismas.
+
+5. La forma de las zonas debe permitir una identificación sencilla de los conectores
+de centroides. Esto es particularmente importante para la estimación
+sucesiva de características intrazonales. Una zona debe representar
+el área natural de cobertura de las redes de transporte y su(s) conector(es)
+debe(n) ser identificado(s) de forma que representen los costes principales
+de acceso a la red.
+
+6. Las zonas no tienen porqué ser de tamaño similar. Si acaso pueden ser de
+dimensiones semejantes en unidades de tiempo de viaje, lo que implica la
+generación de zonas más pequeñas en áreas más congestionadas.
+
+Algunas veces puede ser ventajoso desarrollar un sistema de zonas jerárquico,
+como el empleado en los Estudios de Transporte de Londres (LTS), en
+el que las subzonas se agregan en zonas mayores, que a su vez se agregan
+en distritos, municipios y finalmente sectores. Esto facilita un análisis al nivel
+de detalle adecuado para diferentes tipos de decisiones. Los sistemas de zonificación
+jerárquica pueden plantearse con un esquema de numeración zonal
+adecuado, en el que el primer dígito indica el sector, el segundo el municipio,
+el tercero el distrito y así sucesivamente.
+
+### 2.6.2 Representación de Redes
+
+La red de transporte trata de representar la parte de la oferta dentro del proceso
+de modelización, es decir, lo que el sistema de transporte ofrece para satisfacer
+las necesidades de desplazamiento de los viajeros en el área de estudio. La
+descripción de una red de transporte en un modelo de ordenador puede realizarse
+con diferentes niveles de detalle y requiere simplificar su estructura,
+sus propiedades o atributos y la relación entre dichos atributos y los flujos de
+tráfico @Ortúzar2008.
+
+A. Detalles de la red
+
+La red de transporte puede representarse con diferentes niveles de agregación dentro de un modelo. En un extremo están los modelos sin ningún arco que se
+basan en representaciones continuas de la oferta de transporte @Smeed1968.
+Con estos modelos se puede obtener, por ejemplo, una ecuación continua de
+la capacidad media de tráfico por unidad de área en vez de por elementos
+discretos o arcos. En un nivel de desagregación ligeramente mayor, se puede
+considerar una calle o vía individual, pero suponiendo características como la
+curva flujo-velocidad tomada de un área mucho más amplia; ver, por ejemplo,
+Wardrop @Wardrop1968.
+La práctica normal, sin embargo, es modelizar la red como un grafo dirigido u orientado, es decir un sistema de nodos y arcos conectados @Larson1981. La mayor parte de los nodos representa intersecciones, mientras que los arcos representan tramos de calles o vías homogéneas entre intersecciones. Los arcos se caracterizan por varios atributos como, por ejemplo, longitud, velocidad, número de carriles, etc., y son habitualmente unidireccionales.
+Incluso si se especifica durante la entrada de datos un único arco de doble
+dirección, por simplicidad, éste se convierte luego, internamente en dos arcos
+unidireccionales. Un subconjunto de nodos se asocia a los centroides de zonas y
+un subconjunto de los arcos a los conectores de los centroides. 
+Un problema con este enfoque es que la conectividad de un nodo a cada arco
+que llega a él no tiene coste alguno, pero en la práctica algunos movimientos
+de giro en intersecciones pueden ser más difíciles de realizar que otros, incluso
+pueden estar prohibidos. Para representar mejor estas características de la red
+real, es posible penalizar y/o prohibir movimientos de giro. Esto puede hacerse
+manualmente desagregando la intersección y asignando arcos separados (llamados
+a veces arcos ficticios) a cada movimiento de giro y asociando costes diferente
+a cada uno. Algunos programas comerciales son capaces de llevar a cabo
+esta desagregación de forma semiautomática, siguiendo instrucciones simples
+proporcionadas por el usuario sobre los movimientos penalizados o prohibidos.
+El nivel de desagregación puede incrementarse posteriormente si se utilizan
+modelos detallados de simulación de tráfico (nivel micro de planificación).
+En estos casos se utilizan arcos adicionales en intersecciones complejas para
+tener en cuenta el funcionamiento de los carriles reservados, señales de ceda
+el paso, etcétera.
+Las redes son a veces subconjuntos de sistemas más amplios y por tanto
+pueden ser delimitadas por un cordón que defina los accesos, o puntos del
+cordón, donde la red de interés está conectada con el resto del mundo. Estos
+puntos se denominan en ocasiones “puertas” (gateways) y se pueden utilizar
+arcos ficticios para conectarlos con las zonas exteriores.
+Una decisión fundamental en la preparación de una red es determinar los
+niveles de jerarquía viaria que han de incluirse. Si se incluyen más calles, mejor
+será la representación de la realidad, pero de nuevo aparecerá el problema de los
+costes del estudio frente al realismo, lo cual puede conducir al modelizador a
+prescindir de algunos arcos. Además, no tiene mucho sentido incluir un número
+elevado de vías en la red para después realizar hipótesis más generales sobre
+giros y demoras en las intersecciones. Tampoco es muy razonable utilizar una
+red muy detallada junto con un sistema de zonificación menos preciso, ya que
+los errores de agregación espacial (en términos de conexión de centroides a
+la red) reducen el valor de todo el proceso. Esto es especialmente importante *en el caso de redes de transporte público* Lo
+que más importa es que la elección de rutas y flujos sea lo más realista posible dentro de las limitaciones del estudio. Jansen y Bovy @Jansen1982 investigaron la influencia de la definición y detalle de las redes sobre el realismo de la asignación de flujos en la red. La principal
+conclusión de su estudio es que se obtienen errores más grandes en los niveles
+jerárquicos más bajos de la red viaria. Por tanto se debe incluir en la red al
+menos un nivel por debajo de los arcos de interés. Por ejemplo, en un estudio
+de vías de tipo A (carreteras nacionales), se ha de incluir las vías de tipo
+B (carreteras secundarias).
+En el caso de redes de transporte público se requiere un nivel de detalle
+adicional. El modelizador debe especificar la estructura de redes que corresponda
+a los servicios de transporte público ofrecidos. Éstos se codifican como
+una secuencia de nodos sobre los cuales transita el servicio (autobús, ferrocarril),
+en donde normalmente cada nodo representa una parada o estación. Las
+intersecciones sin paradas de autobús pueden, por tanto, excluirse de las redes
+de transporte público. Además se necesita añadir a las redes dos tipos de arcos
+adicionales: los arcos a pie, que representan la o las partes del viaje realizadas
+andando, y los arcos que modelizan los costes adicionales asociados con el
+trasbordo de uno a otro servicio.
+
+B. Propiedades de los arcos
+
+El nivel de detalle asociado a los atributos de los arcos depende del nivel general
+de resolución de la red y del tipo de modelo utilizado. En el nivel mínimo de
+análisis se requieren los siguientes datos referentes al arco:
+
+- Longitud.
+- Velocidad de recorrido, bien como velocidad a flujo libre o bien como un
+valor observado para una determinada intensidad de tráfico.
+- Capacidad del arco, habitualmente en unidades equivalentes de vehículos
+de pasajeros (PCU) por hora.
+
+Además se debe asociar una relación coste-flujo a cada arco, como se señala
+más adelante. En algunos casos se emplean modelos más elaborados para
+representar las demoras al flujo de tráfico, pero éstos requieren información
+adicional sobre los arcos, por ejemplo:
+
+- Tipo de vía (autovía, vía principal, calle local).
+- Anchura de calzada, número de carriles o ambos.
+- Indicaciones sobre la presencia o ausencia de carriles bus o prohibiciones para el uso de determinados vehículos (p. ej., camiones).
+- Giros prohibidos o giros que se realizan sólo cuando existe espacio disponible en el tráfico opuesto.
+- Tipo de intersección y detalles de la misma, incluyendo regulación semafórica.
+- Capacidad de almacenamiento de colas y su existencia al comienzo de una
+determinada fase semafórica y/o período de modelización.
+
+Estudios holandeses han demostrado que el tiempo y la distancia (ponderados)
+explican solamente el 70% de las rutas realmente utilizadas. La categoría de
+la vía (autopista, carretera tipo A, tipo B), la calidad escénica, los semáforos
+y la capacidad contribuyen a explicar la utilización de rutas adicionales. A
+medida que progrese la comprensión de la influencia de estos atributos en la
+elección de ruta, se podrán desarrollar modelos de asignación más realistas.
+La contrapartida a este avance será la necesidad de incluir otras características
+de las vías, tales como su calidad escénica, número de intersecciones de cada
+tipo, etcétera.
+
+C. Coste de las redes
+
+La mayor parte de las técnicas actuales de asignación suponen que, en la elección
+de ruta, los conductores tratan de minimizar una combinación lineal de
+tiempo y distancia, denominada a veces coste generalizado. Esta hipótesis es
+simplista, ya que existen muchas diferencias no sólo en la percepción del tiempo,
+sino también en su importancia relativa comparada con otras características
+de las rutas. Sin embargo, la gran mayoría de los modelos de redes utilizados
+hoy en día trabajan únicamente con distancia y tiempo de viaje.
+Deben distinguirse dos casos cuando se modeliza el tiempo o el coste de viaje
+como una función del flujo existente. El primero es cuando se puede suponer
+que las demoras en un arco dependen sólo del flujo del arco; éste es el caso típico
+de arcos de gran longitud alejados de intersecciones, y por tanto, es el empleado
+en la mayor parte de los modelos de asignación interurbanos hasta hoy. El segundo
+caso se puede encontrar en áreas urbanas, en las que el tiempo o coste de viaje en un arco depende de forma importante del flujo en otros arcos, por ejemplo,
+para tráfico no prioritario en una intersección de tipo ceda el paso o glorieta.
+
+La introducción de formulaciones muy generales para la relación flujodemora
+no es complicada hasta llegar al siguiente paso: el equilibrio entre la
+oferta y la demanda. Aquí, el tratamiento matemático del primer caso (denominado
+corrientemente como el caso de función de costes separable) es más simple
+que el del segundo. Sin embargo existen actualmente técnicas matemáticas
+adecuadas para resolver el equilibrio de la demanda y la oferta en modelos en
+los que el coste o tiempo de viaje en arcos depende del flujo en varios arcos; es
+decir, en los casos en los que el efecto de cada flujo no puede ser separado. 
+
+## 2.7 Asignación de Transporte Público
+### 2.7.1 Características
+A. La Oferta
+
+La red de servicios de transporte público es diferente a la de transporte privado,
+en tanto que incluye, como arcos, secciones de los servicios de los autobuses o trenes que transitan entre dos paradas o estaciones. En el transporte público,
+el concepto de capacidad del arco se asocia a la capacidad de cada unidad
+(autobús o tren) y a su correspondiente frecuencia @Ortúzar2008. Además, el tiempo de viaje
+tiene una componente pura a bordo del medio más otra relativa al tiempo de
+espera en las paradas y otra más debida al tiempo andando hacia y desde la
+parada para llegar al punto de destino. Muchas secciones del transporte público
+utilizan los arcos viales dado que los servicios de autobús y algunos tranvías
+(LRT) recorren las calles de una ciudad. Otras secciones o servicios utilizan
+en cambio arcos completamente diferentes, por ejemplo, carriles exclusivos
+para buses, trazados reservados a los trenes, etc. Generalmente la naturaleza
+de estos arcos genera una red más compleja.
+
+B. Los Pasajeros
+
+En el transporte público la elección del recorrido se refiere a la elección de los
+pasajeros y no de los vehículos. Los pasajeros pueden caminar hasta la parada,
+hacer intercambio entre dos servicios y también efectuar parte del recorrido
+en coche y luego tomar el transporte público. Ello comporta la necesidad de
+construir y precisar los arcos peatonales y de transbordo entre diferentes servicios,
+entre diferentes modos de transporte público (autobús, tren) y entre infraestructuras
+de transporte público y privado (p. ej., “Park and Ride”).
+
+C. Los costes monetarios
+
+En las redes de transporte individual es normal suponer que los costes monetarios
+estén asociados directamente con el consumo de carburante, que es a su vez,
+proporcional a la distancia de viaje. Éstas son obviamente aproximaciones y
+son generalmente aceptadas porque los conductores no perciben estos costes de
+modo tan directo como un pasajero de transporte público percibe su tarifa.
+En años recientes ha aumentado la variedad de estructuras tarifarias de
+transporte público; existen hoy tarifas variables con la distancia, tarifa única
+independiente de la distancia del viaje, tarifas zonales para una o más zonas
+geográficas particulares, billetes combinados que incluyen transbordos (válido
+para dos o más servicios), tarifas limitadas en el tiempo (p. ej., tarifas válidas
+para cualquier número de embarques en una hora), diarias, semanales u
+otros “bonos o pases” para un servicio dado o que cubren una o más zonas y
+modos.
+
+Esta amplia variedad tarifaria dificulta el trato de tarifas en los modelos
+de elección de recorrido y asignación, en cuanto a que los costes monetarios
+no dependen directamente de la distancia y sí generalmente de la localización
+del origen y del destino y del recorrido seleccionado.
+
+D. Costo Generalizado
+
+En el caso de una asignación de demanda al transporte público el coste generalizado
+de viaje puede ser definido como sigue:
+
+$C_{ij} = a_1t_{ij}^v + a_2t_{ij}^w + a_3t_{ij}^t + a_4t_{ij}^n + a_1\delta^n + a_5F_{ij}$
+
+$Donde:$
+$t_{ij}^v\ es\ el\ tiempo\ de\ viaje\ a\ bordo\ del\ modo\ para\ ir\ de\ i\ a\ j;$
+$t_{ij}w^\ es\ el\ tiempo\ andando\ para\ llegar\ o\ ir\ desde\ la\ parada\ (estación);$
+$t_{ij}t^\ es\ el\ tiempo\ de\ espera\ en\ la\ parada;$
+$t_{ij}n^\ es\ el\ tiempo\ de\ transbordo;$
+$ \delta^n\ es\ una\ "penalidad"\ intrínseca\ o\ resistencia\ al\ trasbordo,\ medida\ en\ unidad\ de\ tiempo\ (usualmente\ de\ 2\ a\ 5\ minutos);$
+$F_{ij}\ es\ la\ tarifa\ pagada\ para\ desplazarse\ entre\ i\ y\ j;$
+$De\ a_1\ a\ a_5\ son\ coeficientes\ asociados\ a\ los\ elementos\ de\ coste\ respectivos$
+
+Usualmente a $a_1$ o $a_5$ suele otorgársele el valor 1 según se deseen medir los
+costes generalizados de transporte en unidad de tiempo o coste respectivamente.
+También es habitual encontrar que $a_2$, $a_3$, y $a_4$ sean dos o tres veces el valor de
+$a_1$, es decir los viajeros perciben el tiempo de espera o caminando dos o tres
+veces más que a bordo del medio.
+
+En términos de modelización, el software debería ser capaz de tratar todas
+estas variables y producir una buena estimación de cada uno de estos componentes
+de tiempo (a bordo, peatonal, de espera, de intercambio) a menos que
+sus valores no sean proporcionados externamente. El tiempo de viaje a bordo
+del modo depende de la velocidad alcanzable y del número y de la duración
+de las paradas en el recorrido; el tiempo utilizado caminando depende de la
+proximidad de la parada más cercana (más atractiva) y se suele utilizar, en algunos
+casos, aproximadamente un valor medio del tiempo para la zona completa;
+el tiempo de transbordo varía en función de la configuración y de la distancia
+entre las paradas y las estaciones; por fin el tiempo de espera depende esencialmente de la frecuencia del servicio y de su fiabilidad. Una formulación general del tiempo de espera es:
+
+$t^w = \frac{(h^2 + \sigma^2)}{2h}$
+
+donde $h$ es tiempo entre dos pasos de bus (intervalo) previstos por la programación
+del servicio y σ es su desviación estándar (cuanto menos regular es
+el servicio, mayor es el tiempo de espera). Esta formulación supone que los
+pasajeros llegan aleatoriamente a la parada y que los autobuses tienen capacidad
+ilimitada, de modo que todos pueden subirse a bordo. El problema relativo a
+la "congestión del autobús" es difícil de resolver, pero si los algoritmos utilizados
+no lo consideran es probable que las cargas producidas no sean reales en
+términos de capacidad real del servicio (véase @DeCea1989). Si
+el servicio es perfectamente regular, es decir si $\sigma = 0$, entonces el tiempo previsto
+de espera es la mitad del intervalo entre el paso de dos autobuses consecutivos.
+Es sabido, sin embargo, que si la frecuencia del servicio es baja, los
+pasajeros tienden a llegar justo pocos minutos antes de la siguiente salida, así
+que el límite superior del tiempo de espera puede ser establecido entre 5 y
+10 minutos; obviamente los pasajeros llegarán tanto más cerca del horario de
+salida programado cuanto más fiable resulte el servicio.
+
+E. Líneas Comunes
+
+Éste es probablemente uno de los problemas más difíciles y típicos en la asignación
+al transporte público. El problema surge cuando, al menos para algunos
+pares O/D, hay secciones en recorrido donde transita paralelamente más de un
+servicio de los ofertados, de forma que los pasajeros pueden elegir aquél que se
+acomoda mejor a sus exigencias. Para dichos pasajeros esta elección no es trivial
+(habría sido preferible que el usuario hubiese sabido que un servicio expreso
+iba a llegar tres minutos después del más lento que ha tomado) ni simple desde
+el punto de vista modelístico. En efecto, mientras en el transporte privado normalmente
+un conductor elige un recorrido individual entre el conjunto de todos
+los recorridos posibles, en el caso del transporte público, los usuarios pueden
+elegir un conjunto de itinerarios prefijados, de forma que cuando una línea
+de bus susceptible de ser utilizada llega primero a la parada, va a determinar
+cuáles de los itinerarios factibles realmente van a ser escogidos. La elección
+es por tanto más compleja y necesita un trato más detallado.
+
+No es posible presentar aquí una discusión completa de los algoritmos más
+apropiados para la asignación al transporte público. Se describirán, por tanto,
+los principales métodos o aproximaciones a la modelización, primeramente la
+elección del recorrido y posteriormente la asignación. Estos enfoques difieren
+en el modo en que se tratan algunas de las problemáticas citadas anteriormente,
+en particular las que conciernen a la superposición de las líneas y a las
+de la elección de los métodos de asignación: todo o nada, estocásticos o con
+restricción de capacidad.
+
+### 2.7.2 Modelos de elección de ruta
+
+Antes de discutir los problemas de la elección del recorrido en presencia de
+líneas comunes es útil definir con mayor detalle algunos términos como recorrido
+o ruta, línea y sección.
+Una línea de transporte público, o sencillamente una línea, es una flota de
+vehículos que transitan entre dos puntos (terminales) de una red, generalmente
+con las mismas características de dimensión, capacidad, velocidad, etc. La
+parada de los vehículos en cada nodo a lo largo de sus recorridos permite a los
+usuarios subir o bajar de los autobuses (o trenes, etc.). Por tanto cada línea se
+define por las características del vehículo, la secuencia de los nodos que ella
+sirve y la frecuencia de los servicios ofrecidos.
+Una sección de línea es una porción cualquiera de una línea de transporte
+colectivo entre dos nodos, no necesariamente consecutivos.
+Una ruta o recorrido de transporte público es cualquier itinerario que un
+usuario puede seguir sobre la red del transporte colectivo para desplazarse
+entre dos nodos. La porción de recorrido entre dos nodos de intercambio consecutivo
+se denomina sección de ruta, a la que se asocian una serie de líneas
+atractivas o comunes.
+Una estrategia es una serie de reglas que permiten al viajero alcanzar el
+mismo destino.
+
+### 2.7.3 Asignación de viajes
 \newpage
 
 # CAPÍTULO 3: METODOLOGÍA
