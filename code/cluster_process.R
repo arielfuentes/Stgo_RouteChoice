@@ -253,6 +253,9 @@ names(D0) <- zn_clus
 D1 <- lapply(group_split(pts_zn, Zona), function(x) as.dist(st_distance(x, x)))
 names(D1) <- zn_clus
 
+#tree
+tree <- lapply(D0, function(x)  hclustgeo(x))
+
 #number of clusters -----
 gap_stat <- lapply(1:length(group_split(pts_zn, Zona)), 
                    function(x) clusGap(select(st_drop_geometry(group_split(pts_zn, Zona)[[x]]), 
@@ -261,3 +264,40 @@ gap_stat <- lapply(1:length(group_split(pts_zn, Zona)),
                                        nstart = 25, 
                                        K.max =  nrow(group_split(pts_zn, Zona)[[x]]) - 1, 
                                        B = 50))
+
+nclus <- lapply(1:length(gap_stat), function(x) filter(mutate(as_tibble(gap_stat[[x]][[1]], 
+                                                         rownames = "clus"), 
+                                               GlobalMax = max(gap),
+                                               GapSE = gap - SE.sim, 
+                                               Clus_ch = if_else(GapSE > GlobalMax, 1, 
+                                                                 if_else(gap == GlobalMax, 1, 0))), 
+                                        Clus_ch == 1) %>% 
+                  pull(clus) %>% 
+                  as.numeric()
+                ) 
+
+#Partition
+P <- lapply(1:length(tree), function(x) cutree(tree[[x]], nclus[[x]]))
+
+#Point Cluster
+hclus_stops <- mutate(pts_zn, P = unlist(P))
+
+tm_shape(hclus_stops) +
+  tm_dots(col = "P", palette = c("blue", "red")) +
+  tm_layout(legend.outside = T)
+
+#alpha
+# cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = nclus, graph = T)
+cr <- lapply(1:length(D0, function(x) choicealpha(D0[[x]], 
+                                            D1[[x]], 
+                                            range.alpha = seq(0, 1, .1), 
+                                            K = nclus[[x]], 
+                                            graph = T)))
+alpha_ch <- lapply(cr, function(x) mutate(as_tibble(x$Qnorm, rownames = "alpha"),
+                                       Promedio = (Q0norm+Q1norm)/2))
+alpha_ch <- cr$Qnorm %>% 
+  as_tibble(rownames = "alpha") %>% 
+  mutate(Promedio = (Q0norm+Q1norm)/2) %>% 
+  filter(Promedio == max(Promedio)) %>% 
+  tidyr::separate(alpha, "=", into = c("alpha_nm", "alpha_num")) %>% 
+  pull(alpha_num)
