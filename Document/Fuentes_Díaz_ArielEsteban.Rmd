@@ -848,7 +848,7 @@ $t_{ij}^v\ es\ el\ tiempo\ de\ viaje\ a\ bordo\ del\ modo\ para\ ir\ de\ i\ a\ j
 $t_{ij}w^\ es\ el\ tiempo\ andando\ para\ llegar\ o\ ir\ desde\ la\ parada\ (estación);$
 $t_{ij}t^\ es\ el\ tiempo\ de\ espera\ en\ la\ parada;$
 $t_{ij}n^\ es\ el\ tiempo\ de\ transbordo;$
-$ \delta^n\ es\ una\ "penalidad"\ intrínseca\ o\ resistencia\ al\ trasbordo,\ medida\ en\ unidad\ de\ tiempo\ (usualmente\ de\ 2\ a\ 5\ minutos);$
+$δ^n\ es\ una\ penalidad\ intrínseca\ o\ resistencia\ al\ trasbordo,\ medida\ en\ unidad\ de\ tiempo\ (usualmente\ de\ 2\ a\ 5\ minutos);$
 $F_{ij}\ es\ la\ tarifa\ pagada\ para\ desplazarse\ entre\ i\ y\ j;$
 $De\ a_1\ a\ a_5\ son\ coeficientes\ asociados\ a\ los\ elementos\ de\ coste\ respectivos$
 
@@ -935,7 +935,113 @@ atractivas o comunes.
 Una estrategia es una serie de reglas que permiten al viajero alcanzar el
 mismo destino.
 
+Durante muchos años la elección de la ruta que minimiza el tiempo de viaje
+ha constituido la aproximación convencional al problema. Sin embargo, una
+buena estrategia flexible produce tiempos de viaje esperados más breves con
+respecto a la aproximación convencional; en efecto, dicha estrategia flexible es
+más realista y permite al usuario obtener ventaja de la variabilidad del tiempo
+de espera con respecto a una elección más oportuna de un buen servicio pero
+con frecuencias más bajas @Spiess1989.
+
+Para cada nodo se puede definir también una serie de líneas atractivas que
+serían parte de una buena estrategia para alcanzar un determinado destino j.
+Dada una estrategia, un desplazamiento real se desarrolla en base al siguiente
+mecanismo:
+
+1. Situar al viajero en el nodo $i$ de origen.
+2. Abordar el primer bus que llega y que pertenece a la serie de líneas atractivas
+para los pasajeros de $i$.
+3. Descender del bus en un nodo predeterminado.
+4. Si todavía no es su destino, se emplaza $i$ en el nodo correspondiente y se
+vuelve al paso 2; en otro caso, el viaje ha finalizado.
+
+Obsérvese que aunque este mecanismo tenga el nodo de destino bien definido,
+el origen no forma parte de la estrategia. Una estrategia es el conjunto
+de reglas que permite a los usuarios alcanzar su destino partiendo de un nodo
+cualquiera de la red. Esta exposición se explica por las siguientes notaciones
+adicionales:
+
+$Sjk = conjunto\ de\ secciones\ de\ línea\ que\ conectan\ directamente\ los\ nodos\ j\ y\ k;$
+$L_j^+ = conjunto\ de\ secciones\ de\ línea\ en\ salida\ del\ nodo\ j;$
+  $v_s = flujo\ sobre\ la\ sección\ de\ línea\ s;$
+  $t_s = tiempo\ de\ viaje\ a\ bordo\ del\ vehículo\ sobre\ la\ sección\ de\ línea\ s;$
+  $f_s = frecuencia\ asociada\ a\ la\ sección\ de\ línea\ s;$
+  $g_j = número\ de\ viajes\ hacia\ el\ destino\ j;$
+  $V_{jk} = flujo\ total\ sobre\ la\ sección\ de\ ruta\ jk.$
+
+Entonces, se puede identificar el conjunto de líneas atractivas que provienen
+del nodo $j$ utilizando la variable $X_s$; donde $X_s$ es igual a 1 si la sección $s$ de la línea, perteneciente al conjunto de secciones que van de $j$ a $k$, es atractiva, en otro
+caso es igual a cero. Luego para un par de nodos $j,k$ dados, los valores asociados
+$X_s\ (s\ \epsilon\ S_{jk})$ definen el conjunto óptimo o atractivo de las líneas hacia $k$.
+
 ### 2.7.3 Asignación de viajes
+
+Una vez identificado el mejor conjunto de segmentos de línea que unen los
+orígenes y los destinos es necesario realizar la asignación de los viajes a estas
+líneas. La mayor parte de los programas tratan de conseguir una distribución
+razonable y realista de los viajes entre los recorridos factibles. En las aproximaciones
+convencionales, en las que las problemáticas de las líneas comunes no se
+afrontan explícitamente, resulta que la amplia distribución de viajes se genera
+teniendo en cuenta una serie de criterios; por ejemplo: distinguir explícitamente
+los diferentes puntos de acceso (paradas, estaciones) para cada zona y construir
+para cada punto de acceso, y no simplemente para los centroides, los árboles
+de mínimo coste hacia todos los destinos. De este modo se identifican varios
+recorridos alternativos, uno por cada punto de acceso diferente. Los usuarios
+pueden asignarse a estos recorridos utilizando una función multinominal logit
+en la que los costes son los costes de los arcos entre los orígenes y los destinos
+para cada ruta o recorrido.
+
+Spiess y Florian @Spiess1989 realizan la fase de asignación siguiendo estrategias
+óptimas identificadas. La asignación, por tanto, se consigue asignando a cada
+arco el porcentaje de volumen acumulado aguas arriba del nodo y que corresponde
+a la frecuencia ofertada por el arco. De Cea y Fernández @DeCea1989, siguen
+una aproximación parecida pero en dos pasos:
+
+1. En el primero, una vez que ha sido localizada la serie de líneas comunes
+para todos los pares $(i,j)$ se construye una nueva red en base a los nodos y
+las secciones de ruta. Es de destacar que las secciones de ruta contienen
+solamente las líneas que minimizan el tiempo total de viaje esperado en
+la sección; ellas tienen asociado un tiempo de viaje $(t_r)$ y una frecuencia
+$(f_r)$ correspondiente a la suma de las frecuencias atractivas (las de las líneas
+comunes). Con estos dos elementos se puede obtener un coste de viaje
+compuesto a lo largo de esta sección de ruta, y por lo tanto para encontrar
+la mejor ruta puede utilizarse un algoritmo apropiado y eficiente de construcción
+de árboles de mínimo coste. Cargando estos árboles resulta un conjunto de flujos de sección de ruta $(v_r)$.
+
+2. A continuación se descomponen los flujos de la sección de ruta en las secciones
+de línea que la conforman: 
+
+$v_s = \frac{f_sv_r}{f_r}$
+
+Hasta aquí no se ha tratado el problema referente al empleo de sistemas
+particulares de tarificación. Si el sistema de tarificación es proporcional a la
+longitud de viaje se pueden reconvertir las unidades de tiempo en unidades de costes y, a partir de aquí, añadir a dicho tiempo de viaje sobre cada arco la
+tarifa. Este tipo de estructura tarifaria, en todo caso, no es muy común. Podría
+asimismo introducirse un sistema tarifario único (tarifa plana o flat fare) aunque
+es preciso indicar que el tratamiento de esquemas más complejos desde
+el punto de vista modelístico puede añadir también dificultades al diseño del
+algoritmo.
+En muchos casos prácticos no es posible modelizar toda la complejidad de
+un sistema tarifario y por tanto, han de realizarse determinadas aproximaciones
+de acuerdo a las tipologías más comunes de billetes utilizados. Por ejemplo,
+en el caso de un sistema tarifario zonal la asignación se puede elaborar en
+base solamente al tiempo de viaje mientras que el coste de la tarifa sólo será
+añadido al final. Esta solución no tiene en cuenta a los usuarios que dispongan
+de contratos especiales de transporte (bono-buses), aunque dicho sistema de
+tarificación zonal puede resultar en todo caso bastante bueno en ciertas situaciones
+como, por ejemplo, el acceso al centro de Londres.
+Finalmente, se debe subrayar que la asignación al transporte público presenta,
+generalmente, los mismos límites que los identificados para las redes de
+transporte privado. Además es correcto afirmar que la asignación en situaciones
+de congestión está menos desarrollada que la de situaciones sin congestión. En
+el caso de redes congestionadas se presentan dos efectos: el primero concierne
+a la capacidad limitada de las unidades de transporte (autobuses, trenes), lo
+que provoca que algunos usuarios no puedan realizar sus estrategias óptimas,
+lo cual supone en general un incremento de su tiempo de viaje; el segundo es
+que hay una interacción entre transporte público y circulación privada debida
+al hecho de que se utilizan las mismas calles, de forma que el consiguiente
+incremento de tráfico sobre un modo influirá en el tiempo de viaje del otro.
+
 \newpage
 
 # CAPÍTULO 3: METODOLOGÍA
