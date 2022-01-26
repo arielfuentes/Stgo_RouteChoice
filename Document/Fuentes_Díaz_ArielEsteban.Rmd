@@ -124,11 +124,17 @@ Lo antes mencionado, podrá ser logrado gracias a la disponibilidad de datos de 
 La estructura del trabajo se clasifica en:
 
 - Justificación del Problema
+
 - Marco Teórico de la Modelación de Demanda de Transporte Público
+
 - Metodología
+
 - Aplicación del Modelo
+
 - Validación
+
 - Análisis de Resultados
+
 - Conclusiones y Recomendaciones
 
 <!---BLOCK_PORTRAIT_STOP--->
@@ -180,7 +186,7 @@ fp_refnote <- fp_text_lite(vertical.align = "superscript")
 bl <- block_list(fpar(ftext("Herramienta para análisis de datos masivos de transporte público", fp_bold)))
 ````
 
-La forma en que generalmente se responde a tales incertidumbres es midiendo la demanda por inclusión o eliminación de paradas, datos que son provistos por ADATRAP `r run_footnote(x = bl, prop = fp_refnote)`;  sin considerar el efecto de red por las diversas modificaciones en el sistema. Se obtienen las transacciones promedio por tipo día y se calendariza para el siguiente año. Metodología poco clara, que puede ser un mix de las anteriores. Es necesaria una modelación apropiada que pueda ser desarrollada en corto plazo para responder a esta problemática. Las metodologías antes mencionadas, poseen un alto grado de incertidumbre, para ser consideradas suficientes para evaluar cambios al programa operacional, predecir la demanda del siguiente periodo y renegociación de contratos. Una metodología comúnmente aceptada, para medir la elasticidad del sistema de transporte, es el modelo clásico de transporte. Por dicha razón es que el Directorio Metropolitano de Santiago (DTPM) @DTPMModelo, ha licitado a través de SECTRA, modelos de asignación (4 etapa del modelo clásico de transporte) que sean capaces de estimar a un nivel táctico-operacional, a diferencia de las modelaciones que comúnmente realiza SECTRA. Estos están dispuestos en la página web del DTPM, temporalmente son distantes entre sí; que, al no tener buen nivel de actualización, les resta utilidad para aplicabilidad a las problemáticas que las empresas operadoras necesitan resolver. Adicionalmente, el costo de elaboración de estos es alto, tanto en tiempo como en dinero . El año 2016, DTPM licitó estudio de Mejoramiento y Actualización del Modelo de Asignación de viajes del Sistema Transantiago, adjudicándose por un monto que ascendió a 89.000.000 millones de pesos @Chilecompra, y que cuyos resultados se materializaron el año 2018.
+La forma en que generalmente se responde a tales incertidumbres es midiendo la demanda por inclusión o eliminación de paradas, datos que son provistos por ADATRAP `r run_footnote(x = bl, prop = fp_refnote)`;  sin considerar el efecto de red por las diversas modificaciones en el sistema. Se obtienen las transacciones promedio por tipo día y se calendariza para el siguiente año. Metodología poco clara, que puede ser un mix de las anteriores. Es necesaria una modelación apropiada que pueda ser desarrollada en corto plazo para responder a esta problemática. Las metodologías antes mencionadas, poseen un alto grado de incertidumbre, para ser consideradas suficientes para evaluar cambios al programa operacional, predecir la demanda del siguiente periodo y renegociación de contratos. Una metodología comúnmente aceptada, para medir la elasticidad del sistema de transporte, es el modelo clásico de transporte. Por dicha razón es que el Directorio Metropolitano de Santiago (DTPM) @DTPMModelo, ha licitado a través de SECTRA, modelos de asignación (4 etapa del modelo clásico de transporte) que sean capaces de estimar a un nivel táctico-operacional, a diferencia de las modelaciones que comúnmente realiza SECTRA. Estos están dispuestos en la página web del DTPM, temporalmente son distantes entre sí; que, al no tener buen nivel de actualización, les resta utilidad para aplicabilidad a las problemáticas que las empresas operadoras necesitan resolver. Adicionalmente, el costo de elaboración de estos es alto, tanto en tiempo como en dinero. El año 2016, DTPM licitó estudio de Mejoramiento y Actualización del Modelo de Asignación de viajes del Sistema Transantiago, adjudicándose por un monto que ascendió a 89.000.000 millones de pesos @Chilecompra, y que cuyos resultados se materializaron el año 2018.
 
 \newline
 
@@ -220,13 +226,13 @@ v) Evaluar la precisión táctica-operacional para modelo propuesto en la nueva 
 
 ## 2.1 La Demanda de Transporte
 
-La demanda de servicios del transporte es altamente cualitativa y diferenciada @Ortúzar2008. Existe una amplia gama de demandas específicas de transporte que se diferencian por hora del día, día de la semana, motivo del viaje, tipo de mercancía, importancia de la velocidad y frecuencia, etcétera.Un servicio de transporte sin los atributos que permitan satisfacer esta demanda diferenciada puede ser totalmente inútil. Estas características hacen más difícil analizar y predecir la demanda por servicios de transporte: las ton/km y los pasajeros/km son unidades de rendimiento extremadamente gruesas que esconden una inmensa gama de requerimientos y servicios. La demanda de transporte es una demanda derivada, es decir, no es un fin en sí misma. Con la posible excepción del turismo, la gente viaja para satisfacer ciertas necesidades en sus destinos (trabajo, salud, entretenimiento). Esto es aún más cierto en el caso de las mercancías. Para comprender la demanda de transporte es importante analizar cómo están distribuidas en el espacio las facilidades para satisfacer estas necesidades humanas e industriales, tanto en contextos urbanos como regionales. Es evidente que un buen sistema de transporte amplía las oportunidades para satisfacer dichas necesidades, así como un sistema muy congestionado o mal conectado limita las opciones de movilidad y, por tanto, el desarrollo económico y social.La demanda de transporte tiene lugar en relación al espacio. Aunque parece trivial, es la distribución de las actividades en el espacio lo que provoca la demanda de transporte. Existen algunos problemas de transporte que se pueden tratar, a un nivel muy agregado, sin considerar explícitamente el espacio. Sin embargo, en la gran mayoría de los casos, el tratamiento explícito del espacio es inevitable y muy deseable. El enfoque más usual para tratar el espacio consiste en dividir el área de estudio en zonas y codificarlas, junto a las redes de transporte, de una forma adecuada para su procesamiento y tratamiento con la ayuda de paquetes computacionales especializados (software). En algunos casos, el área de estudio puede ser descrito simplificadamente, suponiendo que las zonas de interés forman un corredor que puede ser representado mediante un sistema lineal. En ambos casos existen diferentes métodos para tratar la distancia y/o distribuir orígenes y destinos (y sus atributos) en el espacio, los cuales son elementos esenciales del análisis de transporte.La articulación espacial de la demanda frecuentemente provoca problemas de falta de coordinación del sistema, la cual puede influir, de forma relevante, en el equilibrio entre oferta y demanda de transporte. Por ejemplo, un servicio de taxis puede tener una fuerte demanda no satisfecha en una parte de la ciudad, mientras en otras existen muchos taxis buscando clientes. Por otro lado, la concentración de población y actividad económica en corredores bien definidos puede justificar un sistema de transporte masivo de alta capacidad que quizás no sería defendible en áreas geográficas con menor densidad de actividades.Finalmente, la oferta y demanda de transporte tienen elementos dinámicosmuy potentes. Una parte importante de la demanda de viajes de transporte se concentra especialmente, durante unas pocas horas del día, en áreas urbanas coincidentemente con los momentos de mayor congestión de tráfico (horas punta). Esta característica de variabilidad de la demanda en el tiempo hace que su análisis y cálculo de previsiones sean más difíciles y a la vez también más interesantes de estudiar. Puede ser que un sistema de transporte funcione adecuadamente para la demanda promedio de viajes pero que se colapse durante la hora punta. Existen varias técnicas para tratar de repartir la carga de la hora punta de una red: flexibilizar los horarios de trabajo, partir la jornada laboral, tarificación por congestión, etc. Sin embargo, la variación de demanda entre las horas punta y valle sigue siendo un problema central y fascinante de la modelización y planificación del transporte.
+La demanda de servicios del transporte es altamente cualitativa y diferenciada @Ortúzar2008. Existe una amplia gama de demandas específicas de transporte que se diferencian por hora del día, día de la semana, motivo del viaje, tipo de mercancía, importancia de la velocidad y frecuencia, etcétera. Un servicio de transporte sin los atributos que permitan satisfacer esta demanda diferenciada puede ser totalmente inútil. Estas características hacen más difícil analizar y predecir la demanda por servicios de transporte: las ton/km y los pasajeros/km son unidades de rendimiento extremadamente gruesas que esconden una inmensa gama de requerimientos y servicios. La demanda de transporte es una demanda derivada, es decir, no es un fin en sí misma. Con la posible excepción del turismo, la gente viaja para satisfacer ciertas necesidades en sus destinos (trabajo, salud, entretenimiento). Esto es aún más cierto en el caso de las mercancías. Para comprender la demanda de transporte es importante analizar cómo están distribuidas en el espacio las facilidades para satisfacer estas necesidades humanas e industriales, tanto en contextos urbanos como regionales. Es evidente que un buen sistema de transporte amplía las oportunidades para satisfacer dichas necesidades, así como un sistema muy congestionado o mal conectado limita las opciones de movilidad y, por tanto, el desarrollo económico y social. La demanda de transporte tiene lugar en relación al espacio. Aunque parece trivial, es la distribución de las actividades en el espacio lo que provoca la demanda de transporte. Existen algunos problemas de transporte que se pueden tratar, a un nivel muy agregado, sin considerar explícitamente el espacio. Sin embargo, en la gran mayoría de los casos, el tratamiento explícito del espacio es inevitable y muy deseable. El enfoque más usual para tratar el espacio consiste en dividir el área de estudio en zonas y codificarlas, junto a las redes de transporte, de una forma adecuada para su procesamiento y tratamiento con la ayuda de paquetes computacionales especializados (software). En algunos casos, el área de estudio puede ser descrito simplificadamente, suponiendo que las zonas de interés forman un corredor que puede ser representado mediante un sistema lineal. En ambos casos existen diferentes métodos para tratar la distancia y/o distribuir orígenes y destinos (y sus atributos) en el espacio, los cuales son elementos esenciales del análisis de transporte. La articulación espacial de la demanda frecuentemente provoca problemas de falta de coordinación del sistema, la cual puede influir, de forma relevante, en el equilibrio entre oferta y demanda de transporte. Por ejemplo, un servicio de taxis puede tener una fuerte demanda no satisfecha en una parte de la ciudad, mientras en otras existen muchos taxis buscando clientes. Por otro lado, la concentración de población y actividad económica en corredores bien definidos puede justificar un sistema de transporte masivo de alta capacidad que quizás no sería defendible en áreas geográficas con menor densidad de actividades. Finalmente, la oferta y demanda de transporte tienen elementos dinámicos muy potentes. Una parte importante de la demanda de viajes de transporte se concentra especialmente, durante unas pocas horas del día, en áreas urbanas coincidentemente con los momentos de mayor congestión de tráfico (horas punta). Esta característica de variabilidad de la demanda en el tiempo hace que su análisis y cálculo de previsiones sean más difíciles y a la vez también más interesantes de estudiar. Puede ser que un sistema de transporte funcione adecuadamente para la demanda promedio de viajes pero que se colapse durante la hora punta. Existen varias técnicas para tratar de repartir la carga de la hora punta de una red: flexibilizar los horarios de trabajo, partir la jornada laboral, tarificación por congestión, etc. Sin embargo, la variación de demanda entre las horas punta y valle sigue siendo un problema central y fascinante de la modelización y planificación del transporte.
 
 ## 2.2 Oferta de Transporte
 
-La primera característica de la oferta de transporte es @Ortúzar2008 que es un servicio y no una mercancía; por lo tanto, no se puede almacenar para ser utilizada cuando exista una demanda mayor. Un servicio de transporte tiene que ser consumido cuándo y dónde se produce, si no, pierde su beneficio. Por esta razón es muy importante estimar la demanda con la mayor precisión posible para así ahorrar recursos ajustando la oferta de servicios de transporte a ella.Muchas características de los sistemas de transporte provienen de su naturaleza como servicio. En términos muy generales, un sistema de transporte requiere un número de activos fijos (la infraestructura) y un número de unidades móviles (los vehículos). Es la combinación de ambos, junto con una serie de normas para su operación, lo que posibilita el movimiento de personas y mercancías.Frecuentemente se da el caso de que la infraestructura y/o los vehículos de transporte no son propiedad ni son operados por la misma empresa o grupo de empresas. Esto sucede en la mayoría de los modos de transporte, con la excepción notable de muchos sistemas ferroviarios. La separación entre el gestor de infraestructura y el gestor del servicio final de transporte genera una serie de interacciones suficientemente complejas entre entidades o Administraciones Públicas (estatales, regionales y/o locales), empresas de construcción, empresarios, operadores de transporte, viajeros, transportistas y público en general. Este último juega diversos papeles en la oferta de servicios de transporte, ya que con sus demandas puede influir en la puesta en marcha o no, de nuevos servicios que satisfagan sus necesidades dotando así, por ejemplo, de accesibilidad a un territorio y fomentando a la vez el desarrollo y la actividad económica.La provisión de infraestructura de transporte es particularmente importante desde el punto de vista de la oferta. La infraestructura de transporte es un “sistema unitario”, en el sentido de que no se puede concebir media pista de aterrizaje o la tercera parte de una estación de ferrocarril. Ciertamente, en algunos casos, puede haber razones suficientes para proveer gradualmente infraestructura a medida que crece la demanda. Por ejemplo, se puede empezar con una carretera sin pavimento, mejorarla más adelante con una o dos vías mediante un tratamiento superficial; luego una carretera sencilla o autovía bien construida, para finalizar con una carretera a nivel de autopista. De esta forma, la provisión de la infraestructura puede ajustarse y adecuarse a la demanda, evitándose así tempranas inversiones en instalaciones costosas innecesarias. Esto no es tan sencillo en otras áreas como, por ejemplo, aeropuertos, líneas ferroviarias, de metro, etcétera.A este respecto es necesario indicar que las últimas tendencias en la planificación del transporte van dirigidas hacia la gestión de la demanda en entornos de movilidad sostenible. El espacio es limitado pero el crecimiento de la demanda no lo es tanto. Por ello, puede ser interesante, en lugar de crecer en infraestructuras, proceder a una mejor optimización de los recursos existentes gestionando adecuadamente la demanda en modos y formas diferentes a los utilizados en las últimas décadas.Por otro lado, las inversiones en infraestructura del transporte no solamente son enormes sino que también su puesta en servicio lleva un tiempo considerable. Normalmente se trata de proyectos grandes y desde que comienza su planificación hasta que se implementan pueden pasar entre 5 y 15 años. Este aspecto es incluso más crítico en áreas urbanas en las que cualquier construcción y/o reparación de infraestructura de transporte, puede provocar serias perturbaciones, cuyas repercusiones en los usuarios y no usuarios son evidentes.
+La primera característica de la oferta de transporte es @Ortúzar2008 que es un servicio y no una mercancía; por lo tanto, no se puede almacenar para ser utilizada cuando exista una demanda mayor. Un servicio de transporte tiene que ser consumido cuándo y dónde se produce, si no, pierde su beneficio. Por esta razón es muy importante estimar la demanda con la mayor precisión posible para así ahorrar recursos ajustando la oferta de servicios de transporte a ella. Muchas características de los sistemas de transporte provienen de su naturaleza como servicio. En términos muy generales, un sistema de transporte requiere un número de activos fijos (la infraestructura) y un número de unidades móviles (los vehículos). Es la combinación de ambos, junto con una serie de normas para su operación, lo que posibilita el movimiento de personas y mercancías. Frecuentemente se da el caso de que la infraestructura y/o los vehículos de transporte no son propiedad ni son operados por la misma empresa o grupo de empresas. Esto sucede en la mayoría de los modos de transporte, con la excepción notable de muchos sistemas ferroviarios. La separación entre el gestor de infraestructura y el gestor del servicio final de transporte genera una serie de interacciones suficientemente complejas entre entidades o Administraciones Públicas (estatales, regionales y/o locales), empresas de construcción, empresarios, operadores de transporte, viajeros, transportistas y público en general. Este último juega diversos papeles en la oferta de servicios de transporte, ya que con sus demandas puede influir en la puesta en marcha o no, de nuevos servicios que satisfagan sus necesidades dotando así, por ejemplo, de accesibilidad a un territorio y fomentando a la vez el desarrollo y la actividad económica. La provisión de infraestructura de transporte es particularmente importante desde el punto de vista de la oferta. La infraestructura de transporte es un “sistema unitario”, en el sentido de que no se puede concebir media pista de aterrizaje o la tercera parte de una estación de ferrocarril. Ciertamente, en algunos casos, puede haber razones suficientes para proveer gradualmente infraestructura a medida que crece la demanda. Por ejemplo, se puede empezar con una carretera sin pavimento, mejorarla más adelante con una o dos vías mediante un tratamiento superficial; luego una carretera sencilla o autovía bien construida, para finalizar con una carretera a nivel de autopista. De esta forma, la provisión de la infraestructura puede ajustarse y adecuarse a la demanda, evitándose así tempranas inversiones en instalaciones costosas innecesarias. Esto no es tan sencillo en otras áreas como, por ejemplo, aeropuertos, líneas ferroviarias, de metro, etcétera. A este respecto es necesario indicar que las últimas tendencias en la planificación del transporte van dirigidas hacia la gestión de la demanda en entornos de movilidad sostenible. El espacio es limitado pero el crecimiento de la demanda no lo es tanto. Por ello, puede ser interesante, en lugar de crecer en infraestructuras, proceder a una mejor optimización de los recursos existentes gestionando adecuadamente la demanda en modos y formas diferentes a los utilizados en las últimas décadas. Por otro lado, las inversiones en infraestructura del transporte no solamente son enormes sino que también su puesta en servicio lleva un tiempo considerable. Normalmente se trata de proyectos grandes y desde que comienza su planificación hasta que se implementan pueden pasar entre 5 y 15 años. Este aspecto es incluso más crítico en áreas urbanas en las que cualquier construcción y/o reparación de infraestructura de transporte, puede provocar serias perturbaciones, cuyas repercusiones en los usuarios y no usuarios son evidentes.
 
-Además, las inversiones en transporte tienen un componente político muy importante. Por ejemplo, en los países en desarrollo los políticos normalmente consideran los proyectos de carreteras como algo seguro electoralmente: demuestran que hacen algo y es difícil que los medios de comunicación puedan demostrar errores. En países industrializados, en cambio, los proyectos de transporte normalmente conllevan el riesgo de polemizar con los residentes afectados o con los usuarios que sufren debido a la congestión y a los retrasos en obras sobrepasadas por la demanda. El juicio político es esencial en este tipo de disyuntivas, pero cuando no está apoyado por una planificación exhaustiva, las decisiones resultan ser una reacción rápida y, en general, poco reflexiva al problema y al momento de crisis; en el caso del transporte esto es, inevitablemente, “demasiado tarde”. En estos casos, la ref lexión y la planificación son esenciales. En los 80, el énfasis en medidas tácticas de gestión de transporte a corto plazo ref lejaba tanto una desconfianza en la modelización como un intento de evitar los problemas políticos, y una incapacidad a la hora de pensar estratégicamente acerca del futuro del sistema de transporte.La separación entre los que proveen infraestructura y los que ofrecen servicios introduce también complejidades desde el punto de vista económico. Para empezar, no siempre está claro que todos los usuarios perciban realmente los costes totales incurridos en la provisión de los servicios que ellos usan. Por ejemplo, prácticamente nunca se paga directamente por el espacio físico ocupado por las carreteras y cuando se hace, no se incluyen los costes de congestión u otras externalidades; posiblemente lo más cercano a esto son las autopistas de peaje y los modernos esquemas de tarificación vial. Los impuestos sobre vehículos y combustibles son solamente una aproximación genérica al pago por la provisión de infraestructura.Pero, ¿son importantes estas cuestiones? ¿no ocurre quizás que otros bienes y servicios como los parques públicos, las bibliotecas, la policía son a menudo proporcionados sin realizar ningún pago directo? ¿Qué problema hay en permitir la libre utilización económica de las calles? La teoría económica básica nos enseña que sí importa. En un mercado perfecto, una buena asignación de recursos para satisfacer las necesidades humanas solamente se consigue cuando los costes marginales de los bienes son iguales a su utilidad marginal. Por eso, a menudo se dice que el precio de los bienes y servicios, es decir, su coste percibido, debería fijarse según su coste marginal. Por supuesto, los mercados reales no son perfectos y la capacidad para pagar no es un buen indicador de necesidad; sin embargo, este marco general proporciona una base para contrastar otras formas de organizar el sistema de precios y su impacto en la asignación de recursos.El transporte es un elemento muy importante en el bienestar de los países y sus habitantes. Si los usuarios que utilizan la infraestructura de transporte no perciben las consecuencias de sus elecciones en términos de recursos, probablemente van a generar un equilibrio ineficiente entre oferta y demanda. Se despilfarrarán recursos, escasos al ser tarificados por debajo de su coste real, mientras que recursos más abundantes pero tarificados podrían no ser utilizados. El hecho de que globalmente algunos sectores de la economía (típicamente los dueños de vehículos privados) paguen más de lo necesario (a través de impuestos, tasas, combustibles, etc.) por el uso de infraestructura, no garantiza una asignación de recursos más racional. Los propietarios de coches probablemente ven estos costes anuales como costes fijos (a fondo perdido) y como mucho afectan en su decisión de comprar un coche, pero no de utilizarlo.En los países industrializados, sobre todo, las subvenciones entre usuarios se producen de forma “cruzada” no sólo entre modos (los impuestos del combustible pueden usarse para subvencionar el ferrocarril) sino dentro del mismo modo (los costes de mantenimiento de las carreteras son pagados mucho más ampliamente por los coches en función de lo que deterioran, que lo que pagan los vehículos pesados que, evidentemente, deterioran mucho más). Comparados con los vehículos pesados, los coches contribuyen más a los costes de mantenimiento de una carretera (de peaje o no) que el deterioro que ambos generan.Otro elemento de distorsión proviene de los efectos secundarios asociados a la producción de servicios de transporte: accidentes, contaminación y degradación del medioambiente en general. Estos efectos normalmente no son internalizados; el usuario del sistema de transporte raramente percibe el coste medioambiental o los gastos derivados de las hospitalizaciones de los heridos en accidentes relacionados con el transporte. Internalizar estos costes también podría ayudar a mejorar la toma de decisiones en planificación de transporte y, por tanto, a mejorar la asignación de la demanda hacia modos alternativos.Una de las características más importantes de la oferta de transporte es el grado de congestión al que se ha llegado últimamente, sobre todo en áreas urbanas y en algunas infraestructuras interurbanas. Es difícil definir la congestión objetivamente aunque todos sabemos cuándo la sufrimos. Hay aquí un problema de “percepción”, ya que de sobra es conocido que lo que se considera congestión excesiva en ciudades como Leeds o Lleida frecuentemente se consideraría normal en Londres o Lagos. La congestión surge cuando la intensidad de la demanda se aproxima a la capacidad de la instalación (calle, carretera, estación, etc.) y el tiempo requerido para utilizarla (viajar a través de ella) sobrepasa muy por encima la media establecida bajo condiciones de baja demanda. En el caso de la infraestructura de transporte, la inclusión de un vehículo adicional en el sistema genera un retraso suplementario a todos los demás usuarios, como puede verse, por ejemplo \@ref(fig:cong)
+Además, las inversiones en transporte tienen un componente político muy importante. Por ejemplo, en los países en desarrollo los políticos normalmente consideran los proyectos de carreteras como algo seguro electoralmente: demuestran que hacen algo y es difícil que los medios de comunicación puedan demostrar errores. En países industrializados, en cambio, los proyectos de transporte normalmente conllevan el riesgo de polemizar con los residentes afectados o con los usuarios que sufren debido a la congestión y a los retrasos en obras sobrepasadas por la demanda. El juicio político es esencial en este tipo de disyuntivas, pero cuando no está apoyado por una planificación exhaustiva, las decisiones resultan ser una reacción rápida y, en general, poco reflexiva al problema y al momento de crisis; en el caso del transporte esto es, inevitablemente, “demasiado tarde”. En estos casos, la reflexión y la planificación son esenciales. En los 80, el énfasis en medidas tácticas de gestión de transporte a corto plazo reflejaba tanto una desconfianza en la modelización como un intento de evitar los problemas políticos, y una incapacidad a la hora de pensar estratégicamente acerca del futuro del sistema de transporte. La separación entre los que proveen infraestructura y los que ofrecen servicios introduce también complejidades desde el punto de vista económico. Para empezar, no siempre está claro que todos los usuarios perciban realmente los costes totales incurridos en la provisión de los servicios que ellos usan. Por ejemplo, prácticamente nunca se paga directamente por el espacio físico ocupado por las carreteras y cuando se hace, no se incluyen los costes de congestión u otras externalidades; posiblemente lo más cercano a esto son las autopistas de peaje y los modernos esquemas de tarificación vial. Los impuestos sobre vehículos y combustibles son solamente una aproximación genérica al pago por la provisión de infraestructura. Pero, ¿son importantes estas cuestiones? ¿no ocurre quizás que otros bienes y servicios como los parques públicos, las bibliotecas, la policía son a menudo proporcionados sin realizar ningún pago directo? ¿Qué problema hay en permitir la libre utilización económica de las calles? La teoría económica básica nos enseña que sí importa. En un mercado perfecto, una buena asignación de recursos para satisfacer las necesidades humanas solamente se consigue cuando los costes marginales de los bienes son iguales a su utilidad marginal. Por eso, a menudo se dice que el precio de los bienes y servicios, es decir, su coste percibido, debería fijarse según su coste marginal. Por supuesto, los mercados reales no son perfectos y la capacidad para pagar no es un buen indicador de necesidad; sin embargo, este marco general proporciona una base para contrastar otras formas de organizar el sistema de precios y su impacto en la asignación de recursos. El transporte es un elemento muy importante en el bienestar de los países y sus habitantes. Si los usuarios que utilizan la infraestructura de transporte no perciben las consecuencias de sus elecciones en términos de recursos, probablemente van a generar un equilibrio ineficiente entre oferta y demanda. Se despilfarrarán recursos, escasos al ser tarificados por debajo de su coste real, mientras que recursos más abundantes pero tarificados podrían no ser utilizados. El hecho de que globalmente algunos sectores de la economía (típicamente los dueños de vehículos privados) paguen más de lo necesario (a través de impuestos, tasas, combustibles, etc.) por el uso de infraestructura, no garantiza una asignación de recursos más racional. Los propietarios de coches probablemente ven estos costes anuales como costes fijos (a fondo perdido) y como mucho afectan en su decisión de comprar un coche, pero no de utilizarlo.En los países industrializados, sobre todo, las subvenciones entre usuarios se producen de forma “cruzada” no sólo entre modos (los impuestos del combustible pueden usarse para subvencionar el ferrocarril) sino dentro del mismo modo (los costes de mantenimiento de las carreteras son pagados mucho más ampliamente por los coches en función de lo que deterioran, que lo que pagan los vehículos pesados que, evidentemente, deterioran mucho más). Comparados con los vehículos pesados, los coches contribuyen más a los costes de mantenimiento de una carretera (de peaje o no) que el deterioro que ambos generan. Otro elemento de distorsión proviene de los efectos secundarios asociados a la producción de servicios de transporte: accidentes, contaminación y degradación del medioambiente en general. Estos efectos normalmente no son internalizados; el usuario del sistema de transporte raramente percibe el coste medioambiental o los gastos derivados de las hospitalizaciones de los heridos en accidentes relacionados con el transporte. Internalizar estos costes también podría ayudar a mejorar la toma de decisiones en planificación de transporte y, por tanto, a mejorar la asignación de la demanda hacia modos alternativos. Una de las características más importantes de la oferta de transporte es el grado de congestión al que se ha llegado últimamente, sobre todo en áreas urbanas y en algunas infraestructuras interurbanas. Es difícil definir la congestión objetivamente aunque todos sabemos cuándo la sufrimos. Hay aquí un problema de “percepción”, ya que de sobra es conocido que lo que se considera congestión excesiva en ciudades como Leeds o Lleida frecuentemente se consideraría normal en Londres o Lagos. La congestión surge cuando la intensidad de la demanda se aproxima a la capacidad de la instalación (calle, carretera, estación, etc.) y el tiempo requerido para utilizarla (viajar a través de ella) sobrepasa muy por encima la media establecida bajo condiciones de baja demanda. En el caso de la infraestructura de transporte, la inclusión de un vehículo adicional en el sistema genera un retraso suplementario a todos los demás usuarios, como puede verse, por ejemplo \@ref(fig:cong)
 
 ```{r, echo=FALSE}
 img.file <- file.path("Congestión.png")
@@ -249,13 +255,13 @@ con diferentes motivos de viaje, en distintos momentos del día, semana, mes y
 año, utilizando los distintos modos que lo conforman @Ortúzar2008. El sistema de transporte
 se puede definir como la interacción de:
 
-1. Una infraestructura (p. ej., la red de transporte).
+a) Una infraestructura (p. ej., la red de transporte).
 
-2. Un sistema de gestión (esto es, un conjunto de normas, como p. ej., conducir
+b) Un sistema de gestión (esto es, un conjunto de normas, como p. ej., conducir
 por la derecha y una serie de estrategias de control, como las señales de
 tráfico, etc.).
 
-3. Un conjunto de modos de transporte y sus operadores.
+c) Un conjunto de modos de transporte y sus operadores.
 
 Considérense un conjunto de volúmenes de tráfico V sobre una red, a una
 velocidad *S* y con una capacidad de operación *Q* de acuerdo a un sistema de
@@ -441,9 +447,13 @@ un viajero puede responder con una serie de cambios simples en:
 
 - El *recorrido* seguido, para evitar la congestión o aprovechar nuevos enlaces;
 esto incluye la elección de aparcamiento o una combinación de servicios en el caso de transporte público.
+
 - El *modo* utilizado para llegar al destino.
+
 - La *hora* de salida para evitar los momentos más congestionados.
+
 - El *destino* del viaje hacia una zona menos congestionada.
+
 - La *frecuencia* de los viajes, haciéndolos otro día, o quizás combinándolos
 con otras actividades.
 
@@ -560,7 +570,7 @@ distancia, etcétera.
 - Para estudios estratégicos se debería definir el área de estudio de forma que
 la mayoría de los viajes tenga su origen y destino dentro de ella. Sin embargo,
 esto puede no ser posible en el análisis de problemas de transporte en
-pequeñas áreas urbanas donde la mayoría de los viaje de interés atraviesan
+pequeñas áreas urbanas donde la mayoría de los viajes de interés atraviesan
 el área e interesa considerar la posibilidad de establecer una circunvalación
 (by-pass).
 
@@ -618,36 +628,36 @@ definición de los límites de zonas.
 A continuación se incluye un sencillo listado de criterios de zonificación
 que han sido recopilados a partir de la experiencia adquirida en varios estudios:
 
-1. El tamaño de las zonas debe ser tal que el error de agregación causado por la hipótesis de que todas las actividades se concentran en el centroide, no
+a) El tamaño de las zonas debe ser tal que el error de agregación causado por la hipótesis de que todas las actividades se concentran en el centroide, no
 sea muy grande. Puede ser conveniente comenzar con un sistema con zonas
 muy pequeñas, ya que éstas pueden agregarse de varias formas dependiendo
 de la naturaleza de los proyectos que vayan a ser evaluados.
 
-2. El sistema de zonificación debe ser compatible con otras divisiones administrativas,
+b) El sistema de zonificación debe ser compatible con otras divisiones administrativas,
 particularmente las zonas censales. Este criterio es probablemente
 el fundamental y el resto sólo ha de seguirse si no conduce a inconsistencias
 con el censo.
 
-3. Es necesario que las zonas sean lo más homogéneas posibles en su composición
+c) Es necesario que las zonas sean lo más homogéneas posibles en su composición
 de usos del suelo y/o población. Las secciones censales con claras diferencias
 al respecto (p. ej., sectores residenciales con niveles de ingreso
 diferentes) no deben agregarse, ni aunque sean pequeñas.
 
-4. Es importante que los límites de zonas sean compatibles con los cordones y
+d) Es importante que los límites de zonas sean compatibles con los cordones y
 las líneas-pantalla, así como con los límites de zonificaciones preexistentes.
 Se ha demostrado en la práctica que se debe evitar el uso de vías o calles
 principales como límites de zonas, ya que incrementa considerablemente
 la dificultad de asignar viajes a zonas, cuando éstos se originan o acaban
 en la frontera entre las mismas.
 
-5. La forma de las zonas debe permitir una identificación sencilla de los conectores
+e) La forma de las zonas debe permitir una identificación sencilla de los conectores
 de centroides. Esto es particularmente importante para la estimación
 sucesiva de características intrazonales. Una zona debe representar
 el área natural de cobertura de las redes de transporte y su(s) conector(es)
 debe(n) ser identificado(s) de forma que representen los costes principales
 de acceso a la red.
 
-6. Las zonas no tienen porqué ser de tamaño similar. Si acaso pueden ser de
+f) Las zonas no tienen porqué ser de tamaño similar. Si acaso pueden ser de
 dimensiones semejantes en unidades de tiempo de viaje, lo que implica la
 generación de zonas más pequeñas en áreas más congestionadas.
 
@@ -739,8 +749,10 @@ de resolución de la red y del tipo de modelo utilizado. En el nivel mínimo de
 análisis se requieren los siguientes datos referentes al arco:
 
 - Longitud.
+
 - Velocidad de recorrido, bien como velocidad a flujo libre o bien como un
 valor observado para una determinada intensidad de tráfico.
+
 - Capacidad del arco, habitualmente en unidades equivalentes de vehículos
 de pasajeros (PCU) por hora.
 
@@ -750,10 +762,15 @@ representar las demoras al flujo de tráfico, pero éstos requieren información
 adicional sobre los arcos, por ejemplo:
 
 - Tipo de vía (autovía, vía principal, calle local).
+
 - Anchura de calzada, número de carriles o ambos.
+
 - Indicaciones sobre la presencia o ausencia de carriles bus o prohibiciones para el uso de determinados vehículos (p. ej., camiones).
+
 - Giros prohibidos o giros que se realizan sólo cuando existe espacio disponible en el tráfico opuesto.
+
 - Tipo de intersección y detalles de la misma, incluyendo regulación semafórica.
+
 - Capacidad de almacenamiento de colas y su existencia al comienzo de una
 determinada fase semafórica y/o período de modelización.
 
@@ -784,7 +801,7 @@ en la mayor parte de los modelos de asignación interurbanos hasta hoy. El segun
 caso se puede encontrar en áreas urbanas, en las que el tiempo o coste de viaje en un arco depende de forma importante del flujo en otros arcos, por ejemplo,
 para tráfico no prioritario en una intersección de tipo ceda el paso o glorieta.
 
-La introducción de formulaciones muy generales para la relación flujodemora
+La introducción de formulaciones muy generales para la relación flujo-demora
 no es complicada hasta llegar al siguiente paso: el equilibrio entre la
 oferta y la demanda. Aquí, el tratamiento matemático del primer caso (denominado
 corrientemente como el caso de función de costes separable) es más simple
@@ -794,7 +811,9 @@ los que el coste o tiempo de viaje en arcos depende del flujo en varios arcos; e
 decir, en los casos en los que el efecto de cada flujo no puede ser separado. 
 
 ## 2.7 Asignación de Transporte Público
+
 ### 2.7.1 Características
+
 A. La Oferta
 
 La red de servicios de transporte público es diferente a la de transporte privado,
@@ -1051,13 +1070,71 @@ incremento de tráfico sobre un modo influirá en el tiempo de viaje del otro.
 
 # CAPÍTULO 3: METODOLOGÍA
 
+En este capítulo se define la metodología general de la presente propuesta metodológica que permitirá obtener el mayor número de zonas para el área de estudio a partir del análisis de los datos disponibles y la construcción de modelos estadísticos-espaciales. 
+En el primer apartado se describirá el Diagrama Metodológico general y en el segundo subítem se describirán cada una de sus etapas.
+
+El objetivo de esta metodología es que a partir de la información espacial detallada se pueda construir un mayor número de zonas. Esta será una iteración para cada zona de la zonificación actual (EOD 2012) que actúa en el área de estudio, para ello, se aplicarán geoprocesos, clusterización espacial y la aplicación de la Teselación de Voronoi. El enfoque de esta metodología, es ser aplicada para el periodo punta mañana (6:30 - 9:00) dado que es el periodo más exigente del día.
+
 ## 3.1 Metodología General
 
+````{r, echo=FALSE}
+img.file <- file.path("MET_GNRL.png")
+fpar_5 <- fpar(external_img(src = img.file, height = 4, width = 5))
+````
+
+````{r, echo = F, fig.cap="Metodología General", fig.id = "Met", fig.cap.style = "Image Caption"}
+fpar_5
+````
+Fuente: Elaboración Propia
+
+La Metodología está desglosada en 3 fases conectadas, que son:
+
+a) la adquisición de datos y post-procesamiento para alimentar el modelo,
+
+b) Definición de modelo matemático y flujo del proceso de modelación, y
+
+c) Entrega de resultados, que es el producto de la Propuesta Metodológica.
+
 ## 3.2 Etapas Metodológicas
+
+### 3.2.1 Datos de Entrada
+
+Los datos de entrada, serán los que se necesiten tanto para la construcción de la nueva zonificación como para validar los resultados del modelo.
+
+- Población: Mediante la información a nivel de zona Censal, se obtendrá la densidad poblacional para el área de estudio.
+
+$\rho_{zs} = Población_{zs}/Área_{zs}$
+
+- Localización de Paradas y Estaciones de Metro: Se georreferenciará la información de paradas de bus disponibles en los planes operacionales que son provistos por *DTPM*, las que serán empalmadas con la georreferencia de las estaciones de *metro de santiago*.
+
+- Movilidad: La *Universidad de Chile* a través de su software Adatrap ha dispuesto de manera pública los viajes que realizan los usuarios de *RED Movilidad* @viajes, proceso que es detallado en @Gschwender2016. A partir de lo anterior, se pueden obtener los distintos tiempos de viaje, tiempo de espera y tiempo de transbordos, para el caso del tiempo de acceso y tiempo de egreso, estos serán estimados según la caminata del inicio/fin de viaje hacia los centroides de zona.   
+
+### 3.2.2 Modelo
+
+El modelo será aplicado para cada polígono de la zonificación base del área de estudio y el tratamiento de los datos mencionado en el ítem anterior serán del tipo puntual. 
+Con ello, se construirá un método de clusterización jerárquica con tratamiento de datos espaciales, primero generamos geoproceso que filtre la cantidad de puntos en cada zona y posteriormente aplicamos el método para todos aquellos polígonos en los que contengan mayor a dos paradas de modo que se pueda calcular los cluster, la clusterización lo haremos según lo que propone @Chavent2018, quien integra en el método de clusterización restricciones espaciales para crear dos matrices de disimilaridades. Una con atributos y otra con las localizaciones, que en nuestro caso son las paradas y estaciones de metro. Para poder aplicar la restricción espacial es necesario un parámetro de mezcla ($\alpha$) de las matrices de disimilaridades, del cual calcularemos el óptimo. 
+
+Adicionalmente, vamos a estimar automáticamente el número óptimo de clusters por cada zona, para ello, utilizaremos el método *"Gap Statistic"* que podemos encontrar el detalle en @mohajer2011comparison.
+
+Para cada cluster se calculará envolvente para que ninguna localización quede fuera del cluster y posteriormente su centroide. Con ello, podemos ocupar la teselación de Voronoi, que produce polígonos infintos y finalmente aplicamos un geoproceso que corte espacialmente estos polígonos de voronoi según los polígonos de la zonificación inicial, obteniendo así los nuevos polígonos que serán ensamblados mediante geoproceso con los polígonos que no fueron modificados.   
+
+### 3.2.3 Salida
+
+Como resultado del procedimiento anteriormente mencionado se obtiene:
+
+- Nueva zonificación, 
+
+- Nueva Matriz de Origen-Destino,  
+
+- El cálculo del porcentaje de viajes intrazonales que fueron recuperados, y
+
+- El cálculo de los nuevos tiempos de acceso y egreso por los nuevos centroides de zonas.
 
 \newpage
 
 # CAPÍTULO 4: APLICACIÓN DEL MODELO Y ANÁLISIS DE RESULTADOS
+
+Como se definió inicialmente, el área  
 
 ## 4.1 Asignación de Demanda en Zonificación Base
 
@@ -1078,12 +1155,3 @@ incremento de tráfico sobre un modo influirá en el tiempo de viaje del otro.
 \newpage
 
 # BIBLIOGRAFÍA
-
-\newpage
-
-# ANEXOS
-
-\newpage
-
-# APÉNDICE
-
