@@ -288,16 +288,20 @@ tm_shape(hclus_stops) +
 
 #alpha
 # cr <- choicealpha(D0, D1, range.alpha = seq(0, 1, .1), K = nclus, graph = T)
-cr <- lapply(1:length(D0, function(x) choicealpha(D0[[x]], 
+cr <- lapply(1:length(D0), function(x) choicealpha(D0[[x]], 
                                             D1[[x]], 
                                             range.alpha = seq(0, 1, .1), 
                                             K = nclus[[x]], 
-                                            graph = T)))
-alpha_ch <- lapply(cr, function(x) mutate(as_tibble(x$Qnorm, rownames = "alpha"),
-                                       Promedio = (Q0norm+Q1norm)/2))
-alpha_ch <- cr$Qnorm %>% 
-  as_tibble(rownames = "alpha") %>% 
-  mutate(Promedio = (Q0norm+Q1norm)/2) %>% 
-  filter(Promedio == max(Promedio)) %>% 
-  tidyr::separate(alpha, "=", into = c("alpha_nm", "alpha_num")) %>% 
-  pull(alpha_num)
+                                            graph = T))
+alpha_ch <- lapply(cr, function(x) filter(mutate(as_tibble(x$Q, rownames = "alpha"),
+                                               Promedio = (Q0+Q1)/2),
+                                               Promedio == max(Promedio)) %>% 
+                     tidyr::separate(alpha, 
+                                     "=", 
+                                     into = c("alpha_nm", "alpha_num")) %>% 
+                     pull(alpha_num))
+alpha_ch <- lapply(1:length(alpha_ch), function(x) alpha_ch[[x]][1])
+#trees
+tree <- lapply(1:length(alpha_ch), function(x) hclustgeo(D0[[x]], 
+                                                         D1[[x]],
+                                                         alpha = as.numeric(alpha_ch[[x]])))
