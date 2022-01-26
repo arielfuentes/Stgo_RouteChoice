@@ -286,7 +286,7 @@ el bienestar social.
 
 Algunas relaciones causa-efecto muy simples se pueden representar gráficamente
 para ayudar a comprender la naturaleza de algunos problemas de
-transporte. Un ejemplo típico es el círculo vicioso coche/transporte público
+transporte. Un ejemplo típico es el círculo vicioso coche/transporte público.
 
 ````{r, echo=FALSE}
 img.file <- file.path("circulo vicioso.png")
