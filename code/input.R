@@ -104,3 +104,12 @@ rm(stops_bus, stops_mt)
 library(sf)
 zones <- st_read("data/Zonificacion_EOD2012.shp") %>%
   st_make_valid()
+vial_stgo <- st_read("data/Capas_Base/Capas_Base.shp") %>%
+  st_transform(32719) %>%
+  filter(!CLASE_URBA %in% c("CARRETERA", "N/A", "PRIVADO"))
+vial_zoi <- st_filter(vial_stgo, nngeo::st_remove_holes(st_union(zoi)), .predicate = st_within)
+tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
+  tm_polygons(col = "red") +
+  tm_shape(vial_zoi) +
+  tm_lines()
+st_write("data/vial_zoi.gpkg", obj = vial_zoi)
