@@ -305,3 +305,9 @@ alpha_ch <- lapply(1:length(alpha_ch), function(x) alpha_ch[[x]][1])
 tree <- lapply(1:length(alpha_ch), function(x) hclustgeo(D0[[x]], 
                                                          D1[[x]],
                                                          alpha = as.numeric(alpha_ch[[x]])))
+P <- lapply(1:length(tree), function(x) cutree(tree[[x]], nclus[[x]]))
+#Point Cluster
+hclus_stops <- mutate(pts_zn, P = unlist(P))
+#convex hull
+hull <- 
+hull <- st_convex_hull(st_union(group_by(hclus_stops, P), by_feature = T))
