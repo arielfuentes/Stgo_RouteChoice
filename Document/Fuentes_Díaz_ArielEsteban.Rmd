@@ -724,10 +724,7 @@ elevado de vías en la red para después realizar hipótesis más generales sobr
 giros y demoras en las intersecciones. Tampoco es muy razonable utilizar una
 red muy detallada junto con un sistema de zonificación menos preciso, ya que
 los errores de agregación espacial (en términos de conexión de centroides a
-la red) reducen el valor de todo el proceso. Esto es especialmente importante *en el caso de redes de transporte público* Lo
-que más importa es que la elección de rutas y flujos sea lo más realista posible dentro de las limitaciones del estudio. Jansen y Bovy @Jansen1982 investigaron la influencia de la definición y detalle de las redes sobre el realismo de la asignación de flujos en la red. La principal
-conclusión de su estudio es que se obtienen errores más grandes en los niveles
-jerárquicos más bajos de la red viaria. Por tanto se debe incluir en la red al
+la red) reducen el valor de todo el proceso. Esto es especialmente importante *en el caso de redes de transporte público* Lo que más importa es que la elección de rutas y flujos sea lo más realista posible dentro de las limitaciones del estudio. Jansen y Bovy @Jansen1982 investigaron la influencia de la definición y detalle de las redes sobre el realismo de la asignación de flujos en la red. La principal conclusión de su estudio es que se obtienen errores más grandes en los niveles jerárquicos más bajos de la red viaria. Por tanto se debe incluir en la red al
 menos un nivel por debajo de los arcos de interés. Por ejemplo, en un estudio
 de vías de tipo A (carreteras nacionales), se ha de incluir las vías de tipo
 B (carreteras secundarias).
@@ -866,14 +863,21 @@ En el caso de una asignación de demanda al transporte público el coste general
 de viaje puede ser definido como sigue:
 
 $C_{ij} = a_1t_{ij}^v + a_2t_{ij}^w + a_3t_{ij}^t + a_4t_{ij}^n + a_1\delta^n + a_5F_{ij}$
-
+\newline
 $Donde:$
+\newline
 $t_{ij}^v\ es\ el\ tiempo\ de\ viaje\ a\ bordo\ del\ modo\ para\ ir\ de\ i\ a\ j;$
+\newline
 $t_{ij}w^\ es\ el\ tiempo\ andando\ para\ llegar\ o\ ir\ desde\ la\ parada\ (estación);$
+\newline
 $t_{ij}t^\ es\ el\ tiempo\ de\ espera\ en\ la\ parada;$
+\newline
 $t_{ij}n^\ es\ el\ tiempo\ de\ transbordo;$
+\newline
 $δ^n\ es\ una\ penalidad\ intrínseca\ o\ resistencia\ al\ trasbordo,\ medida\ en\ unidad\ de\ tiempo\ (usualmente\ de\ 2\ a\ 5\ minutos);$
+\newline
 $F_{ij}\ es\ la\ tarifa\ pagada\ para\ desplazarse\ entre\ i\ y\ j;$
+\newline
 $De\ a_1\ a\ a_5\ son\ coeficientes\ asociados\ a\ los\ elementos\ de\ coste\ respectivos$
 
 Usualmente a $a_1$ o $a_5$ suele otorgársele el valor 1 según se deseen medir los
@@ -986,11 +990,17 @@ cualquiera de la red. Esta exposición se explica por las siguientes notaciones
 adicionales:
 
 $Sjk = conjunto\ de\ secciones\ de\ línea\ que\ conectan\ directamente\ los\ nodos\ j\ y\ k;$
+\newline
 $L_j^+ = conjunto\ de\ secciones\ de\ línea\ en\ salida\ del\ nodo\ j;$
+  \newline
   $v_s = flujo\ sobre\ la\ sección\ de\ línea\ s;$
+  \newline
   $t_s = tiempo\ de\ viaje\ a\ bordo\ del\ vehículo\ sobre\ la\ sección\ de\ línea\ s;$
+  \newline
   $f_s = frecuencia\ asociada\ a\ la\ sección\ de\ línea\ s;$
+  \newline
   $g_j = número\ de\ viajes\ hacia\ el\ destino\ j;$
+  \newline
   $V_{jk} = flujo\ total\ sobre\ la\ sección\ de\ ruta\ jk.$
 
 Entonces, se puede identificar el conjunto de líneas atractivas que provienen
@@ -1108,6 +1118,56 @@ $\rho_{zs} = Población_{zs}/Área_{zs}$
 - Localización de Paradas y Estaciones de Metro: Se georreferenciará la información de paradas de bus disponibles en los planes operacionales que son provistos por *DTPM*, las que serán empalmadas con la georreferencia de las estaciones de *metro de santiago*.
 
 - Movilidad: La *Universidad de Chile* a través de su software Adatrap ha dispuesto de manera pública los viajes que realizan los usuarios de *RED Movilidad* @viajes, proceso que es detallado en @Gschwender2016. A partir de lo anterior, se pueden obtener los distintos tiempos de viaje, tiempo de espera y tiempo de transbordos, para el caso del tiempo de acceso y tiempo de egreso, estos serán estimados según la caminata del inicio/fin de viaje hacia los centroides de zona.   
+
+- Zonificación: Contamos con una Zonificación inicial que en este caso será la EOD 2012.Sin embargo, esta cobertura presenta problemas topológicos dado que presentan hoyos, en algunos casos son razonables porque corresponden a hitos geográficos como rotondas que no dejan de complejizar por la existencia de paradas y su asociación a zonas que es muy importante en el proceso; pero por otro lado, hay zonas que por edición están separadas unas de otras, cayendo en este vacío algunas paradas. Ejemplo de esto es:
+
+````{r, echo = F, message = F, warnings = F}
+ filter(start_pts, is.na(Zona)) %>%
+  as_tibble() #%>%
+  # kableExtra::kable_classic()
+tm_shape(zoi) +
+  tm_polygons() +
+  tm_shape(filter(start_pts, is.na(Zona))) +
+  tm_dots()
+````
+
+Estos 6 casos puntuales fueron sometidos a edición manual para que las paradas cayeran en la zona más próxima. 
+
+- Vialidad: Se utiliza la cobertura de vialidad generada por INE 2017, esta es utilizada para obtener los tiempos de caminata de acceso y egreso a los centroides mediante el cálculo de camino más corto usando algoritmo dijkstra, para ello, se eliminan ejes que correspondan a Carretera o Camino Privado. Posterior a ello, se determina cual es el camino más corto desde cada para de inicio de viaje y fin de viaje a cada centroide de zona.
+
+$Sea:$\newline 
+$Z_i = Zona\ del\ Área\ de\ estudio,\ donde\ i \in \mathbb{Z}:1\ a\ 483$ \newline
+$P_{i,j} = Localización\ de\ parada\ o\ estación\ de\ metro\ j\ / P_{i,j} \cap Z_i\ \forall i$ \newline
+$C_i = Matriz\ de\ costo\ en \ distancia\ de\ la\ red\ vial\ / red\ vial\ \cap Z_i\ \forall i$
+$\Longrightarrow \ C.C(P_{i,j}, Cent_i) = min\ \overrightarrow{dist}(P_{i,j}, Cent_i)\forall \ i$ \newline
+$C.C = Camino\ más\ corto$ \newline
+$Cent_i = Centroide\ en\ zona\ i$ \newline
+
+Para ello, se utilizó la librería sfnetworks en R, la que permite calcular las distancias más cortas en un grafo con datos geográficos, en este caso, el grafo construido sobre la vialidad no fue aplicado en direccionalidad dado que solo nos interesan las caminatas, que para los tiempos se consideró que en promedio es de 48 m/min.
+
+Por ejemplo, el camino más corto en la zona 375 desde la parada "PD26" hacia el centroide es:
+
+````{r, echo = F, message = F, warning = F}
+tm_shape(filter(zoi, Zona == 375)) +
+  tm_polygons() +
+  tm_shape(filter(st_as_sf(zones_vial), Zona == 375)) +
+  tm_lines() +
+  tm_shape(filter(ctd, Zona == 375)) +
+  tm_dots(col = "red", size = 0.5) +
+  tm_shape(filter(start_pts, Zona == 375)[1,]) +
+  tm_dots(col = "blue", size = 0.5) +
+  tm_shape(filter(zones_vial, Zona == 375) %>%
+             convert(to_spatial_shortest_paths,
+                     from = filter(start_pts, Zona == 375)[1,],
+                     to = filter(ctd, Zona == 375)) %>%
+             st_as_sf()) +
+  tm_lines(col = "purple", lwd = 4)
+````
+
+Los datos de entrada necesitan de un procesamiento, en el caso de las paradas se escogen 3 planes operacionales, de modo de minimizar la cantidad de paradas que no sean encontradas en los datos de movilidad, la fecha de estos planes son: 1 de marzo, 1 de abril y 23 de junio de 2019, de estos se obtienen los únicos del código de parada tanto de usuario como la codificación interna del DTPM, a esto se adicionan las columnas x e y que contienen coordenadas en proyección UTM, por lo que pueden ser espacializadas. Mediante este proceso solo no fueron encontradas las paradas de codificación usuario "PF1126" y "PD1614", las que fueron agregadas posteriormente mediante una búsqueda directa. Estas posteriomente se unifican al diccionario de estaciones de metro, que fueron geolocalizadas por observación en Google Earth.
+
+Los datos de movilidad son obtenidos a partir del procesamiento de las tarjetas bip! contienen la codificación interna del DTPM tanto para las paradas como para los recorridos, por eso es que en la obtención de las paradas se necesitaban las dos codificaciones, en el caso de los recorridos se crea diccionario para una mejor identificación, esta información de diccionario puede ser confeccionada a partir del archivo geográfico de rutas del plan operacional, el cual posee columnas en su tabla de atributos con ese fin, el que se debe complementar en función de las rutas que no encuentre mediante una inspección de su codificación.
+
 
 ### 3.2.2 Modelo
 
