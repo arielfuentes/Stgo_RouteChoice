@@ -208,17 +208,18 @@ vjs_pma <- mutate(vjs_pma,
 # vjs_pma <- vjs_pma %>% filter(Demanda > 0)
 # zoi_trips <- st_join(head(vjs_pma), zoi, join = st_intersects) #%>%
   # filter(!is.na(id))
-zoi_trips_a <- st_filter(vjs_pma[1:200000,], zoi, join = st_within)
-zoi_trips_b <- st_filter(vjs_pma[200001:400000,], zoi, join = st_within)
-zoi_trips_c <- st_filter(vjs_pma[400001:600000,], zoi, join = st_within)
-zoi_trips_d <- st_filter(vjs_pma[600001:nrow(vjs_pma),], zoi, join = st_within)
-zoi_trips <- bind_rows(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
-rm(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
+# zoi_trips_a <- st_filter(vjs_pma[1:200000,], zoi, .predicate = st_within)
+# zoi_trips_b <- st_filter(vjs_pma[200001:400000,], zoi, .predicate = st_within)
+# zoi_trips_c <- st_filter(vjs_pma[400001:600000,], zoi, .predicate = st_within)
+# zoi_trips_d <- st_filter(vjs_pma[600001:nrow(vjs_pma),], zoi, .predicate = st_within)
+# zoi_trips <- bind_rows(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
+# rm(zoi_trips_a, zoi_trips_b, zoi_trips_c, zoi_trips_d)
+zoi_trips <- st_filter(vjs_pma, nngeo::st_remove_holes(st_union(zoi)), .predicate = st_within)
 
 tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
   tm_grid(col = "white", lwd = 2, labels.size = .8) +
   tm_polygons(col = "red", border.col = "black", border.alpha = 1) +
-  tm_shape(arrange(zoi_trips, desc(Demanda))[1:120,]) +
+  tm_shape(arrange(zoi_trips, desc(Demanda))) +
   tm_lines(lwd = "Demanda", scale = 6) +
   tm_layout(bg.color = "#DAF7A6", 
             main.title = "Principales Flujos", 
@@ -318,3 +319,126 @@ tm_shape(zones) +
             legend.show = F) +
   tm_compass(position = c("left", "top"), type = "4star", size = 2) +
   tm_scale_bar(position = c("right", "bottom")) 
+################################################
+library(sfnetworks)
+library(tidygraph)
+sub_net <- lapply(split(zoi, zoi$Zona), 
+                  function(x) st_filter(vial_zoi, x, .predicate = st_within))
+sub_net <- lapply(1:length(sub_net), 
+                  function(x) as_sfnetwork(mutate(sub_net[[x]], 
+                                                  Zona = names(sub_net)[x]),
+                                           directed = FALSE))
+# vjs_pma <- read_delim("data/vjs_pma.csv", delim = ",")
+start_pts <- distinct(select(st_drop_geometry(zoi_trips), 
+                             paraderosubida_SIMT, 
+                             x_sub, 
+                             y_sub)) %>%
+  st_as_sf(coords = c("x_sub", "y_sub"), crs = 32719)
+start_pts <- st_join(start_pts, zoi, .predicate = st_within)
+# start_pts <- split(start_pts, start_pts$Zona)[1:3]
+# d_cen <- sub_net[[1]] %>% 
+#   activate("edges") %>%
+#   mutate(weight = edge_length()) %>%
+#   convert(to_spatial_shortest_paths, 
+#           from = filter(start_pts, Zona == 4)[1,], 
+#           to = st_centroid(filter(zoi, Zona == 4))) %>%
+#   st_as_sf() %>%
+#   summarise(vel_centr = sum(st_distance(.)/units::set_units(48, "m/min"))) %>%
+#   st_drop_geometry()
+# lapply(1:length(sub_net), function(x) sub_net[[x]] %>%
+#          activate("edges") %>%
+#          mutate(weight = edge_length()) %>%
+#          convert(to_spatial_shortest_paths, 
+#                  from = split(start_pts, start_pts$Zona)[[x]], 
+#                  to = st_centroid(split(zoi, zoi$Zona)[[x]])))
+start_pts_lst <- split(start_pts, start_pts$Zona)[1:3]
+# lapply(1:nrow(split(start_pts, start_pts$Zona)[[1]]), function(x) sub_net[[1]] %>%
+#          activate("edges") %>%
+#          mutate(weight = edge_length()) %>%
+#          convert(to_spatial_shortest_paths,
+#                  from = split(start_pts, start_pts$Zona)[[1]][x,],
+#                  to = st_centroid(split(zoi, zoi$Zona)[[1]])) %>%
+#   st_as_sf() %>%
+#   summarise(vel_centr = sum(st_distance(.)/units::set_units(48, "m/min"))) %>%
+#   st_drop_geometry()) %>%
+#   bind_rows() %>%
+#   bind_cols(split(start_pts, start_pts$Zona)[[1]])
+time_acc <- lapply(1:length(start_pts_lst), function(x) lapply(1:nrow(start_pts_lst[[x]]), 
+                                                   function(y) sub_net[[x]] %>%
+                                                     activate("edges") %>%
+                                                     mutate(weight = edge_length()) %>%
+                                                     convert(to_spatial_shortest_paths,
+                                                             from = start_pts_lst[[x]][y,],
+                                                             to = st_centroid(split(zoi, zoi$Zona)[[x]]))%>%
+                                                     st_as_sf() %>%
+                                                     summarise(vel_centr = sum(st_distance(.)/units::set_units(48, "m/min"))) %>%
+                                                     st_drop_geometry()) %>%
+         bind_rows() %>%
+         bind_cols(start_pts_lst[[x]])) %>%
+  bind_rows()
+tm_shape(filter(zoi, Zona == 4)) + 
+  tm_polygons() + 
+  tm_shape(st_centroid(filter(zoi, Zona == 4))) + 
+  tm_dots(col = "red") + 
+  tm_shape(filter(start_pts, Zona == 4)[2,]) + 
+  tm_dots(col = "blue") + 
+  tm_shape(sub_net[[1]] %>% activate("edges") %>% st_as_sf()) + 
+  tm_lines(col = "white") + 
+  tm_shape(xy) + 
+  tm_lines(col = "black")
+# xy %>% 
+#   mutate(dist_mt = st_distance(.)) %>% 
+#   st_drop_geometry() %>% 
+#   summarise(dist_mt = sum(dist_mt))
+# net = as_sfnetwork(vial_zoi, directed = FALSE) %>%
+#   # st_transform(3035) %>%
+#   activate("edges") %>%
+#   mutate(weight = edge_length()) %>%
+#   morph(to_spatial_shortest_paths, from = 1, to = 10) %>%
+#   mutate(in_paths = TRUE) %>%
+#   unmorph()
+# net = as_sfnetwork(vial_zoi, directed = FALSE) %>%
+#   # st_transform(3035) %>%
+#   activate("edges") %>%
+#   mutate(weight = edge_length()) %>%
+#   convert(to_spatial_shortest_paths, from = 1, to = 10)
+# net
+# 
+# paths = st_network_paths(net, from = 495, to = c(458, 121))
+# st_network_cost(net, from = 495, to = c(458, 121))
+# ?to_spatial_shortest_paths(net, from = 495, to = c(458, 121))
+# to_spatial_shortest_paths(paths)
+# paths
+# 
+# paths %>%
+#   slice(1) %>%
+#   pull(node_paths) %>%
+#   unlist()
+# 
+# paths %>%
+#   slice(1) %>%
+#   pull(edge_paths) %>%
+#   unlist()
+# 
+# plot_path = function(node_path) {
+#   net %>%
+#     activate("nodes") %>%
+#     slice(node_path) %>%
+#     plot(cex = 1.5, lwd = 1.5, add = TRUE)
+# }
+# 
+# colors = sf.colors(3, categorical = TRUE)
+# 
+# plot(net, col = "grey")
+# paths %>%
+#   pull(node_paths) %>%
+#   walk(plot_path)
+# net %>%
+#   activate("nodes") %>%
+#   st_as_sf() %>%
+#   slice(c(495, 121, 458)) %>%
+#   plot(col = colors, pch = 8, cex = 2, lwd = 2, add = TRUE)
+# 
+# net %>%
+#   activate("edges") %>%
+#   st_as_sf() %>% summarise(sum(SHAPE_Leng))
