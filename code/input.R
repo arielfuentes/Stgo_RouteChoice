@@ -106,7 +106,9 @@ zones <- st_read("data/Zonificacion_EOD2012.shp") %>%
   st_make_valid()
 vial_stgo <- st_read("data/Capas_Base/Capas_Base.shp") %>%
   st_transform(32719) %>%
-  filter(!CLASE_URBA %in% c("CARRETERA", "N/A", "PRIVADO"))
+  select(-c("NOMBRE_VIA", "CLASE_COMU", "SHAPE_Leng")) %>%
+  filter(!CLASE_URBA %in% c("CARRETERA", "PRIVADO"))
+source("code/zoi.R", encoding = "utf-8")
 vial_zoi <- st_filter(vial_stgo, nngeo::st_remove_holes(st_union(zoi)), .predicate = st_within)
 tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
   tm_polygons(col = "red") +
