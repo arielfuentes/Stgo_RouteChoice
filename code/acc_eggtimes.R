@@ -12,17 +12,79 @@ start_pts <- distinct(select(st_drop_geometry(zoi_trips),
                              x_sub, 
                              y_sub)) %>%
   st_as_sf(coords = c("x_sub", "y_sub"), crs = 32719) %>% 
-  st_join(zoi, .predicate = st_within) %>%
-  na.omit() 
+  st_join(zoi, .predicate = st_within) #%>%
+  # na.omit() 
 
 end_pts <- distinct(select(st_drop_geometry(zoi_trips), 
                              paraderobajada_SIMT, 
                              x_baj, 
                              y_baj)) %>%
   st_as_sf(coords = c("x_baj", "y_baj"), crs = 32719) %>% 
-  st_join(zoi, .predicate = st_within) %>%
-  na.omit()
+  st_join(zoi, .predicate = st_within) #%>%
+  # na.omit()
 
+start_pts2 <- distinct(select(st_drop_geometry(zoi_trips), 
+                             paraderosubida_SIMT, 
+                             x_sub, 
+                             y_sub)) %>%
+  filter(!paraderosubida_SIMT %in% c("PD553", 
+                                     "PD535", 
+                                     "PF286", 
+                                     "PG1213", 
+                                     "MONSENOR EYZAGUIRRE", 
+                                     "PG192")) %>%
+  bind_rows(tibble(paraderosubida_SIMT = c("PD553", 
+                                          "PD535", 
+                                          "PF286", 
+                                          "PG1213", 
+                                          "MONSENOR EYZAGUIRRE", 
+                                          "PG192"),
+                  x_sub = c(353538.5262269145,
+                            353534.8736346469,
+                            355734.5458669194,
+                            344202.2974691084,
+                            350011.18743581336,
+                            349015.1965470637),
+                  y_sub = c(6295645.183735825,
+                            6295629.964601376,
+                            6283374.502934581,
+                            6278005.192301198,
+                            6297309.400843736, 
+                            6281213.9946082905))) %>%
+  st_as_sf(coords = c("x_sub", "y_sub"), crs = 32719) %>% 
+  st_join(zoi, .predicate = st_within)
+
+end_pts2 <- distinct(select(st_drop_geometry(zoi_trips), 
+                              paraderobajada_SIMT, 
+                              x_baj, 
+                              y_baj)) %>%
+  filter(!paraderobajada_SIMT %in% c("PD553", 
+                                     "PD535", 
+                                     "PF286", 
+                                     "PG1213", 
+                                     "MONSENOR EYZAGUIRRE", 
+                                     "PG192")) %>%
+  bind_rows(tibble(paraderobajada_SIMT = c("PD553", 
+                                           "PD535", 
+                                           "PF286", 
+                                           "PG1213", 
+                                           "MONSENOR EYZAGUIRRE", 
+                                           "PG192"),
+                   x_baj = c(353538.5262269145,
+                             353534.8736346469,
+                             355734.5458669194,
+                             344202.2974691084,
+                             350011.18743581336,
+                             349015.1965470637),
+                   y_baj = c(6295645.183735825,
+                             6295629.964601376,
+                             6283374.502934581,
+                             6278005.192301198,
+                             6297309.400843736, 
+                             6281213.9946082905))) %>%
+  st_as_sf(coords = c("x_baj", "y_baj"), crs = 32719) %>% 
+  st_join(zoi, .predicate = st_within)
+  
 t_net <- function(pts, nm){
   #path order
   short_net <- lapply(sort(unique(pts$Zona)), function(x) 
@@ -45,5 +107,5 @@ t_net <- function(pts, nm){
   return(time_net)
 }
 
-t_net(pts = filter(start_pts, Zona %in% c(375:376)), nm = "time_acc")
-t_net(pts = filter(end_pts, Zona %in% c(375:376)), nm = "time_egg")
+time_acc <- t_net(pts = filter(start_pts, Zona %in% c(375:376)), nm = "time_acc")
+time_egg <- t_net(pts = filter(end_pts, Zona %in% c(375:376)), nm = "time_egg")
