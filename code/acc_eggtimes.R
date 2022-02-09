@@ -107,5 +107,5 @@ t_net <- function(pts, nm){
   return(time_net)
 }
 
-time_acc <- t_net(pts = filter(start_pts, Zona %in% c(375:376)), nm = "time_acc")
-time_egg <- t_net(pts = filter(end_pts, Zona %in% c(375:376)), nm = "time_egg")
+time_acc <- t_net(pts = start_pts2, nm = "time_acc")
+time_egg <- t_net(pts = end_pts2, nm = "time_egg")
