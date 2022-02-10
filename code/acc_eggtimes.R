@@ -3,7 +3,7 @@ library(tidygraph)
 ctd <- st_centroid(zoi)
 zones_vial <- st_join(vial_zoi, zoi, .predicate = st_within) %>%
   na.omit() %>%
-  filter(Zona %in% c(375, 376)) %>%
+  # filter(Zona %in% c(375, 376)) %>%
   as_sfnetwork(directed = F) %>% 
   activate("edges") %>%
   mutate(weight = edge_length())
