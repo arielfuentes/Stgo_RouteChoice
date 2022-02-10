@@ -442,3 +442,44 @@ tm_shape(filter(zoi, Zona == 4)) +
 # net %>%
 #   activate("edges") %>%
 #   st_as_sf() %>% summarise(sum(SHAPE_Leng))
+
+zoi_tripsCG <- zoi_trips %>%
+  select(Demanda, paraderosubida_SIMT, paraderobajada_SIMT, netapa, rts, tviaje, tesp, tb2, tcam) %>%
+  st_drop_geometry() %>%
+  left_join(select(time_acc, time_acc, paraderosubida_SIMT)) %>%
+  left_join(select(time_egg, time_egg, paraderobajada_SIMT)) %>%
+  group_split(netapa)
+
+zoi_tripsCG <- bind_rows(
+zoi_tripsCG[[1]] %>%
+  mutate(e1 = rts, e2 = NA_character_, e3 = NA_character_, e4 = NA_character_),
+zoi_tripsCG[[2]] %>%
+  separate(rts, into = c("e1", "e2"), remove = F) %>%
+  mutate(e3 = NA_character_, e4 = NA_character_),
+zoi_tripsCG[[3]] %>%
+  separate(rts, into = c("e1", "e2", "e3"), remove = F) %>%
+  mutate(e4 = NA_character_),
+zoi_tripsCG[[4]] %>%
+  separate(rts, into = c("e1", "e2", "e3", "e4"), remove = F)
+) %>%
+  mutate(e1 = as.numeric(e1), 
+         e2 = as.numeric(e2), 
+         e3 = as.numeric(e3), 
+         e4 = as.numeric(e4),
+         Tarifa = case_when(e1 >= 756 | e2 >= 756 | e3 >= 756 | e4 >= 756 ~ 800,
+                            T ~ 700)) %>%
+  select(-c("e1", "e2", "e3", "e4"))
+
+#Usando VST: Valor Social del Tiempo de viaje, transformamos variables
+
+alpha = 2434/60
+zoi_tripsCG <- mutate(zoi_tripsCG, tviaje = tviaje*alpha, 
+                      tesp = 2*tesp*alpha, 
+                      tb2 = 2*tb2*alpha, 
+                      tcam = 2*tcam*alpha,
+                      time_acc = 2*time_acc*alpha,
+                      time_egg = 2*time_egg*alpha)
+
+library(ggplot2)
+ggplot(zoi_tripsCG, aes(tviaje, Demanda)) +
+  geom_point()
