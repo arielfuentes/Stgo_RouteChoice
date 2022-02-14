@@ -446,8 +446,8 @@ tm_shape(filter(zoi, Zona == 4)) +
 zoi_tripsCG <- zoi_trips %>%
   select(Demanda, paraderosubida_SIMT, paraderobajada_SIMT, netapa, rts, tviaje, tesp, tb2, tcam) %>%
   st_drop_geometry() %>%
-  left_join(select(time_acc, time_acc, paraderosubida_SIMT)) %>%
-  left_join(select(time_egg, time_egg, paraderobajada_SIMT)) %>%
+  left_join(st_drop_geometry(select(time_acc, time_acc, paraderosubida_SIMT))) %>%
+  left_join(st_drop_geometry(select(time_egg, time_egg, paraderobajada_SIMT))) %>%
   group_split(netapa)
 
 zoi_tripsCG <- bind_rows(
