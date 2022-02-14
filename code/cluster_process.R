@@ -242,6 +242,9 @@ zones_noclus <- bind_rows(zoi_noclus, anti_zoi)
 tm_shape(zones_noclus) +
   tm_polygons()
 
+tm_shape(zoi_clus) +
+  tm_polygons()
+
 #Disimilarity matrices ----
 pts_zn <- bind_rows(pts_zn) %>%
   filter(Zona %in% zn_clus)
@@ -308,6 +311,32 @@ tree <- lapply(1:length(alpha_ch), function(x) hclustgeo(D0[[x]],
 P <- lapply(1:length(tree), function(x) cutree(tree[[x]], nclus[[x]]))
 #Point Cluster
 hclus_stops <- mutate(pts_zn, P = unlist(P))
-#convex hull
-hull <- 
-hull <- st_convex_hull(st_union(group_by(hclus_stops, P), by_feature = T))
+#cent
+hclus_gr <- group_split(hclus_stops, Zona, P)
+hclus_cent <- lapply(hclus_gr, 
+                     function(x) st_as_sf(
+                       st_centroid(st_convex_hull(st_union(x))))) %>%
+  bind_rows()
+hclus_cent_zn <- unlist(lapply(hclus_gr, function(x) x$Zona))
+hclus_cent <- mutate(hclus_cent, Zona = hclus_cent_zn, cent = row_number())
+hclus_cent_lst <- split(hclust_cent, cent)
+hcent <- hclus_stops %>%
+  group_by(Zona, P) %>%
+  # summarise(.groups = "keep") %>%
+  st_convex_hull() %>%
+  st_centroid() %>%
+  ungroup()
+
+st_vor <- lapply(hcent$Zona, 
+       function(x) st_intersection(st_cast(st_voronoi(st_union(st_geometry(filter(hcent, Zona == x))),
+                                                      envelope = st_geometry(filter(zoi_clus, Zona == x)))),
+                                   filter(zoi_clus, Zona == x)))
+
+st_vor <- lapply(hcent$Zona, 
+                 function(z) mutate(st_as_sf(st_vor[[z]]), Zona = z,
+                                    seq_zn = row_number())) %>%
+  bind_rows()
+
+m <- tm_shape(st_vor) +
+  tm_polygons(col = "Zona")
+tmap_leaflet(m)
