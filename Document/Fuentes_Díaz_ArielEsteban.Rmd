@@ -1123,8 +1123,7 @@ $\rho_{zs} = Población_{zs}/Área_{zs}$
 
 ````{r, echo = F, message = F, warnings = F}
  filter(start_pts, is.na(Zona)) %>%
-  as_tibble() #%>%
-  # kableExtra::kable_classic()
+  as_tibble() 
 tm_shape(zoi) +
   tm_polygons() +
   tm_shape(filter(start_pts, is.na(Zona))) +
@@ -1143,7 +1142,7 @@ $\Longrightarrow \ C.C(P_{i,j}, Cent_i) = min\ \overrightarrow{dist}(P_{i,j}, Ce
 $C.C = Camino\ más\ corto$ \newline
 $Cent_i = Centroide\ en\ zona\ i$ \newline
 
-Para ello, se utilizó la librería sfnetworks en R, la que permite calcular las distancias más cortas en un grafo con datos geográficos, en este caso, el grafo construido sobre la vialidad no fue aplicado en direccionalidad dado que solo nos interesan las caminatas, que para los tiempos se consideró que en promedio es de 48 m/min.
+Para ello, se utilizó la librería sfnetworks en R @sfnet, la que permite calcular las distancias más cortas en un grafo con datos geográficos, en este caso, el grafo construido sobre la vialidad no fue aplicado en direccionalidad dado que solo nos interesan las caminatas, que para los tiempos se consideró que en promedio es de 48 m/min.
 
 Por ejemplo, el camino más corto en la zona 375 desde la parada "PD26" hacia el centroide es:
 
@@ -1178,17 +1177,20 @@ Adicionalmente, vamos a estimar automáticamente el número óptimo de clusters 
 
 Para cada cluster se calculará envolvente para que ninguna localización quede fuera del cluster y posteriormente su centroide. Con ello, podemos ocupar la teselación de Voronoi, que produce polígonos infintos y finalmente aplicamos un geoproceso que corte espacialmente estos polígonos de voronoi según los polígonos de la zonificación inicial, obteniendo así los nuevos polígonos que serán ensamblados mediante geoproceso con los polígonos que no fueron modificados.   
 
+Que son una serie de modelos secuenciales.
+
+El modelo más típico para clusterización es el k-medias, sin embargo, se escoge que sea el método jerárquico, dado que el k-media utiliza una búsqueda aleatoria y a nosotros nos interesa la replicabilidad, adicionalmente . 
+modelo cluster 
+voronoi
+clip
+
 ### 3.2.3 Salida
 
-Como resultado del procedimiento anteriormente mencionado se obtiene:
+Como resultado del procedimiento anteriormente mencionado se obtiene Nueva zonificación que, permite obtener Nueva Matriz de Origen-Destino:
 
-- Nueva zonificación, 
+$\vec Z_{ij}$
 
-- Nueva Matriz de Origen-Destino,  
-
-- El cálculo del porcentaje de viajes intrazonales que fueron recuperados, y
-
-- El cálculo de los nuevos tiempos de acceso y egreso por los nuevos centroides de zonas.
+A la que se puede obtener el porcentaje de viajes intrazonales ($\vec Z_{i=j}$) que fueron recuperados, y los nuevos tiempos de acceso y egreso por los nuevos centroides de zonas.
 
 \newpage
 
