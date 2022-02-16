@@ -317,26 +317,71 @@ hclus_cent <- lapply(hclus_gr,
                      function(x) st_as_sf(
                        st_centroid(st_convex_hull(st_union(x))))) %>%
   bind_rows()
-hclus_cent_zn <- unlist(lapply(hclus_gr, function(x) x$Zona))
-hclus_cent <- mutate(hclus_cent, Zona = hclus_cent_zn, cent = row_number())
-hclus_cent_lst <- split(hclust_cent, cent)
-hcent <- hclus_stops %>%
-  group_by(Zona, P) %>%
-  # summarise(.groups = "keep") %>%
-  st_convex_hull() %>%
-  st_centroid() %>%
-  ungroup()
-
-st_vor <- lapply(hcent$Zona, 
-       function(x) st_intersection(st_cast(st_voronoi(st_union(st_geometry(filter(hcent, Zona == x))),
-                                                      envelope = st_geometry(filter(zoi_clus, Zona == x)))),
-                                   filter(zoi_clus, Zona == x)))
-
-st_vor <- lapply(hcent$Zona, 
-                 function(z) mutate(st_as_sf(st_vor[[z]]), Zona = z,
-                                    seq_zn = row_number())) %>%
+hclus_cent_zn <- unlist(lapply(hclus_gr, function(x) unique(x$Zona)))
+hclus_cent <- mutate(hclus_cent, Zona = hclus_cent_zn) %>%
+  group_by(Zona) %>%
+  mutate(cent = row_number()) %>%
+  ungroup %>%
+  select(-x)
+hclus_cent_lst <- split(hclus_cent, hclus_cent$Zona)
+# hcent <- hclus_stops %>%
+#   group_by(Zona, P) %>%
+#   # summarise(.groups = "keep") %>%
+#   st_convex_hull() %>%
+#   st_centroid() %>%
+#   ungroup()
+# 
+st_vor <- 
+  lapply(hclus_cent_lst, 
+         function(z) rename(st_as_sf(st_intersection(st_cast(
+           st_voronoi(
+             st_union(z),
+             envelope = st_geometry(
+               filter(zoi_clus,
+                      Zona == unique(z$Zona)
+                      )
+               )
+             )
+           ),
+           filter(zoi_clus,
+                  Zona == unique(z$Zona)
+                  )
+           )
+           ), 
+           geometry = x
+           )
+         )
+#se pierden 3 centroides 3725 <- 3722
+# nrow(bind_rows(hclus_cent_lst))
+# st_vor
+st_vor <- 
+  lapply(1:length(st_vor), 
+         function(z) select(mutate(st_vor[[z]], 
+                            Zona = rep(names(st_vor)[z], 
+                                       nrow(st_vor[[z]])),
+                            cent = rep(1:nrow(st_vor[[z]])),
+                            Zona2 = paste0(Zona, "_", cent) 
+                            ),
+                            -cent)
+         ) %>%
   bind_rows()
+final_zon <- select(anti_zoi, -c("ID", "AREA", "Com", "Comuna")) %>%
+  mutate(Zona = as.character(Zona),
+         Zona2 = as.character(Zona)) %>%
+  relocate(Zona2, .after = Zona) %>%
+  bind_rows(st_vor)
 
-m <- tm_shape(st_vor) +
+tm_shape(final_zon) + tm_polygons()
+# st_vor <- lapply(unique(hclus_cent$Zona), 
+#        function(x) st_intersection(st_cast(st_voronoi(st_union(st_geometry(filter(hclus_cent, Zona == x))),
+#                                                       envelope = st_geometry(filter(zoi_clus, Zona == x)))),
+#                                    filter(zoi_clus, Zona == x)))
+# 
+# st_vor <- lapply(unique(hclus_cent$Zona), 
+#                  function(z) mutate(st_as_sf(st_vor[[z]]), Zona = z,
+#                                     seq_zn = row_number())) %>%
+#   bind_rows()
+
+m <- tm_shape(final_zon) +
   tm_polygons(col = "Zona")
 tmap_leaflet(m)
