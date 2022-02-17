@@ -1196,12 +1196,52 @@ A la que se puede obtener el porcentaje de viajes intrazonales ($\vec Z_{i=j}$) 
 
 # CAPÍTULO 4: APLICACIÓN DEL MODELO Y ANÁLISIS DE RESULTADOS
 
-Como se definió inicialmente, el área  
+El área de estudio corresponde al eje central de la región metropolitana, como se detalla en la siguiente figura:
+
+`````{r}
+tm_shape(zones) +
+  tm_grid(col = "white", lwd = 2, labels.size = .8) +
+  tm_polygons(col = "gray") +
+  tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
+  tm_polygons(col = "red", border.col = "black", border.alpha = 1) +
+  tm_shape(vial_zoi) +
+  tm_lines() +
+  tm_layout(bg.color = "lightblue", title = "Área de Estudio") +
+  tm_compass(position = c("right", "top"), type = "rose", size = 3) +
+  tm_scale_bar(position = c("right", "bottom")) 
+````
+  
+Esto corresponde a 483 zonas de un total de 866, es decir, un 56% de las zonas serán las que estarán sujetas al modelo.
+
+Por los datos provistos en la base de datos de viajes a partir de las validaciones de la tarjeta inteligente (bip!), mediante el uso de consultas SQL, proceso de limpieza, imputación de datos, espacialización y geoprocesos se puede obtener la trayectoria de los viajes producidos al interior del área de estudio junto con los datos característicos de la movilidad.
+
+Para evaluar la efectividad del modelo se comparará el grado de ajuste en la estimación de los viajes, que como vimos en el marco teórico, tradicionalmente se utiliza un modelo estático de asignación de demanda a transporte público, el cual necesita de la matriz Origen Destino de las zonas de análisis de transporte, la red tramificada por velocidad, distancias de las rutas y una serie de parámetros que deben ser calibrados. Sin embargo, se opta por aplicar un modelo de Machine Learning, que no es algo novedoso en la temática del transporte, .... dado que sabemos como se escogen las rutas para cada parada del sistema, además de tener las variables de tiempo de viaje, tiempo de espera, tiempo de transbordo, tiempo de caminata y Tarifa, adicionalmente se obtiene las variables de tiempo de acceso y tiempo de egreso, mediante el  uso de algorítmo de camino más corto (dijkstra) se mide la caminata hacia el centroide de zona desde la primera parada de viaje y la última parada de viaje, por tanto, el tamaño de la zona tendrá un efecto en la modelación. A continuación, está la distribución de las variables antes mencionadas:
+
+````{r}
+````
+
+Se observa que las variables relevantes para aplicar un modelo son tiempo de viaje, tarifa, tiempo de acceso y tiempo de egreso. Que no sea tan relevante el tiempo de transbordo, caminata y tiempo de espera, puede tener su explicación en la combinación de rutas ya está detectada a través de la data, y los usuarios escogen la combinación que minimizen esos tiempos.
+
 
 ## 4.1 Asignación de Demanda en Zonificación Base
 
+Se aplica por tanto un modelo Random Forest con muestra de entrenamiento y muestra de validación, cuyos hiperparámetros son:
+
+###########
+
+Los estadísticos son los siguientes:
+
+#############
+
+Por tanto, presenta un buen nivel de ajuste con una distribución normal del error.
+
+````{r}
+````
+
+
 ## 4.2 Análisis Estadístico de las Entradas del Modelo
 
+Disponemos como datos para realizar la nueva zonificación las paradas 
 ## 4.3 Aplicación de Escenarios
 
 ## 4.4 Análisis de Resultados
