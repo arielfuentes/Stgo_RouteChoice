@@ -1210,6 +1210,13 @@ Como se definió inicialmente, el área
 
 # CAPÍTULO 5: CONCLUSIONES Y RECOMENDACIONES
 
+## 5.2 Recomendaciones
+
+Se puede obtener variación de la zonificación mediante el uso de otro tipo de distancia en el cálculo de polígonos de Voronoi, por ejemplo, usando distancias Manhattan en vez de Euclideanas.
+
+Otro método de cluterización , que no sea Ward (aumento de la varianza en la unión de clusters).
+
+Considerar clusterización como 
 \newpage
 
 # GLOSARIO
