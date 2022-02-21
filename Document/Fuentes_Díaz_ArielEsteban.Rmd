@@ -1123,11 +1123,18 @@ $\rho_{zs} = Población_{zs}/Área_{zs}$
 
 ````{r, echo = F, message = F, warnings = F}
  filter(start_pts, is.na(Zona)) %>%
-  as_tibble() 
-tm_shape(zoi) +
-  tm_polygons() +
-  tm_shape(filter(start_pts, is.na(Zona))) +
-  tm_dots()
+    as_tibble() 
+````
+
+````{r, echo = F, message = F, warnings = F}
+tm_shape(zoi) + 
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons() +
+    tm_shape(filter(start_pts, is.na(Zona))) +
+    tm_dots(size = .1) +
+    tm_layout(bg.color = "lightblue", main.title = "Paradas a Reposicionar", main.title.position = "center", main.title.size = 1.1) +
+    tm_compass(position = c("right", "bottom"), type = "arrow", size = 2) +
+    tm_scale_bar(position = c("right", "bottom"))
 ````
 
 Estos 6 casos puntuales fueron sometidos a edición manual para que las paradas cayeran en la zona más próxima. 
@@ -1147,20 +1154,24 @@ Para ello, se utilizó la librería sfnetworks en R @sfnet, la que permite calcu
 Por ejemplo, el camino más corto en la zona 375 desde la parada "PD26" hacia el centroide es:
 
 ````{r, echo = F, message = F, warning = F}
-tm_shape(filter(zoi, Zona == 375)) +
-  tm_polygons() +
-  tm_shape(filter(st_as_sf(zones_vial), Zona == 375)) +
-  tm_lines() +
-  tm_shape(filter(ctd, Zona == 375)) +
-  tm_dots(col = "red", size = 0.5) +
-  tm_shape(filter(start_pts, Zona == 375)[1,]) +
-  tm_dots(col = "blue", size = 0.5) +
-  tm_shape(filter(zones_vial, Zona == 375) %>%
-             convert(to_spatial_shortest_paths,
-                     from = filter(start_pts, Zona == 375)[1,],
-                     to = filter(ctd, Zona == 375)) %>%
-             st_as_sf()) +
-  tm_lines(col = "purple", lwd = 4)
+tm_shape(filter(zoi, Zona == 375)) + 
+    tm_grid(col = "white", lwd = 2, labels.size = .5) +
+    tm_polygons() +
+    tm_shape(filter(st_as_sf(zones_vial), Zona == 375)) +
+    tm_lines() +
+    tm_shape(filter(ctd, Zona == 375)) +
+    tm_dots(col = "red", size = 0.5) +
+    tm_shape(filter(start_pts, Zona == 375)[1,]) +
+    tm_dots(col = "blue", size = 0.5) +
+    tm_shape(filter(zones_vial, Zona == 375) %>%
+                 convert(to_spatial_shortest_paths,
+                         from = filter(start_pts, Zona == 375)[1,],
+                         to = filter(ctd, Zona == 375)) %>%
+                 st_as_sf()) +
+    tm_lines(col = "purple", lwd = 4) +
+    tm_layout(bg.color = "lightblue", main.title = "Ruta más Corta", main.title.position = "center", main.title.size = 1.1) +
+    tm_compass(position = c("left", "top"), type = "arrow", size = 2) +
+    tm_scale_bar(position = c("left", "bottom"))
 ````
 
 Los datos de entrada necesitan de un procesamiento, en el caso de las paradas se escogen 3 planes operacionales, de modo de minimizar la cantidad de paradas que no sean encontradas en los datos de movilidad, la fecha de estos planes son: 1 de marzo, 1 de abril y 23 de junio de 2019, de estos se obtienen los únicos del código de parada tanto de usuario como la codificación interna del DTPM, a esto se adicionan las columnas x e y que contienen coordenadas en proyección UTM, por lo que pueden ser espacializadas. Mediante este proceso solo no fueron encontradas las paradas de codificación usuario "PF1126" y "PD1614", las que fueron agregadas posteriormente mediante una búsqueda directa. Estas posteriomente se unifican al diccionario de estaciones de metro, que fueron geolocalizadas por observación en Google Earth.
@@ -1170,6 +1181,28 @@ Los datos de movilidad son obtenidos a partir del procesamiento de las tarjetas 
 
 ### 3.2.2 Modelo
 
+La definición matemática es:
+
+Sea vector $\vec Z{i}, \ i = \{1, ..., n\}$ donde n es el número total de zonas del área de  estudio, tal que:
+
+i) Existe vector $\vec x_{jk}, \ j = \{1, ..., m\}; \ k = \{1, ..., p\}$ donde j el par de coordenadas para cada parada y k es un vector de los atributos $| \ \exists \ cluster_{l} \  \forall z_i$
+
+ii) Centroide $\forall \ cluster_{l}$
+
+iii) $V(p_l) = \{p | \in S; d(p, p_l), t \neq l\}$
+
+```{r, echo=FALSE}
+img.file <- file.path("OVD.png")
+fpar_iii <- fpar(external_img(src = img.file, height = 4, width = 5))
+````
+
+````{r, echo = F, fig.cap="Diagrama de Voronoi Ordinario", fig.id = "Vor", fig.cap.style = "Image Caption"}
+fpar_iii
+````
+Fuente: Sacado de @Boots1999
+
+iv) $\Re_d \cap Z_i$
+
 El modelo será aplicado para cada polígono de la zonificación base del área de estudio y el tratamiento de los datos mencionado en el ítem anterior serán del tipo puntual. 
 Con ello, se construirá un método de clusterización jerárquica con tratamiento de datos espaciales, primero generamos geoproceso que filtre la cantidad de puntos en cada zona y posteriormente aplicamos el método para todos aquellos polígonos en los que contengan mayor a dos paradas de modo que se pueda calcular los cluster, la clusterización lo haremos según lo que propone @Chavent2018, quien integra en el método de clusterización restricciones espaciales para crear dos matrices de disimilaridades. Una con atributos y otra con las localizaciones, que en nuestro caso son las paradas y estaciones de metro. Para poder aplicar la restricción espacial es necesario un parámetro de mezcla ($\alpha$) de las matrices de disimilaridades, del cual calcularemos el óptimo. 
 
@@ -1177,12 +1210,7 @@ Adicionalmente, vamos a estimar automáticamente el número óptimo de clusters 
 
 Para cada cluster se calculará envolvente para que ninguna localización quede fuera del cluster y posteriormente su centroide. Con ello, podemos ocupar la teselación de Voronoi, que produce polígonos infintos y finalmente aplicamos un geoproceso que corte espacialmente estos polígonos de voronoi según los polígonos de la zonificación inicial, obteniendo así los nuevos polígonos que serán ensamblados mediante geoproceso con los polígonos que no fueron modificados.   
 
-Que son una serie de modelos secuenciales.
-
-El modelo más típico para clusterización es el k-medias, sin embargo, se escoge que sea el método jerárquico, dado que el k-media utiliza una búsqueda aleatoria y a nosotros nos interesa la replicabilidad, adicionalmente . 
-modelo cluster 
-voronoi
-clip
+El modelo más típico para clusterización es el k-medias, sin embargo, se escoge que sea el método jerárquico, dado que el k-media utiliza una búsqueda aleatoria y a nosotros nos interesa la replicabilidad.
 
 ### 3.2.3 Salida
 
@@ -1198,24 +1226,25 @@ A la que se puede obtener el porcentaje de viajes intrazonales ($\vec Z_{i=j}$) 
 
 El área de estudio corresponde al eje central de la región metropolitana, como se detalla en la siguiente figura:
 
-`````{r}
+`````{r, echo = F, message = F, warning = F}
 tm_shape(zones) +
-  tm_grid(col = "white", lwd = 2, labels.size = .8) +
-  tm_polygons(col = "gray") +
-  tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
-  tm_polygons(col = "red", border.col = "black", border.alpha = 1) +
-  tm_shape(vial_zoi) +
-  tm_lines() +
-  tm_layout(bg.color = "lightblue", title = "Área de Estudio") +
-  tm_compass(position = c("right", "top"), type = "rose", size = 3) +
-  tm_scale_bar(position = c("right", "bottom")) 
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 5) +
+    tm_polygons(col = "gray") +
+    tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
+    tm_polygons(col = "red", border.col = "black", border.alpha = 1, alpha = .5) +
+    tm_layout(bg.color = "lightblue", main.title = "Área de Estudio", main.title.position = "center", main.title.size = 1.1) +
+    tm_compass(position = c("right", "top"), type = "rose", size = 3) +
+    tm_scale_bar(position = c("right", "bottom")) 
 ````
   
 Esto corresponde a 483 zonas de un total de 866, es decir, un 56% de las zonas serán las que estarán sujetas al modelo.
 
 Por los datos provistos en la base de datos de viajes a partir de las validaciones de la tarjeta inteligente (bip!), mediante el uso de consultas SQL, proceso de limpieza, imputación de datos, espacialización y geoprocesos se puede obtener la trayectoria de los viajes producidos al interior del área de estudio junto con los datos característicos de la movilidad.
 
-Para evaluar la efectividad del modelo se comparará el grado de ajuste en la estimación de los viajes, que como vimos en el marco teórico, tradicionalmente se utiliza un modelo estático de asignación de demanda a transporte público, el cual necesita de la matriz Origen Destino de las zonas de análisis de transporte, la red tramificada por velocidad, distancias de las rutas y una serie de parámetros que deben ser calibrados. Sin embargo, se opta por aplicar un modelo de Machine Learning, que no es algo novedoso en la temática del transporte, .... dado que sabemos como se escogen las rutas para cada parada del sistema, además de tener las variables de tiempo de viaje, tiempo de espera, tiempo de transbordo, tiempo de caminata y Tarifa, adicionalmente se obtiene las variables de tiempo de acceso y tiempo de egreso, mediante el  uso de algorítmo de camino más corto (dijkstra) se mide la caminata hacia el centroide de zona desde la primera parada de viaje y la última parada de viaje, por tanto, el tamaño de la zona tendrá un efecto en la modelación. A continuación, está la distribución de las variables antes mencionadas:
+Para evaluar la efectividad del modelo se comparará el grado de ajuste en la estimación de los viajes, que como vimos en el marco teórico, tradicionalmente se utiliza un modelo estático de asignación de demanda a transporte público, el cual necesita de la matriz Origen Destino de las zonas de análisis de transporte, la red tramificada por velocidad, distancias de las rutas y una serie de parámetros que deben ser calibrados. Sin embargo, dado que los datos de movilidad que estamos usando contienen las combinaciones efectivas de rutas que los usuarios escogen para cada origen - destino (a nivel de parada), es que se opta por aplicar un modelo de Machine Learning, en @Rocio2021 muestra los distintos subcampos del transporte en los que se ha aplicado. 
+Utilizando la densidad poblacional, más las variables de Costo Generalizado, que son: tiempo de viaje, tiempo de espera, tiempo de transbordo, tiempo de caminata, Tarifa. Para el caso de las variables de tiempo de acceso y tiempo de egreso, como fue mencionado anteriormente, el valor de estas últimas fue cálculado mediante el  uso de algorítmo de camino más corto (dijkstra), donde se mide la caminata hacia el centroide de zona desde la primera parada de viaje y la última parada de viaje. Por tanto, el tamaño de la zona tendrá un efecto en la modelación. 
+
+A continuación, se muestra la distribución de las variables antes mencionadas:
 
 ````{r}
 ````
@@ -1242,7 +1271,9 @@ Por tanto, presenta un buen nivel de ajuste con una distribución normal del err
 ## 4.2 Análisis Estadístico de las Entradas del Modelo
 
 Disponemos como datos para realizar la nueva zonificación las paradas 
-## 4.3 Aplicación de Escenarios
+## 4.3 Análisis de Sensibilidad
+
+Capas de Análisis de Sensibilidad: Variables a incorporar, mcmc, método de clusterización y método de óptimo de número de clusters.
 
 ## 4.4 Análisis de Resultados
 
