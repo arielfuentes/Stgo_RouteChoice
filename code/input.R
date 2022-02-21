@@ -115,3 +115,8 @@ tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
   tm_shape(vial_zoi) +
   tm_lines()
 st_write("data/vial_zoi.gpkg", obj = vial_zoi)
+#population
+cens_stgo <- 
+  st_read("data/xn--Censo_2017_Distrito_Censal__Poblacin,_viviendas_por_rea_y_densidad-gmf02j.geojson") %>%
+  filter(REGION == 13 & NOM_PROVIN == "SANTIAGO" | NOM_COMUNA %in% c("SAN BERNARDO", "PUENTE ALTO")) %>%
+  st_transform(32719)
