@@ -301,7 +301,9 @@ stops_trips <- bind_rows(stops_trips_1era,
             x = mean(x), 
             y = mean(y)) %>%
   st_as_sf(coords = c("x", "y"), crs = 32719)
-  
+#add population variable
+stops_trips <- st_join(stops_trips, select(cens_stgo, Densidad))
+
 rm(stops_trips_1era, 
    stops_trips_2da, 
    stops_trips_3era, 
