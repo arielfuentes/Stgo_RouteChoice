@@ -39,6 +39,8 @@ library(ganttrify)
 library(officer)
 library(kableExtra)
 library(officedown)
+library(tidyr)
+library(ggplot2)
 ```
 
 **UNIVERSIDAD DE SANTIAGO DE CHILE**
@@ -239,7 +241,7 @@ img.file <- file.path("Congestión.png")
 fpar_1 <- fpar(external_img(src = img.file, height = 4, width = 5))
 ````
 
-````{r, echo = F, fig.cap="Congestión y sus efectos externos", fig.id = "cong", fig.cap.style = "Image Caption"}
+````{r, echo = F, fig.cap="Congestión y sus efectos externos", fig.id = "cong", fig.cap.style = "Image Caption", fig.topcaption=TRUE}
 fpar_1
 ````
 Fuente: Sacado de @Ortúzar2008
@@ -293,7 +295,7 @@ img.file <- file.path("circulo vicioso.png")
 fpar_2 <- fpar(external_img(src = img.file, height = 4, width = 5))
 ````
 
-````{r, echo = F, fig.cap="Círculo Vicioso del transporte público", fig.id = "vicioso", fig.cap.style = "Image Caption"}
+````{r, echo = F, fig.cap="Círculo Vicioso del transporte público", fig.id = "vicioso", fig.cap.style = "Image Caption", fig.topcaption=TRUE}
 fpar_2
 ````
 Fuente: Sacado de @Ortúzar2008
@@ -413,7 +415,7 @@ img.file <- file.path("Modelo Clásico.png")
 fpar_3 <- fpar(external_img(src = img.file, height = 4, width = 5))
 ````
 
-````{r, echo = F, fig.cap="Modelo Clásico de Transporte", fig.id = "4etapas", fig.cap.style = "Image Caption"}
+````{r, echo = F, fig.cap="Modelo Clásico de Transporte", fig.id = "4etapas", fig.cap.style = "Image Caption", fig.topcaption=TRUE}
 fpar_3
 ````
 Fuente: Sacado de @Ortúzar2008
@@ -610,7 +612,7 @@ img.file <- file.path("n zonas.png")
 fpar_4 <- fpar(external_img(src = img.file, height = 4, width = 5))
 ````
 
-````{r, echo = F, fig.cap="Número típico de zonas en varios estudios", fig.id = "nzonas", fig.cap.style = "Image Caption"}
+````{r, echo = F, fig.cap="Número típico de zonas en varios estudios", fig.id = "nzonas", fig.cap.style = "Image Caption", fig.topcaption=TRUE}
 fpar_4
 ````
 Fuente: Sacado de @Ortúzar2008
@@ -677,8 +679,7 @@ de modelización, es decir, lo que el sistema de transporte ofrece para satisfac
 las necesidades de desplazamiento de los viajeros en el área de estudio. La
 descripción de una red de transporte en un modelo de ordenador puede realizarse
 con diferentes niveles de detalle y requiere simplificar su estructura,
-sus propiedades o atributos y la relación entre dichos atributos y los flujos de
-tráfico @Ortúzar2008.
+sus propiedades o atributos y la relación entre dichos atributos y los flujos de tráfico @Ortúzar2008.
 
 A. Detalles de la red
 
@@ -1092,7 +1093,7 @@ img.file <- file.path("MET_GNRL.png")
 fpar_5 <- fpar(external_img(src = img.file, height = 4, width = 5))
 ````
 
-````{r, echo = F, fig.cap="Metodología General", fig.id = "Met", fig.cap.style = "Image Caption"}
+````{r, echo = F, fig.cap="Metodología General", fig.id = "Met", fig.cap.style = "Image Caption", fig.topcaption=TRUE}
 fpar_5
 ````
 Fuente: Elaboración Propia
@@ -1127,7 +1128,7 @@ $\rho_{zs} = Población_{zs}/Área_{zs}$
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warnings = F, fig.cap='Paradas a Reposicionar', fig.id='Repos'}
+````{r, echo = F, message = F, warnings = F, fig.cap='Paradas a Reposicionar', fig.id='Repos', fig.topcaption=TRUE}
 tm_shape(zoi) + 
     tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
     tm_polygons() +
@@ -1155,7 +1156,7 @@ Para ello, se utilizó la librería sfnetworks en R @sfnet, la que permite calcu
 
 Por ejemplo, el camino más corto en la zona 375 desde la parada "PD26" hacia el centroide es:
 
-````{r, echo = F, message = F, warning = F, fig.cap='Ruta Más Corta', fig.id='Dijkstra'}
+````{r, echo = F, message = F, warning = F, fig.cap='Ruta Más Corta', fig.id='Dijkstra', fig.topcaption=TRUE}
 tm_shape(filter(zoi, Zona == 375)) + 
     tm_grid(col = "white", lwd = 2, labels.size = .5) +
     tm_polygons() +
@@ -1199,7 +1200,7 @@ img.file <- file.path("OVD.png")
 fpar_iii <- fpar(external_img(src = img.file, height = 4, width = 5))
 ````
 
-````{r, echo = F, fig.cap="Diagrama de Voronoi Ordinario", fig.id = "Vor", fig.cap.style = "Image Caption"}
+````{r, echo = F, fig.cap="Diagrama de Voronoi Ordinario", fig.id = "Vor", fig.cap.style = "Image Caption", fig.topcaption=TRUE}
 fpar_iii
 ````
 Fuente: Sacado de @Boots1999
@@ -1229,7 +1230,7 @@ A la que se puede obtener el porcentaje de viajes intrazonales ($\vec Z_{i=j}$) 
 
 El área de estudio corresponde al eje central de la región metropolitana, como se detalla en la siguiente figura:
 
-`````{r, echo = F, message = F, warning = F, fig.cap='Área de Estudio', fig.id='AEst'}
+`````{r, echo = F, message = F, warning = F, fig.cap='Área de Estudio', fig.id='AEst', fig.topcaption=TRUE}
 tm_shape(zones) +
     tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 5) +
     tm_polygons(col = "gray") +
@@ -1241,7 +1242,57 @@ tm_shape(zones) +
 ````
 Fuente: Elaboración Propia
 
-`````{r, echo = F, message = F, warning = F, fig.cap='Generación de Demanda', fig.id='Gdem'}
+Esto corresponde a 483 zonas de un total de 866, es decir, un 56% de las zonas serán las que estarán sujetas al modelo.
+
+Por los datos provistos en la base de datos de viajes a partir de las validaciones de la tarjeta inteligente (bip!) para abril de 2019, mediante el uso de consultas SQL, proceso de limpieza, imputación de datos, espacialización y geoprocesos se puede obtener la trayectoria de los viajes producidos al interior del área de estudio junto con los datos característicos de la movilidad.
+
+Es decir, con la consulta SQL se obtienen los siguientes atributos:
+
+- Validaciones Promedio por día Laboral
+- Parada de inicio de viaje (subida),
+- Parada de fin de viaje (bajada),
+- Paradas de subidas en etapas intermedias,
+- Cantidad de Etapas Tipo de Viaje,
+- Recorridos Utilizados en cada viaje,
+- tiempo de viaje
+- tiempo de espera 
+- tiempo de caminata, y
+- tiempo de transbordo
+
+Estos datos son filtrados por el periodo Punta Mañana, según es definido por *DTPM* (6:30-8:30 hrs.), además de eliminar aquellos registros que no tengan información de la Parada de Inicio y/o la Parada de Fin de viaje, datos que representan el 0.01% del total de viajes, que es sin considerar aún la selección al interior del área de estudio, también se procede a eliminar aquellos datos incongruentes, es decir, los viajes en los cuales la parada de inicio es la misma que la parada de fin de viaje.
+
+La definición de viajes en el sistema RED, es aquel en el cual se puede realizar hasta un máximo de 3 transbordos (4 etapas), por tanto, todos aquellos registros en los que figuran más de 4 etapas son truncados a cuatro.
+
+Se evidencia que hay registros con columnas sin información se procede a realizar una imputación de forma de no perder viajes, la hipótesis de esta consiste en que hay una consistencia en los patrones de viajes, las decisiones de los viajeros serán racionales y por ende serán las mismas. En la práctica se contabiliza la proporción de viajes para cada parada de inicio y parada de fin de viaje con todos sus atributos completos versus aquellos que no posean todos sus atributos, donde estos últimos tomarán los mismos atributos de los viajes completos, evitando más pérdida de información. 
+
+Como tanto, el nombre de recorridos como de paradas de bus es obtenido con una codificación especial, se procede a realizar diccionarios de nombre de rutas y paradas a partir de los planes operacionales que están disponibles en el sitio web del DTPM, los cuales son cruzados con esta data, junto con ello, se debieron arreglar nombres de estaciones de metro dado que provenía con errores de tipeo, que sin ello, se producía una pérdida importante de viajes, entendiendo que las estaciones de metro son lugares de alta concentración de demanda. Además, a través del diccionario de paradas, los datos pueden ser espacializados dado que en este están las coordendas con proyección UTM en huso 19S. 
+
+Con el procedimiento anteriormente mencionado, obtenemos 832,582 registros de viajes que contemplan 741,219 viajes y 10,553 paradas, al aplicar un geoproceso de selección para el área de estudio, resultan 347,023 registros connos quedamos con  399,391 viajes que corresponden a 6,703 paradas (incluidas las estaciones de metro). Es decir, el área de estudio implica una concentración de 54% de los viajes con el 64% de las paradas.
+
+En Figura \@ref(fig:Pts) se puede visualizar las paradas en la Zona de Estudio, donde se graficó el valor de la Demanda clasificada según percentil, en el cual es posible observar un cierto grado de clusterización espacial. Esto ya nos faculta a validar la nueva zonificación en función de una clusterización.
+
+`````{r, echo = F, message = F, warning = F, fig.cap='Paradas', fig.id='Pts', fig.topcaption=TRUE}
+tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons(col = "red", border.col = "black", border.alpha = 1) +
+    tm_layout(bg.color = "lightblue", 
+              main.title = "Paradas y Estaciones", 
+              main.title.position = "center", main.title.size = 1.1,
+              legend.outside = TRUE) +
+    tm_shape(st_filter(stops_trips, zoi, .predicate = st_within)) + 
+  tm_dots(col = "Demanda", style = "quantile", palette = "viridis") +
+    tm_compass(position = c("left", "top"), type = "rose", size = 3) +
+    tm_scale_bar(position = c("right", "bottom")) 
+````
+Fuente: Elaboración Propia
+
+Por otro lado, quisieramos verificar el comportamiento a nivel de zonificación, esto se puede construir como:
+
+$\sum x_{jk} \ \forall Z_i$
+
+Que es representado en la Figura \@ref(fig:Gdem)
+
+`````{r, echo = F, message = F, warning = F, fig.cap='Generación de Demanda', fig.id='Gdem', fig.topcaption=TRUE}
 DemZon <- st_join(zoi, 
                   select(stops_trips, Demanda), 
                   .predicate = st_within) %>% 
@@ -1263,33 +1314,16 @@ tm_shape(DemZon) +
 ````
 Fuente: Elaboración Propia
 
-Esto corresponde a 483 zonas de un total de 866, es decir, un 56% de las zonas serán las que estarán sujetas al modelo.
-
-Por los datos provistos en la base de datos de viajes a partir de las validaciones de la tarjeta inteligente (bip!), mediante el uso de consultas SQL, proceso de limpieza, imputación de datos, espacialización y geoprocesos se puede obtener la trayectoria de los viajes producidos al interior del área de estudio junto con los datos característicos de la movilidad.
-
-Se obtienen un total de 10553 puntos (paradas y estaciones de metro) dentro del sistema de transporte público metropolitano, quedando 6703 dentro del área de estudio.
-
-`````{r, echo = F, message = F, warning = F, fig.cap='Paradas', fig.id='Pts'}
-tm_shape(nngeo::st_remove_holes(st_union(zoi))) +
-    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
-    tm_polygons(col = "red", border.col = "black", border.alpha = 1) +
-    tm_layout(bg.color = "lightblue", 
-              main.title = "Paradas y Estaciones", 
-              main.title.position = "center", main.title.size = 1.1,
-              legend.outside = TRUE) +
-    tm_shape(st_filter(stops_trips, zoi, .predicate = st_within)) + 
-  tm_dots(col = "Demanda", style = "quantile", palette = "viridis") +
-    tm_compass(position = c("left", "top"), type = "rose", size = 3) +
-    tm_scale_bar(position = c("right", "bottom")) 
-````
-Fuente: Elaboración Propia
+Es claro, dada la estructura urbana y de generación de empleo versus la localización de vivienda es que se evidencia una clusterización zonal.
 
 Para evaluar la efectividad del modelo se comparará el grado de ajuste en la estimación de los viajes, que como vimos en el marco teórico, tradicionalmente se utiliza un modelo estático de asignación de demanda a transporte público, el cual necesita de la matriz Origen Destino de las zonas de análisis de transporte, la red tramificada por velocidad, distancias de las rutas y una serie de parámetros que deben ser calibrados. Sin embargo, dado que los datos de movilidad que estamos usando contienen las combinaciones efectivas de rutas que los usuarios escogen para cada origen - destino (a nivel de parada), es que se opta por aplicar un modelo de Machine Learning, en @Rocio2021 muestra los distintos subcampos del transporte en los que se ha aplicado. 
 Utilizando la densidad poblacional, más las variables de Costo Generalizado, que son: tiempo de viaje, tiempo de espera, tiempo de transbordo, tiempo de caminata, Tarifa. Para el caso de las variables de tiempo de acceso y tiempo de egreso, como fue mencionado anteriormente, el valor de estas últimas fue cálculado mediante el  uso de algorítmo de camino más corto (dijkstra), donde se mide la caminata hacia el centroide de zona desde la primera parada de viaje y la última parada de viaje. Por tanto, el tamaño de la zona tendrá un efecto en la modelación. 
 
 A continuación, se realiza el análisis estadístico de las variables antes mencionadas:
 
-````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Demanda', fig.id='DCajaDem'}
+En el caso de la demanda se observa un alto nivel de dispersión de los datos con la mayoría de sus datos siendo bajos, pero los valores altos, demasiado altos en comparación, esto se explica por la gran variabilidad que poseen paradas con poca demanda a diferencia de las estaciones de metro más transitadas.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Demanda', fig.id='DCajaDem', fig.topcaption=TRUE}
 var_pts <- pivot_longer(st_drop_geometry(st_filter(stops_trips, 
                                                    zoi, 
                                                    .predicate = st_within)), 
@@ -1306,7 +1340,7 @@ filter(var_pts, variables == "Demanda", valor < 250) %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Densidad Poblacional', fig.id='DCajaDens'}
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Densidad Poblacional', fig.id='DCajaDens', fig.topcaption=TRUE}
 filter(var_pts, variables == "Densidad") %>%
     ggplot(aes(variables, valor, fill = "variables")) +
     geom_boxplot(width = .3, fill = "#FFC300") +
@@ -1315,7 +1349,7 @@ filter(var_pts, variables == "Densidad") %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Tiempos', fig.id='DCajaT'}
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Tiempos', fig.id='DCajaT', fig.topcaption=TRUE}
 
 filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
   ggplot(aes(variables, valor, fill = "variables")) +
@@ -1327,7 +1361,7 @@ filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Demanda', fig.id='ViolinDem'}
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Demanda', fig.id='ViolinDem', fig.topcaption=TRUE}
 filter(var_pts, variables == "Demanda" & valor < 250) %>%
     ggplot(aes(variables, valor, fill = "variables")) +
     geom_violin(width = .3, fill = "lightblue") +
@@ -1338,7 +1372,7 @@ filter(var_pts, variables == "Demanda" & valor < 250) %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Densidad Poblacional', fig.id='ViolinDens'}
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Densidad Poblacional', fig.id='ViolinDens', fig.topcaption=TRUE}
 filter(var_pts, variables == "Densidad") %>%
     ggplot(aes(variables, valor, fill = "variables")) +
     geom_violin(width = .3, fill = "lightblue") +
@@ -1349,7 +1383,7 @@ filter(var_pts, variables == "Densidad") %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Tiempos', fig.id='ViolinT'}
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Tiempos', fig.id='ViolinT', fig.topcaption=TRUE}
 filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
   ggplot(aes(variables, valor, fill = "variables")) +
   geom_violin(width = .3, fill = "lightblue") +
@@ -1360,7 +1394,7 @@ filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Demanda', fig.id='DistrDem'}
+````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Demanda', fig.id='DistrDem', fig.topcaption=TRUE}
 filter(var_pts, variables == "Demanda") %>%
     ggplot(aes(valor, fill = variables, colour = variables)) +
     geom_density(alpha = .5, show.legend = F, color="black", fill="lightblue") +
@@ -1369,7 +1403,7 @@ filter(var_pts, variables == "Demanda") %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Densidad Poblacional', fig.id='DistrDens'}
+````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Densidad Poblacional', fig.id='DistrDens', fig.topcaption=TRUE}
 filter(var_pts, variables == "Densidad") %>%
     ggplot(aes(valor, fill = variables, colour = variables)) +
     geom_density(alpha = .5, show.legend = F, color="black", fill="lightblue") +
@@ -1378,7 +1412,7 @@ filter(var_pts, variables == "Densidad") %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Tiempos', fig.id='Distr'}
+````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Tiempos', fig.id='Distr', fig.topcaption=TRUE}
 filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
     ggplot(aes(valor, fill = variables, colour = variables)) +
     geom_density(alpha = .5) +
