@@ -1509,7 +1509,60 @@ Por tanto, presenta un buen nivel de ajuste con una distribución normal del err
 
 Disponemos como datos para realizar la nueva zonificación las paradas 
 
-## 4.3 Análisis de Sensibilidad
+## 4.3 Resultados y Análisis de Sensibilidad
+
+La cantidad de paradas por zona se distribuyen de la siguiente manera.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Cajas de Paradas por Zona', fig.id='boxplot_parZon', fig.topcaption=TRUE}
+ggplot(npts_zn, aes(y = n)) +
+    geom_boxplot(width = .3, fill = "#FFC300") +
+    xlab("") +
+    ylab("Cantidad de Paradas") +
+    labs(title="Diagrama de Cajas de Paradas por Zona", y = "Cantidad") +
+    theme(plot.title = element_text(hjust = 0.5), axis.ticks.x=element_blank(), axis.text.x=element_blank())
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución de Paradas por Zona', fig.id='Dens_parZon', fig.topcaption=TRUE}
+
+ggplot(npts_zn, aes(n)) +
+    geom_density(alpha = .5, fill = "lightblue") +
+    xlab("Cantidad por Zona") +
+    ylab("Densidad") +
+    labs(title="Distribución de Paradas por Zona") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+Nos indica que en su mayoría, las zonas contienen alrededor de 12 paradas y como nos interesa solo aquellas zonas en que se pueda hacer una clusterización, filtramos las que tengan más de 2 paradas, es decir, trabajaremos efectivamente con 465 zonas.
+
+Para encontrar el óptimo de cluster por zona, se usa el estadístico *gap*, en su implementación se considera como máximo número de clusters la cantidad de paradas por zona menos 1, el número de muestras Monte Carlo en 50 y el número de "comienzos" aleatorios está en 25.
+
+Como resultado las 866 zonas se transforman en 4,107, es decir, las 483 zonas del área de estudio se transforman en 3,724.
+
+`````{r, echo = F, message = F, warning = F, fig.cap='Nueva Zonificación', fig.id='NewZ', fig.topcaption=TRUE}
+DemZon1 <- st_join(final_zon, 
+                  select(stops_trips, Demanda), 
+                  .predicate = st_within) %>% 
+  group_by(Zona, Zona2) %>% 
+  summarise(Demanda = sum(Demanda))
+
+tm_shape(zoi) + 
+  tm_polygons() + 
+  tm_shape(DemZon1) +
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons(col = "Demanda", style = "quantile", palette = "viridis", border.alpha = .1) + 
+    tm_shape(zones) + 
+    tm_polygons(col = "gray", alpha = .3) +
+    tm_layout(bg.color = "lightblue", 
+              main.title = "Generación de Demanda", 
+              main.title.position = "center", 
+              main.title.size = 1.1, 
+              legend.outside = TRUE) +
+    tm_compass(position = c("left", "top"), type = "8star", size = 3) +
+    tm_scale_bar(position = c("right", "bottom"))  
+````
+Fuente: Elaboración Propia
 
 Capas de Análisis de Sensibilidad: Variables a incorporar, mcmc, método de clusterización y método de óptimo de número de clusters.
 
