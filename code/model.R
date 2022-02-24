@@ -1,41 +1,87 @@
 library(ggplot2)
 library(dplyr)
 # library(GGally)
-zoi_tripsCG2 <- zoi_tripsCG %>%
+zoi_tripsDay <- st_read("data/zoi_tripsDay.gpkg") 
+zoi_tripsDayCG <- zoi_tripsDay %>%
+  select(Demanda, paraderosubida_SIMT, paraderobajada_SIMT, netapa, rts, tviaje, tesp, tb2, tcam) %>%
+  st_drop_geometry() %>%
+  left_join(st_drop_geometry(select(time_acc, time_acc, paraderosubida_SIMT))) %>%
+  left_join(st_drop_geometry(select(time_egg, time_egg, paraderobajada_SIMT))) %>%
+  group_split(netapa)
+
+zoi_tripsDayCG <- bind_rows(
+  zoi_tripsDayCG[[1]] %>%
+    mutate(e1 = rts, e2 = NA_character_, e3 = NA_character_, e4 = NA_character_),
+  zoi_tripsDayCG[[2]] %>%
+    separate(rts, into = c("e1", "e2"), remove = F) %>%
+    mutate(e3 = NA_character_, e4 = NA_character_),
+  zoi_tripsDayCG[[3]] %>%
+    separate(rts, into = c("e1", "e2", "e3"), remove = F) %>%
+    mutate(e4 = NA_character_),
+  zoi_tripsDayCG[[4]] %>%
+    separate(rts, into = c("e1", "e2", "e3", "e4"), remove = F)
+) %>%
+  mutate(e1 = as.numeric(e1), 
+         e2 = as.numeric(e2), 
+         e3 = as.numeric(e3), 
+         e4 = as.numeric(e4),
+         Tarifa = case_when(e1 >= 756 | e2 >= 756 | e3 >= 756 | e4 >= 756 ~ 800,
+                            T ~ 700)) %>%
+  select(-c("e1", "e2", "e3", "e4")) %>%
   select(-c("paraderosubida_SIMT", "paraderobajada_SIMT")) 
 
 set.seed(123)
-smp_idx <- sample(1:nrow(zoi_tripsCG2), 30000)
-zoi_tripsCG3 <- zoi_tripsCG2[smp_idx,]
-zoi_tripsCG3 <- bind_rows(zoi_tripsCG3, 
-                          zoi_tripsCG3, 
-                          zoi_tripsCG3, 
-                          zoi_tripsCG3, 
-                          zoi_tripsCG3)
+smp_idx <- sample(1:nrow(zoi_tripsDayCG), 30000)
+zoi_tripsDayCG2 <- zoi_tripsDayCG[smp_idx,]
+# zoi_tripsDayCG2 <- bind_rows(zoi_tripsCG3, 
+#                           zoi_tripsCG3, 
+#                           zoi_tripsCG3, 
+#                           zoi_tripsCG3, 
+#                           zoi_tripsCG3)
 # ggpairs(select(zoi_tripsCG2, -rts))
 
-ggplot(zoi_tripsCG3, aes(log1p(tviaje), Demanda)) +
+ggplot(zoi_tripsDayCG2, aes(log1p(tviaje), Demanda, color = factor(Tarifa))) +
   geom_point() +
-  geom_smooth(method = "lm", formula = y~x) +
-  facet_wrap(~Tarifa)
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de viaje") +
+  theme(plot.title = element_text(hjust = 0.5))
+  geom_smooth(method = "lm", formula = y~x) #+
+  # facet_wrap(~Tarifa)
 
-ggplot(zoi_tripsCG2, aes(tesp, Demanda)) +
+ggplot(zoi_tripsDayCG2, aes(tesp, Demanda, color = factor(Tarifa))) +
   geom_point() +
-  geom_smooth(method = "lm", formula = y~x) +
-  facet_wrap(~netapa)
-
-ggplot(zoi_tripsCG2, aes(tcam, Demanda)) +
-  geom_point() +
-  geom_smooth(method = "lm", formula = y~x) +
-  facet_wrap(~netapa)
-
-ggplot(zoi_tripsCG2, aes(tb2, Demanda)) +
-  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Espera") +
+  theme(plot.title = element_text(hjust = 0.5))
   geom_smooth(method = "lm", formula = y~x) +
   facet_wrap(~netapa)
 
-ggplot(zoi_tripsCG3, aes(log1p(time_acc), Demanda)) +
+ggplot(zoi_tripsDayCG2, aes(tcam, Demanda, color = factor(Tarifa))) +
   geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Caminata") +
+  theme(plot.title = element_text(hjust = 0.5))
+  geom_smooth(method = "lm", formula = y~x) +
+  facet_wrap(~netapa)
+
+ggplot(zoi_tripsDayCG2, aes(tb2, Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Transbordo", x = "Tiempo de Transbordo") +
+  theme(plot.title = element_text(hjust = 0.5))
+  geom_smooth(method = "lm", formula = y~x) +
+  facet_wrap(~netapa)
+
+ggplot(zoi_tripsDayCG2, aes(log1p(time_acc), Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Acceso", x = "Tiempo de Acceso") +
+  theme(plot.title = element_text(hjust = 0.5))
   geom_smooth(method = "lm", formula = y~x) +
   facet_wrap(~netapa)
 
@@ -44,7 +90,7 @@ ggplot(zoi_tripsCG3, aes(log1p(time_egg), Demanda)) +
   geom_smooth(method = "lm", formula = y~x) +
   facet_wrap(~netapa)
 
-ggplot(zoi_tripsCG2, aes(Tarifa, Demanda)) +
+ggplot(zoi_tripsDayCG2, aes(Tarifa, Demanda)) +
   geom_point() +
   geom_smooth(method = "lm", formula = y~x) +
   facet_wrap(~netapa)
