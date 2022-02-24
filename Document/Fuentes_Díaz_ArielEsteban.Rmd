@@ -1428,6 +1428,69 @@ Se observa que las variables relevantes para aplicar un modelo son tiempo de via
 
 ## 4.1 Asignación de Demanda en Zonificación Base
 
+Para aplicar el modelo de ML es necesario darle más variabilidad a los datos, por eso en vez de considerar el promedio día se obtienen los viajes para todos los días de la semana, que correponde del del 8 al 12 de abril de 2019. Estos datos fueron pasados igualmente por el proceso de limpieza e imputación anteriormente mencionados, adicionalmente se agrega la variable tarifa que diferenciará aquellos viajes que son realizados solo por bus, metro o combinación de ambos.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Viaje', fig.id='Dem_tviaje', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(log1p(tviaje), Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de viaje", x = "Tiempo de Viaje") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Espera', fig.id='Dem_tesp', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(tesp, Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Espera", x = "Tiempo de Espera") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Caminata', fig.id='Dem_tcam', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(tcam, Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Caminata", x = "Tiempo de Caminata") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Transbordo', fig.id='Dem_tb2', fig.topcaption=TRUE}
+
+ggplot(zoi_tripsDayCG, aes(tb2, Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Transbordo", x = "Tiempo de Transbordo") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Acceso', fig.id='Dem_tacc', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(log1p(time_acc), Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Acceso", x = "Tiempo de Acceso") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Egreso', fig.id='Dem_tegg', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(log1p(time_egg), Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Egreso", x = "Tiempo de Egreso") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
 Se aplica por tanto un modelo Random Forest con muestra de entrenamiento y muestra de validación, cuyos hiperparámetros son:
 
 ###########
