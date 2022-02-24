@@ -1,6 +1,7 @@
 library(sfnetworks)
 library(tidygraph)
 ctd <- st_centroid(zoi)
+ctd <- st_centroid(final_zon)
 zones_vial <- st_join(vial_zoi, zoi, .predicate = st_within) %>%
   na.omit() %>%
   # filter(Zona %in% c(375, 376)) %>%
