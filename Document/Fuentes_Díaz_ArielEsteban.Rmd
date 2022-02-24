@@ -1536,7 +1536,7 @@ Fuente: Elaboración Propia
 
 Nos indica que en su mayoría, las zonas contienen alrededor de 12 paradas y como nos interesa solo aquellas zonas en que se pueda hacer una clusterización, filtramos las que tengan más de 2 paradas, es decir, trabajaremos efectivamente con 465 zonas.
 
-Para encontrar el óptimo de cluster por zona, se usa el estadístico *gap*, en su implementación se considera como máximo número de clusters la cantidad de paradas por zona menos 1, el número de muestras Monte Carlo en 50 y el número de "comienzos" aleatorios está en 25.
+Para encontrar el óptimo de cluster por zona, se usa el estadístico *gap*, en su implementación se considera como máximo número de clusters la cantidad de paradas por zona menos 1, el número de muestras Monte Carlo en 50, el número de "comienzos" aleatorios está en 25 y el método utilizado fue el de máximo global.
 
 Como resultado las 866 zonas se transforman en 4,107, es decir, las 483 zonas del área de estudio se transforman en 3,724.
 
@@ -1563,6 +1563,13 @@ tm_shape(zoi) +
     tm_scale_bar(position = c("right", "bottom"))  
 ````
 Fuente: Elaboración Propia
+
+Análisis de Sensibilidad
+
+a) Umbral de mínimo de paradas por zona.
+
+Como primer análisis de sensibilidad es consideramos cuanto cambia la cantidad de zonas de la nueva zonificación si tomamos en cuenta solo aquellas que sobrepasen el primer quartil, es decir, se aplica el proceso para aquellas zonas que contengan mayor a 8 paradas.
+
 
 Capas de Análisis de Sensibilidad: Variables a incorporar, mcmc, método de clusterización y método de óptimo de número de clusters.
 
