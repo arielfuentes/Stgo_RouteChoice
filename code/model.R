@@ -1,9 +1,10 @@
 library(ggplot2)
+library(tidyr)
 library(dplyr)
 # library(GGally)
 zoi_tripsDay <- st_read("data/zoi_tripsDay.gpkg") 
 zoi_tripsDayCG <- zoi_tripsDay %>%
-  select(Demanda, paraderosubida_SIMT, paraderobajada_SIMT, netapa, rts, tviaje, tesp, tb2, tcam) %>%
+  select(Demanda, DIA, paraderosubida_SIMT, paraderobajada_SIMT, netapa, rts, tviaje, tesp, tb2, tcam) %>%
   st_drop_geometry() %>%
   left_join(st_drop_geometry(select(time_acc, time_acc, paraderosubida_SIMT))) %>%
   left_join(st_drop_geometry(select(time_egg, time_egg, paraderobajada_SIMT))) %>%
@@ -31,7 +32,7 @@ zoi_tripsDayCG <- bind_rows(
   select(-c("paraderosubida_SIMT", "paraderobajada_SIMT")) 
 
 set.seed(123)
-smp_idx <- sample(1:nrow(zoi_tripsDayCG), 30000)
+smp_idx <- sample(1:nrow(zoi_tripsDayCG), 300000)
 zoi_tripsDayCG2 <- zoi_tripsDayCG[smp_idx,]
 # zoi_tripsDayCG2 <- bind_rows(zoi_tripsCG3, 
 #                           zoi_tripsCG3, 
@@ -98,7 +99,7 @@ ggplot(zoi_tripsDayCG2, aes(Tarifa, Demanda)) +
 #### model
 library(tidymodels)
 set.seed(23)
-trips_split <- initial_split(zoi_tripsCG3, prop = .75, strata = Tarifa)
+trips_split <- initial_split(zoi_tripsDayCG2, prop = .75, strata = netapa)
 trips_train <- training(trips_split)
 trips_test <- testing(trips_split)
 
@@ -114,11 +115,27 @@ rf_fit <- rf_mod %>%
 rf_fit
 
 rf_testing_pred <- predict(rf_fit, trips_test) %>%
-  bind_cols(trips_test %>% select(Demanda))
+  bind_cols(trips_test %>% select(Demanda, netapa))
 
-ggplot(rf_testing_pred, aes(Demanda, .pred)) +
+ggplot(rf_testing_pred, aes(y = Demanda, x = .pred)) +
   geom_point() +
   geom_smooth(method = "lm", formula = y~x)
+
+ggplot(rf_testing_pred, aes(Demanda - .pred)) +
+  geom_density()
+
+rf_all_pred <- predict(rf_fit, zoi_tripsDayCG2) %>%
+  bind_cols(zoi_tripsDayCG2 %>% select(Demanda, netapa, Tarifa))
+
+ggplot(rf_all_pred, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  facet_wrap(~Tarifa) +
+  geom_smooth(method = "lm", formula = y~x)
+
+ggplot(rf_all_pred, aes(Demanda - .pred)) +
+  geom_density(fill = "lightblue") +
+  facet_wrap(~Tarifa)
+
 ############################################################################################
 library(tidymodels)
 set.seed(1234)
@@ -246,3 +263,105 @@ predict(final_model, new_data = zoi_tripsCG3) %>%
   write_delim("output/resul1.csv", ",")
 
 ranger_obj <- pull_workflow_fit(final_model)$fit
+
+#############################################################################################
+zoi_tripsDayCG_newzone <- zoi_tripsDay %>%
+  select(Demanda, DIA, paraderosubida_SIMT, paraderobajada_SIMT, netapa, rts, tviaje, tesp, tb2, tcam) %>%
+  st_drop_geometry() %>%
+  left_join(select(time_acc2, time_acc, paraderosubida_SIMT)) %>%
+  left_join(select(time_egg_newzone, time_egg, paraderobajada_SIMT)) %>%
+  group_split(netapa)
+
+zoi_tripsDayCG_newzone <- bind_rows(
+  zoi_tripsDayCG_newzone[[1]] %>%
+    mutate(e1 = rts, e2 = NA_character_, e3 = NA_character_, e4 = NA_character_),
+  zoi_tripsDayCG_newzone[[2]] %>%
+    separate(rts, into = c("e1", "e2"), remove = F) %>%
+    mutate(e3 = NA_character_, e4 = NA_character_),
+  zoi_tripsDayCG_newzone[[3]] %>%
+    separate(rts, into = c("e1", "e2", "e3"), remove = F) %>%
+    mutate(e4 = NA_character_),
+  zoi_tripsDayCG_newzone[[4]] %>%
+    separate(rts, into = c("e1", "e2", "e3", "e4"), remove = F)
+) %>%
+  mutate(e1 = as.numeric(e1), 
+         e2 = as.numeric(e2), 
+         e3 = as.numeric(e3), 
+         e4 = as.numeric(e4),
+         Tarifa = case_when(e1 >= 756 | e2 >= 756 | e3 >= 756 | e4 >= 756 ~ 800,
+                            T ~ 700)) %>%
+  select(-c("e1", "e2", "e3", "e4")) %>%
+  select(-c("paraderosubida_SIMT", "paraderobajada_SIMT")) 
+
+set.seed(123)
+smp_idx <- sample(1:nrow(zoi_tripsDayCG_newzone), 300000)
+zoi_tripsDayCG2_newzone <- zoi_tripsDayCG_newzone[smp_idx,]
+
+set.seed(23)
+trips_split <- initial_split(zoi_tripsDayCG2_newzone, prop = .75, strata = Tarifa)
+trips_train <- training(trips_split)
+trips_test <- testing(trips_split)
+
+rf_mod <- rand_forest(trees = 1000) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+set.seed(234)
+rf_fit <- rf_mod %>%
+  fit(Demanda ~ log1p(tviaje) + log1p(time_acc) + log1p(time_egg) + Tarifa + netapa, 
+      data = trips_train)
+
+rf_fit
+
+rf_testing_pred_newzone <- predict(rf_fit, trips_test) %>%
+  bind_cols(trips_test %>% select(Demanda, netapa, Tarifa))
+
+ggplot(rf_testing_pred_newzone, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  facet_wrap(~Tarifa) +
+  geom_smooth(method = "lm", formula = y~x)
+
+ggplot(rf_testing_pred_newzone, aes(Demanda - .pred), fill = Demanda - .pred, colour = "lightblue") +
+  geom_density() +
+  facet_wrap(~Tarifa)
+
+rf_all_pred_newzone <- predict(rf_fit, zoi_tripsDayCG2_newzone) %>%
+  bind_cols(zoi_tripsDayCG2_newzone %>% select(Demanda, netapa, Tarifa))
+
+ggplot(rf_all_pred_newzone, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  facet_wrap(~Tarifa) +
+  geom_smooth(method = "lm", formula = y~x)
+
+ggplot(rf_all_pred_newzone, aes(Demanda - .pred)) +
+  geom_density(fill = "lightblue") +
+  facet_wrap(~Tarifa)
+
+###########################################################################################
+set.seed(23)
+trips_split <- initial_split(zoi_tripsCG, prop = .75, strata = Tarifa)
+trips_train <- training(trips_split)
+trips_test <- testing(trips_split)
+
+rf_mod <- rand_forest(trees = 1000) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+set.seed(234)
+rf_fit <- rf_mod %>%
+  fit(Demanda ~ log1p(tviaje) + log1p(time_acc) + log1p(time_egg) + Tarifa + netapa, 
+      data = trips_train)
+
+rf_fit
+
+rf_testing_pred_mean <- predict(rf_fit, trips_test) %>%
+  bind_cols(trips_test %>% select(Demanda, netapa, Tarifa))
+
+ggplot(rf_testing_pred_mean, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  facet_wrap(~Tarifa) +
+  geom_smooth(method = "lm", formula = y~x)
+
+ggplot(rf_testing_pred_mean, aes(Demanda - .pred), fill = Demanda - .pred, colour = "lightblue") +
+  geom_density() +
+  facet_wrap(~Tarifa)

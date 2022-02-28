@@ -240,10 +240,11 @@ anti_zoi <- zones[!lengths(st_within(zones, zoi)), ]
 zones_noclus <- bind_rows(zoi_noclus, anti_zoi)
 
 tm_shape(zones_noclus) +
-  tm_polygons()
-
+  tm_polygons(col = "red") +
 tm_shape(zoi_clus) +
-  tm_polygons()
+  tm_polygons(col = "blue") +
+  tm_shape(st_vor) +
+  tm_polygons(col = "green")
 
 #Disimilarity matrices ----
 pts_zn <- bind_rows(pts_zn) %>%
@@ -260,6 +261,7 @@ names(D1) <- zn_clus
 tree <- lapply(D0, function(x)  hclustgeo(x))
 
 #number of clusters -----
+set.seed(123)
 gap_stat <- lapply(1:length(group_split(pts_zn, Zona)), 
                    function(x) clusGap(select(st_drop_geometry(group_split(pts_zn, Zona)[[x]]), 
                                               -c("paraderosubida", "Zona")), 
@@ -365,7 +367,7 @@ st_vor <-
                             -cent)
          ) %>%
   bind_rows()
-final_zon <- select(anti_zoi, -c("ID", "AREA", "Com", "Comuna")) %>%
+final_zon <- select(zones_noclus, -c("ID", "AREA", "Com", "Comuna")) %>%
   mutate(Zona = as.character(Zona),
          Zona2 = as.character(Zona)) %>%
   relocate(Zona2, .after = Zona) %>%

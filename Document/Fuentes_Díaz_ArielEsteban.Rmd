@@ -1259,11 +1259,11 @@ Es decir, con la consulta SQL se obtienen los siguientes atributos:
 - tiempo de caminata, y
 - tiempo de transbordo
 
-Estos datos son filtrados por el periodo Punta Mañana, según es definido por *DTPM* (6:30-8:30 hrs.), además de eliminar aquellos registros que no tengan información de la Parada de Inicio y/o la Parada de Fin de viaje, datos que representan el 0.01% del total de viajes, que es sin considerar aún la selección al interior del área de estudio, también se procede a eliminar aquellos datos incongruentes, es decir, los viajes en los cuales la parada de inicio es la misma que la parada de fin de viaje.
+Estos datos son filtrados por el periodo Punta Mañana, según es definido por *DTPM* (6:30-8:30 hrs.), además de eliminar aquellos registros que no tengan información de la Parada de Inicio y/o la Parada de Fin de viaje, datos que representan el 0.001% del total de viajes, que es sin considerar aún la selección al interior del área de estudio, también se procede a eliminar aquellos datos incongruentes, es decir, los viajes en los cuales la parada de inicio es la misma que la parada de fin de viaje.
 
 La definición de viajes en el sistema RED, es aquel en el cual se puede realizar hasta un máximo de 3 transbordos (4 etapas), por tanto, todos aquellos registros en los que figuran más de 4 etapas son truncados a cuatro.
 
-Se evidencia que hay registros con columnas sin información se procede a realizar una imputación de forma de no perder viajes, la hipótesis de esta consiste en que hay una consistencia en los patrones de viajes, las decisiones de los viajeros serán racionales y por ende serán las mismas. En la práctica se contabiliza la proporción de viajes para cada parada de inicio y parada de fin de viaje con todos sus atributos completos versus aquellos que no posean todos sus atributos, donde estos últimos tomarán los mismos atributos de los viajes completos, evitando más pérdida de información. 
+Se evidencia que hay registros con columnas sin información se procede a realizar una imputación de forma de no perder viajes, la hipótesis de esta consiste en que hay una consistencia en los patrones de viajes, las decisiones de los viajeros serán racionales y por ende serán las mismas. En la práctica se contabiliza la proporción de viajes para cada parada de inicio y parada de fin de viaje con todos sus atributos completos versus aquellos que no posean todos sus atributos, donde estos últimos tomarán los mismos atributos de los viajes completos, evitando más pérdida de información, la información que fue imputada corresponde al 3.3% de los viajes. 
 
 Como tanto, el nombre de recorridos como de paradas de bus es obtenido con una codificación especial, se procede a realizar diccionarios de nombre de rutas y paradas a partir de los planes operacionales que están disponibles en el sitio web del DTPM, los cuales son cruzados con esta data, junto con ello, se debieron arreglar nombres de estaciones de metro dado que provenía con errores de tipeo, que sin ello, se producía una pérdida importante de viajes, entendiendo que las estaciones de metro son lugares de alta concentración de demanda. Además, a través del diccionario de paradas, los datos pueden ser espacializados dado que en este están las coordendas con proyección UTM en huso 19S. 
 
@@ -1335,8 +1335,28 @@ var_pts <- pivot_longer(st_drop_geometry(st_filter(stops_trips,
 filter(var_pts, variables == "Demanda", valor < 250) %>%
     ggplot(aes(variables, valor, fill = "variables")) +
     geom_boxplot(width = .3, fill = "#FFC300") +
-    labs(title="Diagrama de Cajas de Demanda", x = "", y = "Validaciones") +
+    labs(title="Diagrama de Caja de Demanda", x = "", y = "Validaciones") +
     theme(plot.title = element_text(hjust = 0.5), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Demanda', fig.id='ViolinDem', fig.topcaption=TRUE}
+filter(var_pts, variables == "Demanda" & valor < 250) %>%
+    ggplot(aes(variables, valor, fill = "variables")) +
+    geom_violin(width = .3, fill = "lightblue") +
+    labs(title="Gráfico de Demanda", y = "Validaciones") +
+    theme(plot.title = element_text(hjust = 0.5), 
+          axis.text.x=element_blank(), 
+          axis.ticks.x=element_blank())
+````
+Fuente: Elaboración Propia
+
+````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Demanda', fig.id='DistrDem', fig.topcaption=TRUE}
+filter(var_pts, variables == "Demanda" & valor < 250) %>%
+    ggplot(aes(valor, fill = variables, colour = variables)) +
+    geom_density(alpha = .5, show.legend = F, color="black", fill="lightblue") +
+    labs(title="Distribución de Demanda", x = "", y = "Densidad") +
+    theme(plot.title = element_text(hjust = 0.5))
 ````
 Fuente: Elaboración Propia
 
@@ -1344,62 +1364,19 @@ Fuente: Elaboración Propia
 filter(var_pts, variables == "Densidad") %>%
     ggplot(aes(variables, valor, fill = "variables")) +
     geom_boxplot(width = .3, fill = "#FFC300") +
-    labs(title="Diagrama de Cajas de Densidad Poblacional", x = "", y = "Densidad Poblacional") +
+    labs(title="Diagrama de Caja de Densidad Poblacional", x = "", y = "Densidad Poblacional") +
     theme(plot.title = element_text(hjust = 0.5), axis.text.x=element_blank(), axis.ticks.x=element_blank())
 ````
 Fuente: Elaboración Propia
 
-````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Tiempos', fig.id='DCajaT', fig.topcaption=TRUE}
-
-filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
-  ggplot(aes(variables, valor, fill = "variables")) +
-  geom_boxplot(width = .3, fill = "#FFC300") +
-  xlab("") +
-  ylab("Tiempo") +
-  labs(title="Diagrama de Cajas de Tiempos", y = "Tiempo") +
-  theme(plot.title = element_text(hjust = 0.5))
-````
-Fuente: Elaboración Propia
-
-````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Demanda', fig.id='ViolinDem', fig.topcaption=TRUE}
-filter(var_pts, variables == "Demanda" & valor < 250) %>%
-    ggplot(aes(variables, valor, fill = "variables")) +
-    geom_violin(width = .3, fill = "lightblue") +
-    labs(title="Gráfico de Violín de Demanda", y = "Validaciones") +
-    theme(plot.title = element_text(hjust = 0.5), 
-          axis.text.x=element_blank(), 
-          axis.ticks.x=element_blank())
-````
-Fuente: Elaboración Propia
-
-````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Densidad Poblacional', fig.id='ViolinDens', fig.topcaption=TRUE}
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Densidad Poblacional', fig.id='ViolinDens', fig.topcaption=TRUE}
 filter(var_pts, variables == "Densidad") %>%
     ggplot(aes(variables, valor, fill = "variables")) +
     geom_violin(width = .3, fill = "lightblue") +
-    labs(title="Gráfico de Violín de Demanda", y = "Validaciones") +
+    labs(title="Gráfico de Densidad Poblacional", y = "Densidad") +
     theme(plot.title = element_text(hjust = 0.5), 
           axis.text.x=element_blank(), 
           axis.ticks.x=element_blank())
-````
-Fuente: Elaboración Propia
-
-````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Violín de Tiempos', fig.id='ViolinT', fig.topcaption=TRUE}
-filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
-  ggplot(aes(variables, valor, fill = "variables")) +
-  geom_violin(width = .3, fill = "lightblue") +
-  xlab("") +
-  ylab("Tiempo") +
-  labs(title="Gráfico de Violín de Tiempos", y = "Tiempo") +
-  theme(plot.title = element_text(hjust = 0.5))
-````
-Fuente: Elaboración Propia
-
-````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Demanda', fig.id='DistrDem', fig.topcaption=TRUE}
-filter(var_pts, variables == "Demanda") %>%
-    ggplot(aes(valor, fill = variables, colour = variables)) +
-    geom_density(alpha = .5, show.legend = F, color="black", fill="lightblue") +
-    labs(title="Distribución de Demanda", x = "", y = "Densidad") +
-    theme(plot.title = element_text(hjust = 0.5))
 ````
 Fuente: Elaboración Propia
 
@@ -1412,7 +1389,30 @@ filter(var_pts, variables == "Densidad") %>%
 ````
 Fuente: Elaboración Propia
 
-````{r, , echo = F, message = F, warning = F, fig.cap='Distribución de Tiempos', fig.id='Distr', fig.topcaption=TRUE}
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Tiempos', fig.id='DCajaT', fig.topcaption=TRUE}
+
+filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
+  ggplot(aes(variables, valor, fill = "variables")) +
+  geom_boxplot(width = .3, fill = "#FFC300") +
+  xlab("") +
+  ylab("Tiempo") +
+  labs(title="Diagrama de Caja de Tiempos", y = "Tiempo") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Tiempos', fig.id='ViolinT', fig.topcaption=TRUE}
+filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
+  ggplot(aes(variables, valor, fill = "variables")) +
+  geom_violin(width = .3, fill = "lightblue") +
+  xlab("") +
+  ylab("Tiempo") +
+  labs(title="Gráfico de Tiempos", y = "Tiempo") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución de Tiempos', fig.id='Distr', fig.topcaption=TRUE}
 filter(var_pts, !variables %in% c("Demanda", "Densidad")) %>%
     ggplot(aes(valor, fill = variables, colour = variables)) +
     geom_density(alpha = .5) +
@@ -1428,7 +1428,80 @@ Se observa que las variables relevantes para aplicar un modelo son tiempo de via
 
 ## 4.1 Asignación de Demanda en Zonificación Base
 
-Para aplicar el modelo de ML es necesario darle más variabilidad a los datos, por eso en vez de considerar el promedio día se obtienen los viajes para todos los días de la semana, que correponde del del 8 al 12 de abril de 2019. Estos datos fueron pasados igualmente por el proceso de limpieza e imputación anteriormente mencionados, adicionalmente se agrega la variable tarifa que diferenciará aquellos viajes que son realizados solo por bus, metro o combinación de ambos.
+Para aplicar el modelo de ML es necesario darle más variabilidad a los datos, por eso en vez de considerar el promedio día se obtienen los viajes para todos los días de la semana, que correponde del del 8 al 12 de abril de 2019. Estos datos fueron pasados igualmente por el proceso de limpieza e imputación anteriormente mencionados, adicionalmente se agrega la variable tarifa que diferenciará aquellos viajes que son realizados solo por bus, metro o combinación de ambos, con esto, los viajes en el área de estudio pasaron de 347,023 registros a 552,982.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Demanda', fig.id='DCajaDemAsig', fig.topcaption=TRUE}
+var_trips <- pivot_longer(zoi_tripsDayCG, 
+             !c("rts", "netapa", "DIA", "Tarifa"), 
+             names_to = "variables", 
+             values_to = "valor") %>% 
+    mutate(variables = factor(variables))
+
+filter(var_trips, variables == "Demanda", valor < 2) %>%
+    ggplot(aes(variables, valor, fill = "variables")) +
+    geom_boxplot(width = .3, fill = "#FFC300") +
+  facet_wrap(~Tarifa) +
+    labs(title="Diagrama de Caja de Demanda", x = "", y = "Validaciones") +
+    theme(plot.title = element_text(hjust = 0.5), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Demanda', fig.id='ViolinDemAsig', fig.topcaption=TRUE}
+filter(var_trips, variables == "Demanda" & valor < 2) %>%
+    ggplot(aes(variables, valor, fill = "variables")) +
+    geom_violin(width = .3, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    labs(title="Gráfico de Demanda", y = "Validaciones") +
+    theme(plot.title = element_text(hjust = 0.5), 
+          axis.text.x=element_blank(), 
+          axis.ticks.x=element_blank())
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución de Demanda', fig.id='DistrDem', fig.topcaption=TRUE}
+filter(var_trips, variables == "Demanda" & valor < 2) %>%
+    ggplot(aes(valor, fill = variables, colour = variables)) +
+    geom_density(alpha = .5, show.legend = F, color="black", fill="lightblue") +
+  facet_wrap(~Tarifa) +
+    labs(title="Distribución de Demanda", x = "", y = "Densidad") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Tiempos', fig.id='DCajaTAsig', fig.topcaption=TRUE}
+
+filter(var_trips, !variables %in% c("Demanda", "Tarifa") & valor < 60) %>%
+  ggplot(aes(variables, valor, fill = "variables")) +
+  geom_boxplot(width = .3, fill = "#FFC300") +
+  facet_wrap(~Tarifa) +
+  xlab("") +
+  ylab("Tiempo") +
+  labs(title="Diagrama de Caja de Tiempos", y = "Tiempo") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Tiempos', fig.id='ViolinTAsig', fig.topcaption=TRUE}
+filter(var_trips, !variables %in% c("Demanda", "Tarifa") & valor < 60) %>%
+    ggplot(aes(variables, valor, fill = "variables")) +
+    geom_violin(width = .3, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    labs(title="Gráfico de Tiempos", y = "Validaciones") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución de Tiempos', fig.id='Distr', fig.topcaption=TRUE}
+filter(var_trips, !variables %in% c("Demanda", "Tarifa") & valor < 20) %>%
+    ggplot(aes(valor, fill = variables, colour = variables)) +
+    geom_density(alpha = .5) +
+  facet_wrap(~Tarifa) +
+    xlab("Tiempo") +
+    ylab("Densidad") +
+    labs(title="Distribución de Tiempos") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
 
 ````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Viaje', fig.id='Dem_tviaje', fig.topcaption=TRUE}
 ggplot(zoi_tripsDayCG, aes(log1p(tviaje), Demanda, color = factor(Tarifa))) +
@@ -1491,25 +1564,73 @@ ggplot(zoi_tripsDayCG, aes(log1p(time_egg), Demanda, color = factor(Tarifa))) +
 ````
 Fuente: Elaboración Propia
 
-Se aplica por tanto un modelo Random Forest con muestra de entrenamiento y muestra de validación, cuyos hiperparámetros son:
+Dado la distribución de las variables y su relación con la Demanda, se realiza un modelo Random Forest bajo la siguiente definición:
 
-###########
+$Demanda = log(1+t_{viaje}) + log(1+t_{acc}) + log(1+t_{egg}) + Tarifa + netapa + \epsilon$
 
-Los estadísticos son los siguientes:
+Se consideran los datos de entrenamiento como el 75% del total de la muestra, que son estratificados por el número de etapas de viaje.
 
-#############
+Los hiperparámetros son:
 
-Por tanto, presenta un buen nivel de ajuste con una distribución normal del error.
+- Número de árboles: 1000
+- Mtry: 2
 
-````{r}
+Los estadísticos resultantes son:
+
+$R^2 (OOB) = 0.51$
+OOB prediction error (MSE): 82.2
+
+También se aprecia una relación lineal entre la Demanda y la predicción.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda vs Predicción', fig.id='PredAsig', fig.topcaption=TRUE}
+ggplot(rf_testing_pred, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y~x) +
+  facet_wrap(~Tarifa) +
+  labs(title="Predicción de Demanda", x = "Predicción") +
+  theme(plot.title = element_text(hjust = 0.5))
 ````
+Fuente: Elaboración Propia
 
+Y el error presenta una distribución normal centrada en 0.
 
-## 4.2 Análisis Estadístico de las Entradas del Modelo
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución del Error', fig.id='DistrErr', fig.topcaption=TRUE}
+ggplot(rf_testing_pred, aes(Demanda - .pred)) +
+    geom_density(alpha = .5, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    xlab("Demanada - Predicción") +
+    ylab("Densidad") +
+    labs(title="Distribución del Error") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
 
-Disponemos como datos para realizar la nueva zonificación las paradas 
+Para todos los datos, el resultado es el que se muestra a continuación:
 
-## 4.3 Resultados y Análisis de Sensibilidad
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda vs Predicción', fig.id='PredAsigAll', fig.topcaption=TRUE}
+ggplot(rf_all_pred, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y~x) +
+  facet_wrap(~Tarifa) +
+  labs(title="Predicción de Demanda", x = "Predicción") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+Y el error presenta una distribución normal centrada en 0.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución del Error', fig.id='DistrErrAll', fig.topcaption=TRUE}
+ggplot(rf_all_pred, aes(Demanda - .pred)) +
+    geom_density(alpha = .5, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    xlab("Demanada - Predicción") +
+    ylab("Densidad") +
+    labs(title="Distribución del Error") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+## 4.2 Resultados y Análisis de Sensibilidad
 
 La cantidad de paradas por zona se distribuyen de la siguiente manera.
 
@@ -1538,7 +1659,7 @@ Nos indica que en su mayoría, las zonas contienen alrededor de 12 paradas y com
 
 Para encontrar el óptimo de cluster por zona, se usa el estadístico *gap*, en su implementación se considera como máximo número de clusters la cantidad de paradas por zona menos 1, el número de muestras Monte Carlo en 50, el número de "comienzos" aleatorios está en 25 y el método utilizado fue el de máximo global.
 
-Como resultado las 866 zonas se transforman en 4,107, es decir, las 483 zonas del área de estudio se transforman en 3,724.
+Como resultado las 866 zonas se transforman en 4,144, es decir, las 483 zonas del área de estudio se transforman en 3,624.
 
 `````{r, echo = F, message = F, warning = F, fig.cap='Nueva Zonificación', fig.id='NewZ', fig.topcaption=TRUE}
 DemZon1 <- st_join(final_zon, 
@@ -1566,29 +1687,253 @@ Fuente: Elaboración Propia
 
 Análisis de Sensibilidad
 
-a) Umbral de mínimo de paradas por zona.
+a) Generador de número aleatorio
 
-Como primer análisis de sensibilidad es consideramos cuanto cambia la cantidad de zonas de la nueva zonificación si tomamos en cuenta solo aquellas que sobrepasen el primer quartil, es decir, se aplica el proceso para aquellas zonas que contengan mayor a 8 paradas.
+Dado que la obtención del número de cluster está fundamentado en un muestreo, es necesario fijar una "semilla" que contengan los mismos números aleaotorios cada vez que se repita el proceso, de ese modo se asegura los mismos resultados. Para la obtención de la zonificación, se configuró en la semilla "123". Si cambiamos el número de semilla, como resultado entregará distinto número de zonas. Para la semilla "4568" genera 4118 zonas, es decir 26 zonas menos.
 
+`````{r, echo = F, message = F, warning = F, fig.cap='sensibilidad Semilla', fig.id='new_seed', fig.topcaption=TRUE}
+DemZon1 <- st_read("../output/zoning_seed.gpkg", quiet = T) %>%
+  st_join(select(stops_trips, Demanda), 
+                  .predicate = st_within) %>% 
+  group_by(Zona, Zona2) %>% 
+  summarise(Demanda = sum(Demanda))
 
-Capas de Análisis de Sensibilidad: Variables a incorporar, mcmc, método de clusterización y método de óptimo de número de clusters.
+tm_shape(zoi) + 
+  tm_polygons() + 
+  tm_shape(DemZon1) +
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons(col = "Demanda", style = "quantile", palette = "viridis", border.alpha = .1) + 
+    tm_shape(zones) + 
+    tm_polygons(col = "gray", alpha = .3) +
+    tm_layout(bg.color = "lightblue", 
+              main.title = "Generación de Demanda", 
+              main.title.position = "center", 
+              main.title.size = 1.1, 
+              legend.outside = TRUE) +
+    tm_compass(position = c("left", "top"), type = "8star", size = 3) +
+    tm_scale_bar(position = c("right", "bottom"))  
+````
 
-## 4.4 Análisis de Resultados
+b) Número de comienzos aleatorios
 
+La experiencia de otras aplicaciones señala que la estabilidad de alguna simulación es a partir de 20, como se mencionó inicialmente, el número utilizado para este parámetro fue de 25, el que se cambió a 5 para visualizar algún efecto, sin embargo, no produjo ningún cambio en el número de zonas resultantes.
+
+c) Umbral de mínimo de paradas por zona.
+
+Como primer análisis de sensibilidad es consideramos cuanto cambia la cantidad de zonas de la nueva zonificación si tomamos en cuenta solo aquellas que sobrepasen el primer quartil, es decir, se aplica el proceso para aquellas zonas que contengan mayor a 8 paradas. Como resultado se obtienen 3,914 zonas.
+
+`````{r, echo = F, message = F, warning = F, fig.cap='Umbral de Paradas', fig.id='threshold', fig.topcaption=TRUE}
+DemZon1 <- st_read("../output/zoning_threshold.gpkg", quiet = T) %>%
+  st_join(select(stops_trips, Demanda), 
+                  .predicate = st_within) %>% 
+  group_by(Zona, Zona2) %>% 
+  summarise(Demanda = sum(Demanda))
+
+tm_shape(zoi) + 
+  tm_polygons() + 
+  tm_shape(DemZon1) +
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons(col = "Demanda", style = "quantile", palette = "viridis", border.alpha = .1) + 
+    tm_shape(zones) + 
+    tm_polygons(col = "gray", alpha = .3) +
+    tm_layout(bg.color = "lightblue", 
+              main.title = "Generación de Demanda", 
+              main.title.position = "center", 
+              main.title.size = 1.1, 
+              legend.outside = TRUE) +
+    tm_compass(position = c("left", "top"), type = "8star", size = 3) +
+    tm_scale_bar(position = c("right", "bottom"))  
+````
+
+d) Cambiar el máximo número de cluster
+
+Estamos considerando como máximo número de cluster la cantidad total de paradas menos uno, ahora cambiando ese parámetro por que el máximo sea el 80%, es decir, que si tenemos 100 paradas, como máximo habrán 80 clusters. Esto entrega como resultado 3,641 zonas.
+
+`````{r, echo = F, message = F, warning = F, fig.cap='Máximo de Cluster', fig.id='clus_max', fig.topcaption=TRUE}
+DemZon1 <- st_read("../output/zoning_max.gpkg", quiet = T) %>%
+  st_join(select(stops_trips, Demanda), 
+                  .predicate = st_within) %>% 
+  group_by(Zona, Zona2) %>% 
+  summarise(Demanda = sum(Demanda))
+
+tm_shape(zoi) + 
+  tm_polygons() + 
+  tm_shape(DemZon1) +
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons(col = "Demanda", style = "quantile", palette = "viridis", border.alpha = .1) + 
+    tm_shape(zones) + 
+    tm_polygons(col = "gray", alpha = .3) +
+    tm_layout(bg.color = "lightblue", 
+              main.title = "Generación de Demanda", 
+              main.title.position = "center", 
+              main.title.size = 1.1, 
+              legend.outside = TRUE) +
+    tm_compass(position = c("left", "top"), type = "8star", size = 3) +
+    tm_scale_bar(position = c("right", "bottom"))  
+````
+
+e) Cambiar la cantidad de muestras de MonteCarlo
+
+Se consideraron como parámetro unas 50 muestras de montecarlo, para ver la estabilidad se cambió a 5 muestras. Este tiene tiene un mayor efecto en el número de zonas, generándose 4,221. 
+`````{r, echo = F, message = F, warning = F, fig.cap='Cantidad de Muestras', fig.id='clus_max', fig.topcaption=TRUE}
+DemZon1 <- st_read("../output/zoning_mc.gpkg", quiet = T) %>%
+  st_join(select(stops_trips, Demanda), 
+                  .predicate = st_within) %>% 
+  group_by(Zona, Zona2) %>% 
+  summarise(Demanda = sum(Demanda))
+
+tm_shape(zoi) + 
+  tm_polygons() + 
+  tm_shape(DemZon1) +
+    tm_grid(col = "white", lwd = 2, labels.size = .5, n.x = 4) +
+    tm_polygons(col = "Demanda", style = "quantile", palette = "viridis", border.alpha = .1) + 
+    tm_shape(zones) + 
+    tm_polygons(col = "gray", alpha = .3) +
+    tm_layout(bg.color = "lightblue", 
+              main.title = "Generación de Demanda", 
+              main.title.position = "center", 
+              main.title.size = 1.1, 
+              legend.outside = TRUE) +
+    tm_compass(position = c("left", "top"), type = "8star", size = 3) +
+    tm_scale_bar(position = c("right", "bottom"))  
+````
+
+## 4.3 Asignación de Demanda en Nueva Zonificación
+
+Para evaluar el efecto en la Asignación de Demanda mediante modelo Random Forest, el efecto estará principalmente en los nuevos tiempos de acceso y egreso. Con el nuevo esquema de zonificación se procedió a calcular los nuevos caminos más cortos para los inicios y fin de viaje, obteniéndose el comportamiento que se detalla a continuación.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Diagrama de Caja de Tiempos', fig.id='New_times', fig.topcaption=TRUE}
+var_trips <- pivot_longer(zoi_tripsDayCG_newzone, 
+             !c("rts", "netapa", "DIA", "Tarifa"), 
+             names_to = "variables", 
+             values_to = "valor") %>% 
+    mutate(variables = factor(variables))
+
+filter(var_trips, variables %in% c("time_acc", "time_egg") & valor < 60) %>%
+    ggplot(aes(variables, valor, fill = "variables")) +
+    geom_boxplot(width = .3, fill = "#FFC300") +
+  facet_wrap(~Tarifa) +
+    labs(title="Diagrama de Caja de Tiempos", x = "", y = "Validaciones") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Gráfico de Tiempos', fig.id='ViolinT2', fig.topcaption=TRUE}
+filter(var_trips, variables %in% c("time_acc", "time_egg") & valor < 60) %>%
+    ggplot(aes(variables, valor, fill = "variables")) +
+    geom_violin(width = .3, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    labs(title="Gráfico de Tiempos", y = "Validaciones") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución de Tiempos', fig.id='DistrT2', fig.topcaption=TRUE}
+filter(var_trips, variables %in% c("time_acc", "time_egg") & valor < 60) %>%
+    ggplot(aes(valor, fill = variables, colour = variables)) +
+    geom_density(alpha = .5) +
+  facet_wrap(~Tarifa) +
+    xlab("Tiempo") +
+    ylab("Densidad") +
+    labs(title="Distribución de Tiempos") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Acceso', fig.id='Dem_tacc2', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(log1p(time_acc), Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Acceso", x = "Tiempo de Acceso") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda por Tiempo de Egreso', fig.id='Dem_tegg2', fig.topcaption=TRUE}
+ggplot(zoi_tripsDayCG, aes(log1p(time_egg), Demanda, color = factor(Tarifa))) +
+  geom_point() +
+  facet_wrap(~netapa) +
+  scale_color_brewer(palette="Dark2", name = "Tarifa") +
+  labs(title="Demanda por Tiempo de Egreso", x = "Tiempo de Egreso") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+Para comparar los resultados apropiadamente se replica la misma estrategia de modelación, que consiste en que los datos de entrenamiento corresponden al 75% de la muestra, que son estratificados por el número de etapas de viaje, con los siguientes hiperparámetros:
+
+- Número de árboles: 1000
+- Mtry: 2
+
+Los estadísticos resultantes son:
+
+$R^2 (OOB) = 0.41$
+OOB prediction error (MSE): 100.4
+
+Para la muestra de validación, hay una relación lineal entre la Demanda y la predicción.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda vs Predicción', fig.id='PredAsig2', fig.topcaption=TRUE}
+ggplot(rf_testing_pred, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y~x) +
+  facet_wrap(~Tarifa) +
+  labs(title="Predicción de Demanda", x = "Predicción") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+Y el error presenta una distribución normal centrada en 0.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución del Error', fig.id='DistrErr', fig.topcaption=TRUE}
+ggplot(rf_testing_pred, aes(Demanda - .pred)) +
+    geom_density(alpha = .5, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    xlab("Demanada - Predicción") +
+    ylab("Densidad") +
+    labs(title="Distribución del Error") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+Para todos los datos, el resultado no es muy distinto:
+
+````{r, echo = F, message = F, warning = F, fig.cap='Demanda vs Predicción', fig.id='PredAsig2', fig.topcaption=TRUE}
+ggplot(rf_all_pred, aes(y = Demanda, x = .pred)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y~x) +
+  facet_wrap(~Tarifa) +
+  labs(title="Predicción de Demanda", x = "Predicción") +
+  theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
+
+Y el error presenta una distribución normal centrada en 0.
+
+````{r, echo = F, message = F, warning = F, fig.cap='Distribución del Error', fig.id='DistrErr', fig.topcaption=TRUE}
+ggplot(rf_all_pred, aes(Demanda - .pred)) +
+    geom_density(alpha = .5, fill = "lightblue") +
+  facet_wrap(~Tarifa) +
+    xlab("Demanada - Predicción") +
+    ylab("Densidad") +
+    labs(title="Distribución del Error") +
+    theme(plot.title = element_text(hjust = 0.5))
+````
+Fuente: Elaboración Propia
 \newpage
 
 # CAPÍTULO 5: CONCLUSIONES Y RECOMENDACIONES
+
+## 5.1 Conclusiones
+
+Respecto a la Hipótesis y los Objetivos:
+
+Respecto a la hipótesis podemos separar en dos, señalando que si es posible desagregar la demanda zonal utilizando metodología que implique bajo nivel de costo y precisión en la estimación de demanda a servicios, considerando la localización de paradas como indicador espacial de la concentración de demanda, sin embargo, no mejora los resultados de la asignación de rutas si su metodología de estimación es a través de un modelo de Machine Learning, en particular, Random Forest, la diferencia en la variabilidad por modificar la zonificación no genera una diferencia significativa a pesar que son muchas más zonas, se evidencia que permance una proporcionalidad que no cambia su variabilidad. Que no es el caso de otras experiencias en zonificación, por ejemplo en la metodología de @Ghadiri2019 la evaluación se hizo mediante regresiones lineales zonales según propósitos de viaje que entregó resultados relativamente mejores, otras alternativas son como las que presenta @Binetti donde la comparación es mediante la aplicación de modelos clásicos de asignación de transporte. 
 
 ## 5.2 Recomendaciones
 
 Se puede obtener variación de la zonificación mediante el uso de otro tipo de distancia en el cálculo de polígonos de Voronoi, por ejemplo, usando distancias Manhattan en vez de Euclideanas.
 
 Otro método de cluterización , que no sea Ward (aumento de la varianza en la unión de clusters).
-
-Considerar clusterización como 
-\newpage
-
-# GLOSARIO
 
 \newpage
 
